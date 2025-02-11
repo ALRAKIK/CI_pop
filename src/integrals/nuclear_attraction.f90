@@ -7,6 +7,8 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
       integer                      :: i , j , k , l 
       integer                      :: func_index(1:number_of_atoms)
       integer                      :: number_of_atoms
+      integer                      :: idx_s  , idx_p 
+      integer                      :: idx_p1 , idx_p2
       type(atom)                   :: atoms(number_of_atoms)
       type(atom)                   :: atom1 , atom2 
 
@@ -18,7 +20,7 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
       double precision,parameter   :: pi = dacos(-1.d0)
 
 
-      double precision             :: SS 
+      double precision             :: SS , SP(3) , PS(3) , PP(3,3)
       integer                      :: total_functions
 
 
@@ -56,16 +58,63 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
             end do 
           end do 
 
+          do k = 1 , atom1%num_s_function
+            do l = 1 , atom2%num_p_function
+              call nuclear_attraction_integral_sp(number_of_atoms,geometry,r1,r2,atom1,atom2,atoms,k,l,SP)
+              idx_s = func_index(i) + k - 1 
+              idx_p = func_index(j) + atom2%num_s_function - 1 + (l-1) * 3 
+              NA(  idx_s, idx_p+1) = SP(1)                             !  SPx
+              NA(idx_p+1,   idx_s) = SP(1)
+              NA(  idx_s, idx_p+2) = SP(2)                             !  SPy
+              NA(idx_p+2,   idx_s) = SP(2)  
+              NA(  idx_s, idx_p+3) = SP(3)                             !  SPz
+              NA(idx_p+3,   idx_s) = SP(3)  
+            end do 
+          end do 
 
+          do k = 1 , atom1%num_p_function
+            do l = 1 , atom2%num_s_function
+              call nuclear_attraction_integral_ps(number_of_atoms,geometry,r1,r2,atom1,atom2,atoms,k,l,PS)
+              idx_p = func_index(i) + atom1%num_s_function - 1 + (k-1) * 3  
+              idx_s = func_index(j) + l - 1                                 
+              NA(idx_p+1,   idx_s) = PS(1)                               ! PxS
+              NA(  idx_s, idx_p+1) = PS(1)                               
+              NA(idx_p+2,   idx_s) = PS(2)                               ! PyS
+              NA(  idx_s, idx_p+2) = PS(2)                               
+              NA(idx_p+3,   idx_s) = PS(3)                               ! PzS
+              NA(  idx_s, idx_p+3) = PS(3)                               
+            end do 
+          end do
 
+          do k = 1 , atom1%num_p_function
+            do l = 1 , atom2%num_p_function
+              call nuclear_attraction_integral_pp(number_of_atoms,geometry,r1,r2,atom1,atom2,atoms,k,l,PP)
+              idx_p1 = func_index(i) + atom1%num_s_function - 1 + (k-1) * 3  ! p-function index in atom1
+              idx_p2 = func_index(j) + atom2%num_s_function - 1 + (l-1) * 3  ! p-function index in atom2
+              
+              NA(idx_p1+1, idx_p2+1) = PP(1,1)                            ! PxPx
+              NA(idx_p2+1, idx_p1+1) = PP(1,1)                            ! PxPx
+              NA(idx_p1+1, idx_p2+2) = PP(1,2)                            ! PxPy
+              NA(idx_p2+2, idx_p1+1) = PP(1,2)                            ! PxPy
+              NA(idx_p1+1, idx_p2+3) = PP(1,3)                            ! PxPz
+              NA(idx_p2+3, idx_p1+1) = PP(1,3)                            ! PxPz
 
+              NA(idx_p1+2, idx_p2+1) = PP(2,1)                            ! PyPx
+              NA(idx_p2+1, idx_p1+2) = PP(2,1)                            ! PyPx
+              NA(idx_p1+2, idx_p2+2) = PP(2,2)                            ! PyPy
+              NA(idx_p2+2, idx_p1+2) = PP(2,2)                            ! PyPy
+              NA(idx_p1+2, idx_p2+3) = PP(2,3)                            ! PyPz
+              NA(idx_p2+3, idx_p1+2) = PP(2,3)                            ! PyPz
 
+              NA(idx_p1+3, idx_p2+1) = PP(3,1)                            ! PzPx
+              NA(idx_p2+1, idx_p1+3) = PP(3,1)                            ! PzPx
+              NA(idx_p1+3, idx_p2+2) = PP(3,2)                            ! PzPy
+              NA(idx_p2+2, idx_p1+3) = PP(3,2)                            ! PzPy
+              NA(idx_p1+3, idx_p2+3) = PP(3,3)                            ! PzPz
+              NA(idx_p2+3, idx_p1+3) = PP(3,3)                            ! PzPz
 
-
-
-
-
-          
+            end do 
+          end do
 
         end do 
       end do 
