@@ -46,6 +46,8 @@ program CI
 
       call nuclear_attraction_matrix(n_atoms,geometry,atoms)
 
+      call ERI_integral(n_atoms,geometry,atoms)
+
 
 
 
