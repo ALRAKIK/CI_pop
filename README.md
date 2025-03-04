@@ -1,2 +1,2 @@
 # CI_pop
- calculate the integrals matrix
+ Program to calculate the energy of a molecule and solid state (later)
