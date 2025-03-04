@@ -100,12 +100,10 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       !   Compute the Hartree potential J
           call hartree_potential(nBas,P,ERI,J)
-!          J(:,:) = 0.d0 
       ! ****************** !
   
       !   Compute the exchange potential K
           call exchange_potential(nBas,P,ERI,K)
-!          K(:,:) = 0.d0
       ! ****************** !
 
       !   Build Fock operator

@@ -1,22 +1,7 @@
-module classification_ERI
-      
-      implicit none
-
-      type :: ERI_function
-
-        double precision               :: x , y , z 
-        double precision , allocatable :: coefficient(:)
-        double precision , allocatable :: exponent(:)
-        character(LEN=2)               :: orbital 
-
-      end type ERI_function
-
-
-      contains
-
       subroutine classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
     
       use atom_basis
+      use classification_ERI
 
       implicit none 
 
@@ -83,6 +68,3 @@ module classification_ERI
 
 
       end subroutine
-
-
-end module 

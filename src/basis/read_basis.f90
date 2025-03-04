@@ -1,25 +1,6 @@
-module atom_basis
-      
-      implicit none
-
-      type :: atom
-        integer                         :: charge 
-        integer                         :: num_s_function
-        integer                         :: num_p_function
-        integer                         :: num_exponent_s
-        integer                         :: num_exponent_p 
-        double precision  , allocatable :: exponent_s(:)
-        double precision  , allocatable :: exponent_p(:)
-        double precision  , allocatable :: coefficient_s(:,:)
-        double precision  , allocatable :: coefficient_p(:,:)
-      end type atom
-
-
-      contains
-
-
-      subroutine read_basis(atom_type)
+subroutine read_basis_class(atom_type)
         
+      use atom_basis
       implicit none
 
       integer             :: i , j 
@@ -58,16 +39,9 @@ module atom_basis
               if (adjustl(lines(1:1))=="A" .or. adjustl(lines(1:1))=="a") exit
             end do 
           end if 
-          
-
-
-
 
         end do 
 
 3      close(1)
 
-      end subroutine
-
-
-end module 
+end subroutine read_basis_class

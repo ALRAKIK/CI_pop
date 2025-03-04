@@ -4,7 +4,7 @@ program CI
 
       implicit none 
 
-      integer                      :: i , j , k , l , n = 0
+      integer                      :: i , j 
       integer                      :: n_atoms , nBAS
       integer                      :: nO      , n_electron 
 
@@ -104,18 +104,6 @@ program CI
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
 
-!      open (3,file="tttt")
-!      do i = 1 , nBas 
-!        do j = 1 , nBas 
-!          do k = 1 , nBAS
-!            do l = 1 , nBAS
-!              write(3,'(I5,I5,I5,I5,F16.8)') i,j,k,l, ERI(i,j,k,l)
-!            end do 
-!          end do 
-!        end do 
-!      end do 
-!      close(3)
-
       !------------------------------------------------------!
       !                                  (-1/2)         t    !
       !  orthogonalization and get  X = S       =  U s U     !
@@ -147,9 +135,4 @@ program CI
       ! ---------------------------------------------------------------- !
       ! ---------------------------------------------------------------- !
 
-
-
-
-
-
-end program 
+end program CI 

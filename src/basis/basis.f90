@@ -16,7 +16,7 @@ subroutine basis(number_of_atoms,charge,atoms)
 
       do i = 1, number_of_atoms
         atoms(i)%charge = charge(i)
-        call read_basis(atoms(i))
+        call read_basis_class(atoms(i))
       end do
 
-end subroutine
+end subroutine basis 
