@@ -834,3 +834,44 @@ function Boys_func(n, x) result(res)
     end if
     
 end function
+
+
+subroutine header(HEAD,IN)
+
+      implicit none 
+
+      CHARACTER :: HEAD*(*)
+      integer   :: in , indent , length , I 
+  
+      LENGTH = LEN(HEAD)
+      IF (IN .GE. 0) THEN
+        INDENT = IN + 1
+      ELSE
+        INDENT = (72 - LENGTH)/2 + 1
+      END IF
+      
+      WRITE (*, '(//,80A)') (' ',I=1,INDENT), HEAD
+      WRITE (*, '(80A)') (' ',I=1,INDENT), ('=',I=1,LENGTH)
+      WRITE (*, '()')
+  
+end subroutine Header
+
+subroutine header_under(HEAD,IN)
+
+      implicit none 
+
+      CHARACTER :: HEAD*(*)
+      integer   :: in , indent , length , I 
+  
+      LENGTH = LEN(HEAD)
+      IF (IN .GE. 0) THEN
+        INDENT = IN + 1
+      ELSE
+        INDENT = (72 - LENGTH)/2 + 1
+      END IF
+      
+      WRITE (*, '(//,80A)') (' ',I=1,INDENT), HEAD
+      WRITE (*, '(80A)') (' ',I=1,INDENT), ('-',I=1,LENGTH)
+      WRITE (*, '()')
+    
+  end subroutine Header_under

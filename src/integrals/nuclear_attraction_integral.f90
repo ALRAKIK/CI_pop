@@ -12,7 +12,7 @@ subroutine nuclear_attraction_integral_ss(n_atoms,geometry,r1,r2,atom1,atom2,ato
 
   integer                      :: i , j  , k 
   integer                      :: charge_atom
-  double precision,parameter   :: pi = dacos(-1.d0)
+  double precision,parameter   :: pi = 3.14159265358979323846D00
   double precision             :: alpha , beta
   double precision             :: c1    , c2 
   double precision             :: p,mu

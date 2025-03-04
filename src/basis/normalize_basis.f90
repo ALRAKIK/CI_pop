@@ -82,7 +82,7 @@ subroutine norm_orb(n_gaussian,n_contraction,exponent,contraction,n_type,contrac
 
       double precision :: PIPPI , sum , T
 
-      double precision , parameter :: pi = Acos(-1.d0)
+      double precision , parameter :: pi = 3.14159265358979323846D00
 
       ! code !
 

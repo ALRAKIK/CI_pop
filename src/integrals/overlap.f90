@@ -121,11 +121,24 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
         end do 
       end do 
 
-      open(1,file="overlap_matrix")
-      do i = 1 , size(overlap,1)
-        write(1,'(1000f16.12)')  (overlap(i,j),j=1,size(overlap,1))
-      end do 
+      call system('rm -r tmp')
+      call system('mkdir tmp')
+
+      open(1,file="./tmp/OV.dat")
+        do i = 1 , size(overlap,1)
+          do j = i , size(overlap,1)
+            write(1,'(I5,I5,f16.8)') i , j , overlap(i,j)
+          end do 
+        end do 
       close(1)
+
+
+
+!      open(1,file="./tmp/OV")
+!      do i = 1 , size(overlap,1)
+!        write(1,'(1000f16.12)')  (overlap(i,j),j=1,size(overlap,1))
+!      end do 
+!      close(1)
 
 
 end subroutine

@@ -4,9 +4,8 @@ module classification_ERI
 
       type :: ERI_function
 
-        integer                        :: n_contract 
         double precision               :: x , y , z 
-        double precision , allocatable :: coefficient(:,:)
+        double precision , allocatable :: coefficient(:)
         double precision , allocatable :: exponent(:)
         character(LEN=2)               :: orbital 
 
@@ -21,70 +20,67 @@ module classification_ERI
 
       implicit none 
 
-      integer             :: i , j , k 
-      integer             :: index 
-      integer             :: index_s , index_p
+      integer             :: i , j , k
       integer             :: number_of_functions
       integer             :: number_of_atoms 
       double precision    :: geometry(number_of_atoms,3)
       type(atom)          :: atoms(number_of_atoms)
       type(ERI_function)  :: ERI  (number_of_functions)
       
-
       j = 0 
+      
+      do k = 1 , number_of_atoms
 
-      do i = 1 , number_of_atoms
+        do i = 1 , atoms(k)%num_s_function
+              
+          j= j + 1
 
-        index_s =     atoms(i)%num_s_function
-        index_p = 3 * atoms(i)%num_p_function   
-        index   =     index_s + index_p
-    
-        ! Assign 's' orbitals first
+          ERI(j)%x = geometry(k,1) 
+          ERI(j)%y = geometry(k,2) 
+          ERI(j)%z = geometry(k,3)
 
-        do k = 1 , index_s 
-            j = j + 1 
-            ERI(j)%x = geometry(i,1) 
-            ERI(j)%y = geometry(i,2) 
-            ERI(j)%z = geometry(i,3)
-            ERI(j)%orbital = 's'
-            ERI(j)%n_contract   = atoms(i)%num_s_function
-            ERI(j)%exponent     = atoms(i)%exponent_s
-            ERI(j)%coefficient  = atoms(i)%coefficient_s
-        end do 
-    
-        ! Assign 'p' orbitals in order p_x, p_y, p_z
-
-        do k = 1 , index_p / 3
-
-            j = j + 1 
-            ERI(j)%x = geometry(i,1) 
-            ERI(j)%y = geometry(i,2) 
-            ERI(j)%z = geometry(i,3)
-            ERI(j)%orbital = 'px'
-            ERI(j)%n_contract   = atoms(i)%num_p_function
-            ERI(j)%exponent     = atoms(i)%exponent_p
-            ERI(j)%coefficient  = atoms(i)%coefficient_p
-    
-            j = j + 1 
-            ERI(j)%x = geometry(i,1) 
-            ERI(j)%y = geometry(i,2) 
-            ERI(j)%z = geometry(i,3)
-            ERI(j)%orbital = 'py'
-            ERI(j)%n_contract   = atoms(i)%num_p_function
-            ERI(j)%exponent     = atoms(i)%exponent_p
-            ERI(j)%coefficient  = atoms(i)%coefficient_p
-    
-            j = j + 1 
-            ERI(j)%x = geometry(i,1) 
-            ERI(j)%y = geometry(i,2) 
-            ERI(j)%z = geometry(i,3)
-            ERI(j)%orbital = 'pz'
-            ERI(j)%n_contract   = atoms(i)%num_p_function
-            ERI(j)%exponent     = atoms(i)%exponent_p
-            ERI(j)%coefficient  = atoms(i)%coefficient_p
+          ERI(j)%orbital     = "s"
+          ERI(j)%exponent    = atoms(k)%exponent_s
+          ERI(j)%coefficient = atoms(k)%coefficient_s(:,i)
 
         end do 
+
+        do i = 1 , atoms(k)%num_p_function
+
+          j= j + 1
+
+          ERI(j)%x = geometry(k,1) 
+          ERI(j)%y = geometry(k,2) 
+          ERI(j)%z = geometry(k,3)
+
+          ERI(j)%orbital     = "px"
+          ERI(j)%exponent    = atoms(k)%exponent_p
+          ERI(j)%coefficient = atoms(k)%coefficient_p(:,i)
+
+          j= j + 1
+
+          ERI(j)%x = geometry(k,1) 
+          ERI(j)%y = geometry(k,2) 
+          ERI(j)%z = geometry(k,3)
+
+          ERI(j)%orbital     = "py"
+          ERI(j)%exponent    = atoms(k)%exponent_p
+          ERI(j)%coefficient = atoms(k)%coefficient_p(:,i)
+
+          j= j + 1
+
+          ERI(j)%x = geometry(k,1) 
+          ERI(j)%y = geometry(k,2) 
+          ERI(j)%z = geometry(k,3)
+
+          ERI(j)%orbital     = "pz"
+          ERI(j)%exponent    = atoms(k)%exponent_p
+          ERI(j)%coefficient = atoms(k)%coefficient_p(:,i)
+
+          end do 
+
       end do 
+
 
       end subroutine
 
