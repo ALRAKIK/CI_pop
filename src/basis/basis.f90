@@ -8,6 +8,9 @@ subroutine basis(number_of_atoms,charge,atoms)
       integer           :: charge(number_of_atoms)
       type(atom)        :: atoms(number_of_atoms)
 
+      call system('rm -r tmp')
+      call system('mkdir tmp')
+
       call extract_basis   (number_of_atoms,charge)
 
       call normalize_basis()

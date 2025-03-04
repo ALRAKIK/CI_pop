@@ -22,7 +22,7 @@ subroutine extract_basis(number_of_atoms,charge)
       end do 
       
       open(1,file="Basis")
-      open(2,file="Basis_scratch")
+      open(2,file="./tmp/Basis_scratch")
 
       do 
 

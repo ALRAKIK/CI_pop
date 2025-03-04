@@ -1,7 +1,7 @@
 
 # Python code to remove trailing spaces from each line in the file
 
-file_path = 'Basis_normalized'
+file_path = './tmp/Basis_normalized'
 
 # Read the file, process each line, and write back to the same file
 with open(file_path, 'r') as file:

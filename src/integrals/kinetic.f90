@@ -129,11 +129,11 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
       end do 
       close(1)
 
-!      open(1,file="./tmp/KI")
-!      do i = 1 , size(kinetic,1)
-!        write(1,'(1000f16.12)')  (kinetic(i,j),j=1,size(kinetic,1))
-!      end do 
-!      close(1)
+      open(1,file="./tmp/KI_matrix.dat")
+      do i = 1 , size(kinetic,1)
+        write(1,'(1000f16.12)')  (kinetic(i,j),j=1,size(kinetic,1))
+      end do 
+      close(1)
 
 
 end subroutine

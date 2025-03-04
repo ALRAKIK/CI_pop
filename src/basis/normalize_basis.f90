@@ -14,8 +14,8 @@ subroutine normalize_basis()
 
       double precision,allocatable  :: exponent(:) , contraction(:,:) , contractionN(:,:) 
 
-      open(1,file="Basis_scratch")
-      open(2,file="Basis_normalized")
+      open(1,file="./tmp/Basis_scratch")
+      open(2,file="./tmp/Basis_normalized")
 
       do
       
@@ -58,6 +58,8 @@ subroutine normalize_basis()
       end do 
 
 3     close(1)
+
+      close(2)
 
 end subroutine
 

@@ -129,11 +129,11 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
         end do 
       close(1)
 
-!      open(1,file="./tmp/NA")
-!      do i = 1 , size(NA,1)
-!        write(1,'(1000(f16.12,2x))')  (NA(i,j),j=1,size(NA,1))
-!      end do 
-!      close(1)
+      open(1,file="./tmp/NA_matrix.dat")
+      do i = 1 , size(NA,1)
+        write(1,'(1000(f16.12,2x))')  (NA(i,j),j=1,size(NA,1))
+      end do 
+      close(1)
 
 
 end subroutine

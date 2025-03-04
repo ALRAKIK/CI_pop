@@ -11,7 +11,7 @@ subroutine read_basis_class(atom_type)
       
       write(atom_type_charge,'(A,I0)') "A ", atom_type%charge 
     
-      open(1, file="Basis_normalized")
+      open(1, file="./tmp/Basis_normalized")
 
         do 
 
