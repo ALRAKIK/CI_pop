@@ -1,12 +1,12 @@
 subroutine NRE(number_of_atoms,geometry,atoms,E)
 
-      use atom_basis
+      use atom_basis 
 
       implicit none 
 
-      integer,intent(in)             :: number_of_atoms
+      integer         ,intent(in)    :: number_of_atoms
       double precision,intent(in)    :: geometry(number_of_atoms,3)
-      type(atom),intent(in)          :: atoms(number_of_atoms)
+      type(atom)      ,intent(in)    :: atoms(number_of_atoms)
 
       double precision,intent(out)   :: E 
 
@@ -27,4 +27,15 @@ subroutine NRE(number_of_atoms,geometry,atoms,E)
           end do 
         end do 
 
-end subroutine
+        if (E > 1e18) then 
+          call header("Error",-1)
+          write(*,'(a80)')'*******************************************************************************************'
+          write(*,'(a80)')           "* Nuclear repulsion energy is too large, Two atoms are too close to each other *"
+          write(*,'(a,a)')        "*","                                                                              *"
+          write(*,'(a,f13.6,a)')             "* E_NUC = ",E,"                                                        *"
+          write(*,'(a,a)')        "*","                                                                              *"
+          write(*,'(a80)')'*******************************************************************************************'
+          stop 
+        end if
+
+end subroutine NRE 

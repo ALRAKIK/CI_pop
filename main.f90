@@ -84,8 +84,6 @@ program CI
 
       call NRE(n_atoms,geometry,atoms,E_nuc)
 
-      write(*,'(a, f24.12)') "Nuclear repulsion Energy : " ,  E_nuc 
-
 !     -------------------------------------------------------------------     !
 !                Read the one and the two electron integrals     
 !     -------------------------------------------------------------------     !

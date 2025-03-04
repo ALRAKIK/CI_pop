@@ -40,6 +40,10 @@ subroutine print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,Ex,EHF)
   write(*,'(A36,F13.6)')     ' HF LUMO      energy (eV):',e(LUMO)*autoev
   write(*,'(A36,F13.6)')     ' HF HOMO-LUMO gap    (eV):',Gap*autoev
   write(*,'(A50)')           '---------------------------------------'
+  write(*,'(A36,F13.6)')     ' Potential energy        :',(EV+EJ+Ex+ENuc)
+  write(*,'(A36,F13.6)')     ' Kinetic   energy        :', ET
+  write(*,'(A36,F13.6)')     ' Virial    theorem (-V/T):',(EV+EJ+Ex+ENuc)/ET
+  write(*,'(A50)')           '---------------------------------------'
   write(*,*)
 
 ! Print results
