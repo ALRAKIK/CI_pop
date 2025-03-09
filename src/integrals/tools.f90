@@ -743,95 +743,96 @@ end module
 
 
 function Boys_func(n, x) result(res)
-    use libBoys_data
-    implicit none
-!
-    integer, intent(in) :: n
-    double precision, intent(in) :: x
-    double precision :: res, sfac, dx, dxi
-    integer :: i, j
-    double precision, dimension(6) :: n_fac_dble = (/ 1d0, 2d0, 6d0, 24d0, 120d0, 720d0 /)
-    double precision, dimension(31) :: n_fac2_dble = (/ &
-            1d0, 1d0, 1d0, 2d0, 3d0, 8d0, 15d0, 48d0, 105d0, 384d0, 945d0, 3840d0, &
-            10395d0,46080d0,135135d0,645120d0,2027025d0,10321920d0,34459425d0,185794560d0,654729075d0,3715891200d0,13749310575d0,81749606400d0, &
-            316234143225d0,1961990553600d0,7905853580625d0,51011754393600d0,213458046676875d0,1428329123020800d0,6190283353629375d0 /)
-    double precision, parameter :: Pi = 3.1415926535897932d0 
-    double precision, parameter :: eps = 1d-14
-    integer, parameter :: MAX_RECURSION = 6
-    double precision :: epsrel
-!
-    res = 0d0
+
+      use libBoys_data
+      implicit none
+
+      integer, intent(in) :: n
+      double precision, intent(in) :: x
+      double precision :: res, sfac, dx, dxi
+      integer :: i, j
+      double precision, dimension(6) :: n_fac_dble = (/ 1d0, 2d0, 6d0, 24d0, 120d0, 720d0 /)
+      double precision, dimension(31) :: n_fac2_dble = (/ &
+              1d0, 1d0, 1d0, 2d0, 3d0, 8d0, 15d0, 48d0, 105d0, 384d0, 945d0, 3840d0, &
+              10395d0,46080d0,135135d0,645120d0,2027025d0,10321920d0,34459425d0,185794560d0,654729075d0,3715891200d0,13749310575d0,81749606400d0, &
+              316234143225d0,1961990553600d0,7905853580625d0,51011754393600d0,213458046676875d0,1428329123020800d0,6190283353629375d0 /)
+      double precision, parameter :: Pi = 3.1415926535897932d0 
+      double precision, parameter :: eps = 1d-14
+      integer, parameter :: MAX_RECURSION = 6
+      double precision :: epsrel
+
+      res = 0d0
     
-    if ( n .eq. 0 ) then
-            if ( x .lt. eps ) then
-                    res = 1d0
-            else
-                    res = dsqrt( Pi / (4d0*x) ) * derf(dsqrt(x))
-            end if
-    else
-            if ( n .gt. libBoysMaxN ) then
-                    write(*,*) "libboys error: not implemented!"
-                    return
-            end if
-            if ( n .lt. 0 ) then
-                    write(*,*) "libboys error: n < 0!"
-                    return
-            end if
-            
-            if ( x .lt. eps ) then
-                    res = 1d0 / ( 2d0*dble(n) + 1d0 )
-            else if ( x .gt. 50d0 ) then
-                    res = n_fac2_dble(2*n-1 +2) / 2d0**(n+1) * dsqrt(Pi/x**(2*n+1))
-            else
-                    
-                    if ( x .ge. 10d0 ) then
-                            j = int((x-9.95d0)*10d0) + 1
-                            dx = BoysFuncValuesL(j, 1) - x 
-                            dxi = dx
-                            res = BoysFuncValuesL(j, n + 2)
-                            epsrel = res * eps
-                            do i = 1, MAX_RECURSION
-                                    sfac = BoysFuncValuesL(j, n + 2 + i) * dxi / n_fac_dble(i)
-                                    res = res + sfac
-                                    if ( abs(sfac) .lt. epsrel ) then
-                                            return
-                                    end if
-                                    dxi = dxi * dx
-                            end do
-
-                    else if ( x .ge. 5d0 ) then
-                            j = int((x-4.975d0)*20d0) + 1
-                            dx = BoysFuncValuesM(j, 1) - x 
-                            dxi = dx
-                            res = BoysFuncValuesM(j, n + 2)
-                            epsrel = res * eps
-                            do i = 1, MAX_RECURSION
-                                    sfac = BoysFuncValuesM(j, n + 2 + i) * dxi / n_fac_dble(i)
-                                    res = res + sfac
-                                    if ( abs(sfac) .lt. epsrel ) then
-                                            return
-                                    end if
-                                    dxi = dxi * dx
-                            end do
-
-                    else 
-                            j = int(x*40d0+0.5d0) + 1
-                            dx = BoysFuncValuesS(j, 1) - x
-                            dxi = dx
-                            res = BoysFuncValuesS(j, n + 2)
-                            epsrel = res * eps
-                            do i = 1, MAX_RECURSION
-                                    sfac = BoysFuncValuesS(j, n + 2 + i) * dxi / n_fac_dble(i)
-                                    res = res + sfac
-                                    if ( abs(sfac) .lt. epsrel ) then
-                                            return
-                                    end if
-                                    dxi = dxi * dx
-                            end do
-
-                    end if
-            end if
-    end if
+      if ( n .eq. 0 ) then
+              if ( x .lt. eps ) then
+                      res = 1d0
+              else
+                      res = dsqrt( Pi / (4d0*x) ) * derf(dsqrt(x))
+              end if
+      else
+              if ( n .gt. libBoysMaxN ) then
+                      write(*,*) "libboys error: not implemented!"
+                      return
+              end if
+              if ( n .lt. 0 ) then
+                      write(*,*) "libboys error: n < 0!"
+                      return
+              end if
+              
+              if ( x .lt. eps ) then
+                      res = 1d0 / ( 2d0*dble(n) + 1d0 )
+              else if ( x .gt. 50d0 ) then
+                      res = n_fac2_dble(2*n-1 +2) / 2d0**(n+1) * dsqrt(Pi/x**(2*n+1))
+              else
+                      
+                      if ( x .ge. 10d0 ) then
+                              j = int((x-9.95d0)*10d0) + 1
+                              dx = BoysFuncValuesL(j, 1) - x 
+                              dxi = dx
+                              res = BoysFuncValuesL(j, n + 2)
+                              epsrel = res * eps
+                              do i = 1, MAX_RECURSION
+                                      sfac = BoysFuncValuesL(j, n + 2 + i) * dxi / n_fac_dble(i)
+                                      res = res + sfac
+                                      if ( abs(sfac) .lt. epsrel ) then
+                                              return
+                                      end if
+                                      dxi = dxi * dx
+                              end do
+                            
+                      else if ( x .ge. 5d0 ) then
+                              j = int((x-4.975d0)*20d0) + 1
+                              dx = BoysFuncValuesM(j, 1) - x 
+                              dxi = dx
+                              res = BoysFuncValuesM(j, n + 2)
+                              epsrel = res * eps
+                              do i = 1, MAX_RECURSION
+                                      sfac = BoysFuncValuesM(j, n + 2 + i) * dxi / n_fac_dble(i)
+                                      res = res + sfac
+                                      if ( abs(sfac) .lt. epsrel ) then
+                                              return
+                                      end if
+                                      dxi = dxi * dx
+                              end do
+                            
+                      else 
+                              j = int(x*40d0+0.5d0) + 1
+                              dx = BoysFuncValuesS(j, 1) - x
+                              dxi = dx
+                              res = BoysFuncValuesS(j, n + 2)
+                              epsrel = res * eps
+                              do i = 1, MAX_RECURSION
+                                      sfac = BoysFuncValuesS(j, n + 2 + i) * dxi / n_fac_dble(i)
+                                      res = res + sfac
+                                      if ( abs(sfac) .lt. epsrel ) then
+                                              return
+                                      end if
+                                      dxi = dxi * dx
+                              end do
+                            
+                      end if
+              end if
+      end if
     
 end function
 
@@ -874,4 +875,33 @@ subroutine header_under(HEAD,IN)
       WRITE (*, '(80A)') (' ',I=1,INDENT), ('-',I=1,LENGTH)
       WRITE (*, '()')
     
-  end subroutine Header_under
+end subroutine Header_under
+
+
+
+subroutine print_orbital_table(ERI,number_of_functions)
+
+      use classification_ERI
+      implicit none
+      type(ERI_function)  :: ERI(number_of_functions)
+      integer, intent(in) :: number_of_functions
+      integer :: i, j
+        
+      call header_under("Atomic Orbitals", -1)
+        
+      ! Print header
+      write(*,'(A)') "|----------------------------------------------------------------------|"
+      write(*,'(A)') "|  Idx      X         Y        Z      Type    Exponent    Coefficient  |"
+      write(*,'(A)') "|----------------------------------------------------------------------|"
+
+      do i = 1 , number_of_functions
+        write(*,'(a1,I5,3f10.6,3x,a2,6x,f10.6,2x,f10.6,2x,a1)')"|", i  , ERI(i)%x , ERI(i)%y , ERI(i)%z , ERI(i)%orbital , ERI(i)%exponent(1) , ERI(i)%coefficient(1) , "|"
+        do j = 2 , size(ERI(i)%exponent)
+          write(*,'(a1,46x,f10.6,2x,f10.6,2x,a1)')"|" , ERI(i)%exponent(j) , ERI(i)%coefficient(j) , "|"
+        end do
+        write(*,'(A)') "|----------------------------------------------------------------------|"
+      end do
+
+        write(*,'(A)') ""
+
+end subroutine print_orbital_table

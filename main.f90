@@ -1,5 +1,6 @@
 program CI 
 
+      use torus_init
       use atom_basis
 
       implicit none 
@@ -29,6 +30,16 @@ program CI
       double precision             :: E_nuc , EHF
       double precision             :: start_HF,end_HF,t_HF
 
+
+!     -------------------------------------------------------------------     !
+!                             Torus variables 
+!     -------------------------------------------------------------------     !      
+
+
+      logical                      :: type  
+
+!     -------------------------------------------------------------------     !
+
       call read_geometry(n_atoms,charge_tmp,geometry_tmp)
 
       allocate(geometry(n_atoms,3))
@@ -52,10 +63,25 @@ program CI
       do i = 1 , n_atoms
         write(*,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
       end do 
-  
+
+!     -------------------------------------------------------------------     !
+!                         Parameters for the calculation 
+!     -------------------------------------------------------------------     !
+
+      type = .TRUE.
+
+      if (Type) then 
+        call header("Torus with PBC",-1)
+        call Torus_def()
+      else 
+        call header("calculation with OBC",-1)
+      end if 
+
 !     -------------------------------------------------------------------     !
 !                         calculate the integrals 
 !     -------------------------------------------------------------------     !
+
+      call header_under("Calculate the integerals",-1)
 
       call cpu_time(start_HF)
 
@@ -65,7 +91,11 @@ program CI
 
       call nuclear_attraction_matrix(n_atoms,geometry,atoms)
 
+      stop 
+ 
       call ERI_integral(n_atoms,geometry,atoms)
+
+
 
       call cpu_time(end_HF)
 

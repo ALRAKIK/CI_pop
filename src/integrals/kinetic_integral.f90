@@ -1,5 +1,6 @@
 subroutine kinetic_integral_ss(r1,r2,atom1,atom2,index1,index2,S_ss_normal)
 
+      use torus_init
       use atom_basis
       implicit none 
 
@@ -23,6 +24,7 @@ subroutine kinetic_integral_ss(r1,r2,atom1,atom2,index1,index2,S_ss_normal)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
+      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 

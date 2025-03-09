@@ -2,15 +2,17 @@
     
       use atom_basis
       use classification_ERI
+      use filter_module
 
       implicit none 
 
-      integer             :: i , j , k
-      integer             :: number_of_functions
-      integer             :: number_of_atoms 
-      double precision    :: geometry(number_of_atoms,3)
-      type(atom)          :: atoms(number_of_atoms)
-      type(ERI_function)  :: ERI  (number_of_functions)
+      integer                       :: i , j , k
+      integer                       :: number_of_functions
+      integer                       :: number_of_atoms 
+      double precision              :: geometry(number_of_atoms,3)
+      type(atom)                    :: atoms(number_of_atoms)
+      type(ERI_function)            :: ERI  (number_of_functions)
+      double precision, allocatable :: f_array_coef(:), f_array_expo(:)
       
       j = 0 
       
@@ -18,49 +20,73 @@
 
         do i = 1 , atoms(k)%num_s_function
               
-          j= j + 1
+          j = j + 1
 
           ERI(j)%x = geometry(k,1) 
           ERI(j)%y = geometry(k,2) 
           ERI(j)%z = geometry(k,3)
 
           ERI(j)%orbital     = "s"
-          ERI(j)%exponent    = atoms(k)%exponent_s
-          ERI(j)%coefficient = atoms(k)%coefficient_s(:,i)
+
+          call filter(atoms(k)%coefficient_s(:,i),atoms(k)%exponent_s,f_array_coef,f_array_expo)
+
+          ERI(j)%exponent    = f_array_expo
+          ERI(j)%coefficient = f_array_coef
+
+          if (allocated(f_array_coef)) deallocate(f_array_coef)
+          if (allocated(f_array_expo)) deallocate(f_array_expo)
 
         end do 
 
         do i = 1 , atoms(k)%num_p_function
 
-          j= j + 1
+          j = j + 1
 
           ERI(j)%x = geometry(k,1) 
           ERI(j)%y = geometry(k,2) 
           ERI(j)%z = geometry(k,3)
 
           ERI(j)%orbital     = "px"
-          ERI(j)%exponent    = atoms(k)%exponent_p
-          ERI(j)%coefficient = atoms(k)%coefficient_p(:,i)
 
-          j= j + 1
+          call filter(atoms(k)%coefficient_p(:,i),atoms(k)%exponent_p,f_array_coef,f_array_expo)
+
+          ERI(j)%exponent    = f_array_expo
+          ERI(j)%coefficient = f_array_coef
+
+          if (allocated(f_array_coef)) deallocate(f_array_coef)
+          if (allocated(f_array_expo)) deallocate(f_array_expo)
+
+          j = j + 1
 
           ERI(j)%x = geometry(k,1) 
           ERI(j)%y = geometry(k,2) 
           ERI(j)%z = geometry(k,3)
 
           ERI(j)%orbital     = "py"
-          ERI(j)%exponent    = atoms(k)%exponent_p
-          ERI(j)%coefficient = atoms(k)%coefficient_p(:,i)
 
-          j= j + 1
+          call filter(atoms(k)%coefficient_p(:,i),atoms(k)%exponent_p,f_array_coef,f_array_expo)
+
+          ERI(j)%exponent    = f_array_expo
+          ERI(j)%coefficient = f_array_coef
+
+          if (allocated(f_array_coef)) deallocate(f_array_coef)
+          if (allocated(f_array_expo)) deallocate(f_array_expo)
+
+          j = j + 1
 
           ERI(j)%x = geometry(k,1) 
           ERI(j)%y = geometry(k,2) 
           ERI(j)%z = geometry(k,3)
 
           ERI(j)%orbital     = "pz"
-          ERI(j)%exponent    = atoms(k)%exponent_p
-          ERI(j)%coefficient = atoms(k)%coefficient_p(:,i)
+
+          call filter(atoms(k)%coefficient_p(:,i),atoms(k)%exponent_p,f_array_coef,f_array_expo)
+
+          ERI(j)%exponent    = f_array_expo
+          ERI(j)%coefficient = f_array_coef
+
+          if (allocated(f_array_coef)) deallocate(f_array_coef)
+          if (allocated(f_array_expo)) deallocate(f_array_expo)
 
           end do 
 

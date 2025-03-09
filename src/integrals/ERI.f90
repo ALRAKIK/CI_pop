@@ -28,10 +28,8 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
       write(*,*) ""
       write(*,*) ""
 
-!      do i = 1 , number_of_functions
-!        write(*,"(I3,3f12.8,2x,a,2x,100f12.8)") i, ERI(i)%x , ERI(i)%y , ERI(i)%z , ERI(i)%orbital, ERI(i)%coefficient
-!      end do 
-      
+      call print_orbital_table(ERI,number_of_functions)
+
       open(1,file="./tmp/ERI.dat")
 
       do i = 1,number_of_functions

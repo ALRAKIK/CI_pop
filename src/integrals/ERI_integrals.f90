@@ -1,5 +1,5 @@
 subroutine ERI_integral_4_function(one,two,three,four,value)
-
+      use torus_init
       use classification_ERI
 
       implicit none 
@@ -32,9 +32,6 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
       double precision                :: xpb , ypb , zpb 
       double precision                :: xqc , yqc , zqc 
       double precision                :: xqd , yqd , zqd 
-
-
-
 
       double precision                :: c1 , c2 , c3 , c4 
 
@@ -79,6 +76,9 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
       yAB = ya - yb ; yCD = yc - yd
       zAB = za - zb ; zCD = zc - zd 
 
+      if (torus) call PBC(xa,xb,xAB)
+      if (torus) call PBC(xc,xd,xCD)
+
       D2AB = (xAB*xAB + yAB*yAB  + zAB*zAB)
       D2CD = (xCD*xCD + yCD*yCD  + zCD*zCD)
 
@@ -102,6 +102,7 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
           E_AB = dexp(-mu1*D2AB)
 
           xp  = ( xa * alpha + xb * beta ) * ip
+          if (torus) call bary_center(alpha,xa,beta,xb,ip,xp)
           yp  = ( ya * alpha + yb * beta ) * ip
           zp  = ( za * alpha + zb * beta ) * ip
 
@@ -129,6 +130,7 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
               E_CD = dexp(-mu2*D2CD)
 
               xq = ( xc * gamma + xd * delta )* iq
+              if (torus) call bary_center(gamma,xc,delta,xd,iq,xq)
               yq = ( yc * gamma + yd * delta )* iq
               zq = ( zc * gamma + zd * delta )* iq
 
@@ -142,6 +144,7 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
 
 
               xPQ = xp - xq
+              if (torus) call euc(xp,xq,xPQ)
               yPQ = yp - yq
               zPQ = zp - zq
                
@@ -173,7 +176,6 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
               F3     = Boys_func(3,F_in)
               F4     = Boys_func(4,F_in)
 
-
               call ERI_value(o1,o2,o3,o4&
                             &,F0,F1,F2,F3,F4&
                             &,popq,qopq,tu,tv,p,q,pq&
@@ -183,7 +185,7 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
 
               value = value + const * value_s
               
-            end do 
+            end do
           end do 
         end do 
       end do 
