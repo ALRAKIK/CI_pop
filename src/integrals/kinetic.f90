@@ -135,5 +135,7 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
       end do 
       close(1)
 
+      deallocate(kinetic)
+
 
 end subroutine

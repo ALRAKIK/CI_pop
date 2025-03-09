@@ -52,10 +52,7 @@ program CI
       do i = 1 , n_atoms
         write(*,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
       end do 
-
-      
-
-      
+  
 !     -------------------------------------------------------------------     !
 !                         calculate the integrals 
 !     -------------------------------------------------------------------     !
@@ -75,8 +72,6 @@ program CI
       t_HF = end_HF - start_HF
       write(*,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
       write(*,*)
-
-      
 
 !     -------------------------------------------------------------------     !
 !                        Nuclear repulsion energy  

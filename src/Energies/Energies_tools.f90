@@ -97,12 +97,20 @@ subroutine get_X_from_overlap(N,over,X)
 
       ! //////////////////////////////////////////////////////////////// !
       call header_under("The Overlap Eigenvalues",-1)
-      do i = 1, N 
-        write(*,'(f16.8)',advance='no') Eval(i) 
-      end do 
+
+      write(*, "(5f16.8)") (Eval(i), i=1,n)
+
       write(*,*) ""
       write(*,*) ""
-      write(*,'(a,f16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
+      write(*,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
+
+      if (Minval(Eval) < 0.d0) then 
+        call header("Error",-1)
+          write(*,'(a80)')'*******************************************************************************************'
+          write(*,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
+          write(*,'(a80)')'*******************************************************************************************'
+          stop            
+      end if
       ! //////////////////////////////////////////////////////////////// !
 
       do i = 1 , N

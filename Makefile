@@ -9,7 +9,7 @@ $(shell mkdir -p $(BDIR) $(ODIR)/module)
 
 # Compiler and flags
 FC = gfortran
-FFLAGS = -Wall -Wall -Wno-unused -Wno-unused-dummy-argument -O2
+FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O2  -g -fbacktrace  -fcheck=all -fimplicit-none 
 MODDIR = -J$(ODIR) -I$(ODIR)  # Put and find modules in obj directory
 LIBS = -lblas -llapack
 

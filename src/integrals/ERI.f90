@@ -47,6 +47,8 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
 
       close(1)
 
+      deallocate(ERI)
+
       
 
 

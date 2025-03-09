@@ -32,7 +32,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
       do i = 1 , number_of_atoms
         total_functions = total_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
-
+      
       allocate(overlap(total_functions,total_functions))
 
       overlap(:,:) = 0.d0 
@@ -129,13 +129,13 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
         end do 
       close(1)
 
-
-
       open(1,file="./tmp/OV_matrix.dat")
       do i = 1 , size(overlap,1)
         write(1,'(1000f16.12)')  (overlap(i,j),j=1,size(overlap,1))
       end do 
       close(1)
+
+      deallocate(overlap)
 
 
 end subroutine

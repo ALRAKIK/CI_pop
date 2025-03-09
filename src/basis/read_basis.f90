@@ -10,6 +10,10 @@ subroutine read_basis_class(atom_type)
       character(len=10)    :: atom_type_charge
       
       write(atom_type_charge,'(A,I0)') "A ", atom_type%charge 
+
+      atom_type%num_s_function = 0
+      atom_type%num_p_function = 0
+
     
       open(1, file="./tmp/Basis_normalized")
 

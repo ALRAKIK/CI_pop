@@ -4,7 +4,7 @@ module atom_basis
 
       type :: atom
         integer                         :: charge 
-        integer                         :: num_s_function
+        integer                         :: num_s_function 
         integer                         :: num_p_function
         integer                         :: num_exponent_s
         integer                         :: num_exponent_p 
