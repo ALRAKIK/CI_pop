@@ -73,6 +73,7 @@ end subroutine
 !------------------------------------------------------------------------!
 subroutine get_X_from_overlap(N,over,X)
 
+      use files 
       implicit none 
 
       ! input !
@@ -98,17 +99,18 @@ subroutine get_X_from_overlap(N,over,X)
       ! //////////////////////////////////////////////////////////////// !
       call header_under("The Overlap Eigenvalues",-1)
 
-      write(*, "(5f16.8)") (Eval(i), i=1,n)
+      write(outfile, "(5f16.8)") (Eval(i), i=1,n)
 
-      write(*,*) ""
-      write(*,*) ""
-      write(*,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
+      write(outfile,*) ""
+      write(outfile,*) ""
+      write(outfile,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
+      write(outfile,*) ""
 
       if (Minval(Eval) < 0.d0) then 
         call header("Error",-1)
-          write(*,'(a80)')'*******************************************************************************************'
-          write(*,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
-          write(*,'(a80)')'*******************************************************************************************'
+          write(outfile,'(a80)')'*******************************************************************************************'
+          write(outfile,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
+          write(outfile,'(a80)')'*******************************************************************************************'
           stop            
       end if
       ! //////////////////////////////////////////////////////////////// !
@@ -117,7 +119,7 @@ subroutine get_X_from_overlap(N,over,X)
           if (Eval(i) > thresh) then
             Eval(i) = dsqrt(1.d0 / Eval(i))
           else
-            write(*,"(a,I3,a)") 'Eigenvalue ',i,' is too small for Lowdin orthogonalization'
+            write(outfile,"(a,I3,a)") 'Eigenvalue ',i,' is too small for Lowdin orthogonalization'
           end if
       end do
     
@@ -218,7 +220,7 @@ subroutine diagonalize_matrix(N,A,e)
       call dsyev('V','U',N,A,N,e,work,lwork,info)
 
       if(info /= 0) then
-        write(*,'(a)') 'Problem in diagonalize_matrix (dsyev)!!'
+        write(20,'(a)') 'Problem in diagonalize_matrix (dsyev)!!'
         stop
       endif
 
@@ -232,6 +234,7 @@ subroutine matout(m,n,A)
 
       ! Print the MxN array A
   
+      use files
       implicit none
 
       integer,parameter             :: ncol = 5
@@ -244,7 +247,7 @@ subroutine matout(m,n,A)
       do ilower=1,n,ncol
         iupper = min(ilower + ncol - 1,n)
         num = iupper - ilower + 1
-        write(*,'(3X,10(9X,I6))') (j,j=ilower,iupper)
+        write(outfile,'(3X,10(9X,I6))') (j,j=ilower,iupper)
         do i=1,m
           do j=ilower,iupper
             B(j-ilower+1) = A(i,j)
@@ -252,7 +255,7 @@ subroutine matout(m,n,A)
           do j=1,num
             if(abs(B(j)) < small) B(j) = 0d0
           enddo
-          write(*,'(I7,10F15.8)') i,(B(j),j=1,num)
+          write(outfile,'(I7,10F15.8)') i,(B(j),j=1,num)
         enddo
       enddo
   

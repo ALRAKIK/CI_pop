@@ -1,7 +1,7 @@
 subroutine print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,Ex,EHF)
 
       ! Print one- and two-electron energies and other stuff for RHF calculation
-
+      use files 
       implicit none
 
       integer,intent(in)                 :: nBas,nO
@@ -19,43 +19,43 @@ subroutine print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,Ex,EHF)
 
       ! Dump results
 
-      write(*,*)
-      write(*,'(A50)')           '---------------------------------------'
-      write(*,'(A32)')           ' Summary              '
-      write(*,'(A50)')           '---------------------------------------'
-      write(*,'(A32,1X,F16.10)') ' One-electron energy  ',ET + EV
-      write(*,'(A32,1X,F16.10)') ' Kinetic      energy  ',ET
-      write(*,'(A32,1X,F16.10)') ' Potential    energy  ',EV
-      write(*,'(A50)')           '---------------------------------------'
-      write(*,'(A32,1X,F16.10)') ' Two-electron energy  ',EJ + Ex
-      write(*,'(A32,1X,F16.10)') ' Coulomb      energy  ',EJ
-      write(*,'(A32,1X,F16.10)') ' Exchange     energy  ',Ex
-      write(*,'(A50)')           '---------------------------------------'
-      write(*,'(A32,1X,F16.10)') ' Electronic   energy  ',EHF
-      write(*,'(A32,1X,F16.10)') ' Nuclear   repulsion  ',ENuc
-      write(*,'(A32,1X,F16.10)') ' Hartree-Fock energy  ',EHF + ENuc
-      write(*,'(A50)')           '---------------------------------------'
-      write(*,'(A36,F13.6)')     ' HF HOMO      energy (eV):',e(HOMO)*autoeV
-      write(*,'(A36,F13.6)')     ' HF LUMO      energy (eV):',e(LUMO)*autoev
-      write(*,'(A36,F13.6)')     ' HF HOMO-LUMO gap    (eV):',Gap*autoev
-      write(*,'(A50)')           '---------------------------------------'
-      write(*,'(A36,F13.6)')     ' Potential energy        :',(EV+EJ+Ex+ENuc)
-      write(*,'(A36,F13.6)')     ' Kinetic   energy        :', ET
-      write(*,'(A36,F13.6)')     ' Virial    theorem (-V/T):',(EV+EJ+Ex+ENuc)/ET
-      write(*,'(A50)')           '---------------------------------------'
-      write(*,*)
+      write(outfile,*)
+      write(outfile,'(A50)')           '---------------------------------------'
+      write(outfile,'(A32)')           ' Summary              '
+      write(outfile,'(A50)')           '---------------------------------------'
+      write(outfile,'(A32,1X,F16.10)') ' One-electron energy  ',ET + EV
+      write(outfile,'(A32,1X,F16.10)') ' Kinetic      energy  ',ET
+      write(outfile,'(A32,1X,F16.10)') ' Potential    energy  ',EV
+      write(outfile,'(A50)')           '---------------------------------------'
+      write(outfile,'(A32,1X,F16.10)') ' Two-electron energy  ',EJ + Ex
+      write(outfile,'(A32,1X,F16.10)') ' Coulomb      energy  ',EJ
+      write(outfile,'(A32,1X,F16.10)') ' Exchange     energy  ',Ex
+      write(outfile,'(A50)')           '---------------------------------------'
+      write(outfile,'(A32,1X,F16.10)') ' Electronic   energy  ',EHF
+      write(outfile,'(A32,1X,F16.10)') ' Nuclear   repulsion  ',ENuc
+      write(outfile,'(A32,1X,F16.10)') ' Hartree-Fock energy  ',EHF + ENuc
+      write(outfile,'(A50)')           '---------------------------------------'
+      write(outfile,'(A36,F13.6)')     ' HF HOMO      energy (eV):',e(HOMO)*autoeV
+      write(outfile,'(A36,F13.6)')     ' HF LUMO      energy (eV):',e(LUMO)*autoev
+      write(outfile,'(A36,F13.6)')     ' HF HOMO-LUMO gap    (eV):',Gap*autoev
+      write(outfile,'(A50)')           '---------------------------------------'
+      write(outfile,'(A36,F13.6)')     ' Potential energy        :',(EV+EJ+Ex+ENuc)
+      write(outfile,'(A36,F13.6)')     ' Kinetic   energy        :', ET
+      write(outfile,'(A36,F13.6)')     ' Virial    theorem (-V/T):',-(EV+EJ+Ex+ENuc)/ET
+      write(outfile,'(A50)')           '---------------------------------------'
+      write(outfile,*)
 
       ! Print results
 
-      write(*,'(A50)') '---------------------------------------'
-      write(*,'(A50)') 'Hartree-Fock orbital coefficients      '
-      write(*,'(A50)') '---------------------------------------'
+      write(outfile,'(A50)') '---------------------------------------'
+      write(outfile,'(A50)') 'Hartree-Fock orbital coefficients      '
+      write(outfile,'(A50)') '---------------------------------------'
       call matout(nBas,nBas,C)
-      write(*,*)
-      write(*,'(A50)') '---------------------------------------'
-      write(*,'(A50)') ' Hartree-Fock orbital energies         '
-      write(*,'(A50)') '---------------------------------------'
+      write(outfile,*)
+      write(outfile,'(A50)') '---------------------------------------'
+      write(outfile,'(A50)') ' Hartree-Fock orbital energies         '
+      write(outfile,'(A50)') '---------------------------------------'
       call matout(nBas,1,e)
-      write(*,*)
+      write(outfile,*)
 
 end subroutine print_RHF

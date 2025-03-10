@@ -45,8 +45,7 @@ subroutine overlap_integral_ss(r1,r2,atom1,atom2,index1,index2,S_ss_normal)
         end do 
       end do
 
-
-!-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
 
 end subroutine
 
@@ -54,6 +53,7 @@ end subroutine
 
 subroutine overlap_integral_sp(r1,r2,atom1,atom2,index1,index2,S_sp_normal)
 
+      use torus_init
       use atom_basis
       implicit none 
 
@@ -77,6 +77,7 @@ subroutine overlap_integral_sp(r1,r2,atom1,atom2,index1,index2,S_sp_normal)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
+      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -97,6 +98,7 @@ subroutine overlap_integral_sp(r1,r2,atom1,atom2,index1,index2,S_sp_normal)
               mu = alpha*beta/p 
 
               X            =  (x1 - x2)
+              if (torus) call SSD(x1,x2,X)
               X_PB_normal  =  (alpha/p)*(X)
 
               Y            =  (y1 - y2)
@@ -121,6 +123,7 @@ end subroutine
 
 subroutine overlap_integral_ps(r1,r2,atom1,atom2,index1,index2,S_ps_normal)
 
+      use torus_init
       use atom_basis
       implicit none 
 
@@ -144,6 +147,7 @@ subroutine overlap_integral_ps(r1,r2,atom1,atom2,index1,index2,S_ps_normal)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
+      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -164,6 +168,7 @@ subroutine overlap_integral_ps(r1,r2,atom1,atom2,index1,index2,S_ps_normal)
               mu = alpha*beta/p 
         
               X            =  (x1 - x2)
+              if (torus) call SSD(x1,x2,X)
               X_PA_normal  = -(beta/p)*(X)
         
               Y            =  (y1 - y2)
@@ -188,6 +193,7 @@ end subroutine
 
 subroutine overlap_integral_pp(r1,r2,atom1,atom2,index1,index2,S_pp_normal)
 
+      use torus_init
       use atom_basis
       implicit none 
 
@@ -213,6 +219,7 @@ subroutine overlap_integral_pp(r1,r2,atom1,atom2,index1,index2,S_pp_normal)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
+      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -233,6 +240,7 @@ subroutine overlap_integral_pp(r1,r2,atom1,atom2,index1,index2,S_pp_normal)
               mu = alpha*beta/p 
         
               X            =  (x1 - x2)
+              if (torus) call SSD(x1,x2,X)
               X_PB_normal  =  (alpha/p)*(X)
               X_PA_normal  = -(beta/p) *(X)
               C_X_normal   = X_PB_normal*X_PA_normal+(1/(2.d0*p))

@@ -42,6 +42,8 @@ subroutine bary_center(alpha,x1,beta,x2,p_R,xp)
 
       xp = xp * p_R
 
+      if (xp >= Lx) xp = xp - Lx 
+
 end subroutine bary_center
 
 subroutine SSD(x1,x2,X)
@@ -82,14 +84,12 @@ subroutine euc(x1,x2,X)
               
 
       call SSD(x1,x2,X)
-    
+
       if (X >= 0.d0) then 
         sign = +1.d0 
       else
         sign = -1.d0  
       end if 
-
-      X = sign*dabs(X)
 
       X = sign * (dsqrt(2.d0 * (1.d0 - dcos(ax*x)) / (ax * ax)))
 

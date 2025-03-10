@@ -1,5 +1,6 @@
 program CI 
 
+      use files
       use torus_init
       use atom_basis
 
@@ -11,7 +12,6 @@ program CI
 
       double precision             :: geometry_tmp(100,3)
       integer                      :: charge_tmp(100)
-
 
       double precision,allocatable :: geometry(:,:)
       integer         ,allocatable :: charge(:)
@@ -56,12 +56,12 @@ program CI
 
       call basis(n_atoms,charge,atoms)
 
-      call system("clear")
+      open (outfile,file="results.out")
 
       CALL HEADER ('The Geometry',-1)
 
       do i = 1 , n_atoms
-        write(*,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
+        write(outfile,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
       end do 
 
 !     -------------------------------------------------------------------     !
@@ -90,16 +90,15 @@ program CI
       call kinetic_matrix(n_atoms,geometry,atoms)
 
       call nuclear_attraction_matrix(n_atoms,geometry,atoms)
- 
+            
       call ERI_integral(n_atoms,geometry,atoms)
-
-
 
       call cpu_time(end_HF)
 
       t_HF = end_HF - start_HF
-      write(*,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
-      write(*,*)
+
+      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
+      write(outfile,*)
 
 !     -------------------------------------------------------------------     !
 !                        Nuclear repulsion energy  
@@ -133,7 +132,7 @@ program CI
 
       CALL HEADER ('The Overlap Matrix',-1)
 
-      call matout(nBas,nBas,S)
+!      call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
 
@@ -150,10 +149,12 @@ program CI
       call cpu_time(end_HF)
 
       t_HF = end_HF - start_HF
-      write(*,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',t_HF,' seconds'
-      write(*,*)
+      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',t_HF,' seconds'
+      write(outfile,*)
 
       ! ---------------------------------------------------------------- !
       ! ---------------------------------------------------------------- !
+
+      close(outfile)
 
 end program CI 

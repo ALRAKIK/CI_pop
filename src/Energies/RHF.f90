@@ -2,6 +2,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       ! Perform a restricted Hartree-Fock calculation
 
+      use files 
       implicit none
 
       ! Input variables
@@ -19,12 +20,12 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       ! Local variables
   
-      integer,parameter             :: maxSCF = 64
+      integer,parameter             :: maxSCF = 50
       double precision,parameter    :: thresh = 1d-5
       integer                       :: nSCF
       double precision              :: Conv
       double precision              :: Gap
-      double precision              :: ET,EV,EJ
+      double precision              :: ET,EV,EJ , EHF_old
       double precision              :: EK
       double precision,allocatable  :: cp(:,:)
       double precision,allocatable  :: P(:,:)
@@ -33,77 +34,85 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,allocatable  :: F(:,:),Fp(:,:)
       double precision,allocatable  :: error(:,:)
       double precision,external     :: trace_matrix
+
+      integer                       :: max_diis = 5
+      integer                       :: n_diis
+      double precision              :: rcond
+      double precision,allocatable  :: err_diis(:,:)
+      double precision,allocatable  :: F_diis(:,:)
   
       ! Output variables
   
-      double precision,intent(out)  :: EHF
+      double precision,intent(out)  :: EHF 
       double precision,intent(out)  :: e(nBas)
       double precision,intent(out)  :: c(nBas,nBas)
     
-      write(*,*)
-      write(*,*)'******************************************************************************************'
-      write(*,*)'|                          Restricted Hartree-Fock calculation                           |'
-      write(*,*)'******************************************************************************************'
-      write(*,*)
+      write(outfile,*)
+      write(outfile,*)'******************************************************************************************'
+      write(outfile,*)'|                          Restricted Hartree-Fock calculation                           |'
+      write(outfile,*)'******************************************************************************************'
+      write(outfile,*)
   
       ! Memory allocation
   
-      allocate(cp(nBas,nBas),P(nBas,nBas),      &
+      allocate(cp(nBas,nBas),P(nBas,nBas),                         &
              J(nBas,nBas),K(nBas,nBas),F(nBas,nBas),Fp(nBas,nBas), &
              error(nBas,nBas))
+
+      allocate(err_diis(nBas*nBas,max_diis))
+      allocate(F_diis(nBas*nBas,max_diis))
   
       ! Guess coefficients and eigenvalues
   
       F(:,:) = Hc(:,:)
   
+      cp(:,:) = matmul(transpose(X(:,:)), matmul(Hc(:,:), X(:,:)))
+
+      call diagonalize_matrix(nBAS, cp, e)
+      
+      c(:,:) = matmul(X(:,:), cp(:,:))
+
+      P(:,:) = 2d0 * matmul(c(:,1:nO), transpose(c(:,1:nO)))
+
       ! Initialization
   
       nSCF = 0
       Conv = 1d0
+
+      n_diis        = 0
+      F_diis(:,:)   = 0d0
+      err_diis(:,:) = 0d0
+      rcond         = 0d0
+
+      EHF_old       = 0d0 
   
       !------------------------------------------------------------------------
       ! Main SCF loop
       !------------------------------------------------------------------------
   
-      write(*,*)
-      write(*,*)'------------------------------------------------------------------------------------------'
-      write(*,*)'|                                     RHF calculation                                    |'
-      write(*,*)'------------------------------------------------------------------------------------------'
-      write(*,'(1X,A1,1X,A3,1X,A1,1X,A16,1X,A1,1X,A10,1X,A1,1X,A10,1X,A1,1X,A16,1X,A1,1X,A16,1X,A1)') &
-                '|','#','|','HF energy','|','Conv','|','HL Gap','|',"One contribution","|","Two contribution","|" 
-      write(*,*)'------------------------------------------------------------------------------------------'
+      write(outfile,*)
+      write(outfile,*) repeat('-', 110)
+      write(outfile,*) "|",repeat(' ', 47),"RHF calculation",repeat(' ', 46),"|"
+      write(outfile,*) repeat('-', 110)
 
-      do while(Conv > thresh .and. nSCF < maxSCF)
+      write(outfile,'(1x,a1,a2,1x,a1,a,a1,a,a1,a,a1,a,a1,a,a1,a,a1)') &
+      "|","#","|","      HF energy  ","|", "    Conv   ","|","   HL Gap  ","|", "    T contribution  ",&
+      "|","   V contribution   ","|","   Two contribution ","|"
+      write(outfile,*) repeat('-', 110)
+      do while(nSCF < maxSCF)
   
+      !  Conv > thresh .and. 
+
       !   Increment 
   
       nSCF = nSCF + 1
   
-      !   Transform for the Fock matrix F in the orthogonal basis 
-          Fp = matmul(transpose(X),matmul(F,X))
-      
-      ! ****************** !
-  
-      !   Diagonalize F' to get MO coefficients (eigenvectors in the orthogonal basis) c' and MO energies (eigenvalues) e
-          cp(:,:) = Fp(:,:)
-          call diagonalize_matrix(nBas,cp,e)
-      ! ****************** !
-  
-      !   Back-transform the MO coefficients c in the original non-orthogonal basis
-          c = matmul(X,cp)
-
-      ! ****************** !
-  
-      !   Compute the density matrix P
-          P(:,:)  = 2d0*matmul(c(:,1:nO),transpose(c(:,1:nO)))
-      ! ****************** !
-
       !   Compute the Hartree potential J
-          call hartree_potential(nBas,P,ERI,J)
+      call hartree_potential(nBas,P,ERI,J)
       ! ****************** !
   
       !   Compute the exchange potential K
-          call exchange_potential(nBas,P,ERI,K)
+      call exchange_potential(nBas,P,ERI,K)
       ! ****************** !
 
       !   Build Fock operator
@@ -111,8 +120,9 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       F(:,:) = Hc(:,:) + J(:,:) + K(:,:)
   
       !   Compute the error vector and extract the convergence criterion
-          error = matmul(F,matmul(P,S)) - matmul(matmul(S,P),F)
-          Conv  = maxval(abs(error))
+      error = matmul(F,matmul(P,S)) - matmul(matmul(S,P),F)
+      if(nSCF > 1) Conv = maxval(abs(error)) 
+      if (Conv < thresh) exit 
       ! ****************** !
   
       !------------------------------------------------------------------------
@@ -120,26 +130,31 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       !------------------------------------------------------------------------
   
       !   Compute the kinetic energy
-          ET = trace_matrix(nBas,matmul(P,T))
+      ET = trace_matrix(nBas,matmul(P,T))
       ! ****************** !
 
       !   Compute the potential energy
-          EV = trace_matrix(nBas,matmul(P,V))
+      EV = trace_matrix(nBas,matmul(P,V))
       ! ****************** !
 
       !   Compute the Hartree energy
-          EJ = 0.5d0*trace_matrix(nBas,matmul(P,J))
+      EJ = 0.5d0*trace_matrix(nBas,matmul(P,J))
       ! ****************** !
 
       !   Compute the exchange energy
-          EK = 0.5d0*trace_matrix(nBas,matmul(P,K))
+      EK = 0.5d0*trace_matrix(nBas,matmul(P,K))
       ! ****************** !
 
       !   Total HF energy
   
       EHF = ET + EV + EJ + EK
-  
-      ! *** Exercise 3.5 *** !
+
+      if (abs(EHF - EHF_old) < thresh) exit
+
+      if (nSCF > 2) then 
+        EHF_old = EHF 
+      end if 
+
       !   Compute HOMO-LUMO gap
           if(nBas > nO) then
             Gap = e(nO+1) - e(nO)
@@ -147,29 +162,53 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
             Gap = 0d0
           endif
       ! ****************** !
+
+      ! DIIS extrapolation ! 
+
+      if(max_diis > 1) then
+        n_diis = min(n_diis+1,max_diis)
+        call DIIS_extrapolation(rcond,nBas*nBas,nBas*nBas,n_diis,err_diis,F_diis,error,F)
+      end if
+
+      !   Transform for the Fock matrix F in the orthogonal basis 
+      
+      Fp = matmul(transpose(X),matmul(F,X))
+            
+      !   Diagonalize F' to get MO coefficients (eigenvectors in the orthogonal basis) c' and MO energies (eigenvalues) e
+
+      cp(:,:) = Fp(:,:)
+      call diagonalize_matrix(nBas,cp,e)
+
+      !   Back-transform the MO coefficients c in the original non-orthogonal basis
+
+      c = matmul(X,cp)
+
+      !   Compute the density matrix P 
+
+      P(:,:) = 2d0*matmul(c(:,1:nO),transpose(c(:,1:nO)))
   
   
       !   Dump results
-  
-      write(*,'(1X,A1,1X,I3,1X,A1,1X,F16.10,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X,F16.10,1X,A1,1X,F16.10,1X,A1,1X)') &
-        '|',nSCF,'|',EHF+ENuc,'|',Conv,'|',Gap,'|',ET+EV,"|",EJ+EK,"|"
    
+      write(outfile,"(1x,a1,i2,1x,a1,f16.8,1x,a1,f10.6,1x,a1,f10.6,1x,a1,f16.8,4x,a1,f16.8,4x,a1,f16.8,4x,a1)")      & 
+      "|",nSCF,"|",EHF+ENuc,"|",Conv,"|",Gap,"|",ET,"|",EV,"|",Ej+EK,"|"
       enddo
-      write(*,*)'------------------------------------------------------------------------------------------'
+
+      write(outfile,*) repeat('-', 110)
 
       !------------------------------------------------------------------------
       ! End of SCF loop
       !------------------------------------------------------------------------
   
-      ! Did it actually converge?
-  
       if(nSCF == maxSCF) then
   
-        write(*,*)
-        write(*,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-        write(*,*)'                 Convergence failed                 '
-        write(*,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-        write(*,*)
+        write(outfile,*)
+        write(outfile,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+        write(outfile,*)'                 Convergence failed                 '
+        write(outfile,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+        write(outfile,*)
+
+        call print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,EK,EHF)
   
         stop
   

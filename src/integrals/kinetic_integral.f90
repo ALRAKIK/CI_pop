@@ -39,7 +39,6 @@ subroutine kinetic_integral_ss(r1,r2,atom1,atom2,index1,index2,S_ss_normal)
         do j = 1 , atom2%num_exponent_s
           beta = atom2%exponent_s(j)
           c2   = atom2%coefficient_s(j,index2)
-            if (c1*c2 == 0.d0) cycle  
               p  = alpha + beta 
               mu = alpha*beta/p 
               const = alpha*beta/p * (3.d0 - 2.d0*alpha*beta/p*D_normal)
@@ -56,6 +55,7 @@ end subroutine
 
 subroutine kinetic_integral_sp(r1,r2,atom1,atom2,index1,index2,S_sp_normal)
 
+      use torus_init
       use atom_basis
       implicit none 
 
@@ -80,6 +80,7 @@ subroutine kinetic_integral_sp(r1,r2,atom1,atom2,index1,index2,S_sp_normal)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
+      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -95,11 +96,11 @@ subroutine kinetic_integral_sp(r1,r2,atom1,atom2,index1,index2,S_sp_normal)
         do j = 1 , atom2%num_exponent_p
           beta = atom2%exponent_p(j)
           c2   = atom2%coefficient_p(j,index2)
-            if (c1*c2 == 0.d0) cycle  
               p  = alpha + beta 
               mu = alpha*beta/p 
         
               X            =  (x1 - x2)
+              if (torus) call SSD(x1,x2,X)
               X_PB_normal  =  (alpha/p)*(X)
         
               Y            =  (y1 - y2)
@@ -124,6 +125,7 @@ end subroutine
 
 subroutine kinetic_integral_ps(r1,r2,atom1,atom2,index1,index2,S_ps_normal)
 
+      use torus_init
       use atom_basis
       implicit none 
 
@@ -148,6 +150,7 @@ subroutine kinetic_integral_ps(r1,r2,atom1,atom2,index1,index2,S_ps_normal)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
+      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -163,11 +166,11 @@ subroutine kinetic_integral_ps(r1,r2,atom1,atom2,index1,index2,S_ps_normal)
         do j = 1 , atom2%num_exponent_s
           beta = atom2%exponent_s(j)
           c2   = atom2%coefficient_s(j,index2)
-            if (c1*c2 == 0.d0) cycle  
               p  = alpha + beta 
               mu = alpha*beta/p 
         
               X            =  (x1 - x2)
+              if (torus) call SSD(x1,x2,X)
               X_PA_normal  = -(beta/p)*(X)
         
               Y            =  (y1 - y2)
@@ -191,93 +194,95 @@ end subroutine
 
 
 subroutine kinetic_integral_pp(r1,r2,atom1,atom2,index1,index2,S_pp_normal)
+  
+      use torus_init
+      use atom_basis
+      implicit none 
 
-  use atom_basis
-  implicit none 
+      double precision,intent(in)  :: r1(3) , r2(3)
+      type(atom),intent(in)        :: atom1 , atom2 
+      integer                      :: index1 , index2 
 
-  double precision,intent(in)  :: r1(3) , r2(3)
-  type(atom),intent(in)        :: atom1 , atom2 
-  integer                      :: index1 , index2 
+      integer                      :: i , j 
+      double precision,parameter   :: pi = Acos(-1.d0)
+      double precision             :: alpha , beta
+      double precision             :: c1    , c2 
+      double precision             :: p,mu
+      double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision             :: X , Y , Z
+      double precision             :: D_normal  
+      double precision             :: X_PB_normal , Y_PB_normal , Z_PB_normal 
+      double precision             :: X_PA_normal , Y_PA_normal , Z_PA_normal 
+      double precision             :: C_X_normal  , C_Y_normal  , C_Z_normal 
+      double precision             :: const1 , const2 ,  S11 , integral 
+      double precision,intent(out) :: S_pp_normal(3,3) 
 
-  integer                      :: i , j 
-  double precision,parameter   :: pi = Acos(-1.d0)
-  double precision             :: alpha , beta
-  double precision             :: c1    , c2 
-  double precision             :: p,mu
-  double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
-  double precision             :: X , Y , Z
-  double precision             :: D_normal  
-  double precision             :: X_PB_normal , Y_PB_normal , Z_PB_normal 
-  double precision             :: X_PA_normal , Y_PA_normal , Z_PA_normal 
-  double precision             :: C_X_normal  , C_Y_normal  , C_Z_normal 
-  double precision             :: const1 , const2 ,  S11 , integral 
-  double precision,intent(out) :: S_pp_normal(3,3) 
+      x1 = r1(1) ; x2 = r2(1) 
+      y1 = r1(2) ; y2 = r2(2)
+      z1 = r1(3) ; z2 = r2(3)
 
-  x1 = r1(1) ; x2 = r2(1) 
-  y1 = r1(2) ; y2 = r2(2)
-  z1 = r1(3) ; z2 = r2(3)
+      X            = (x1 - x2)
+      if (torus) call PBC(x1,x2,X)
+      Y            = (y1 - y2)
+      Z            = (z1 - z2)
 
-  X            = (x1 - x2)
-  Y            = (y1 - y2)
-  Z            = (z1 - z2)
+      D_normal     = (X*X+Y*Y+Z*Z)
 
-  D_normal     = (X*X+Y*Y+Z*Z)
+      !-----------------------------------------------------------------!
 
-  !-----------------------------------------------------------------!
+      S_pp_normal(:,:) = 0.d0
 
-  S_pp_normal(:,:) = 0.d0
+      do i = 1 , atom1%num_exponent_p
+        alpha = atom1%exponent_p(i)
+        c1    = atom1%coefficient_p(i,index1)
+        do j = 1 , atom2%num_exponent_p
+          beta = atom2%exponent_p(j)
+          c2   = atom2%coefficient_p(j,index2)
+              p  = alpha + beta 
+              mu = alpha*beta/p 
+        
+              X            =  (x1 - x2)
+              if (torus) call SSD(x1,x2,X)
+              X_PB_normal  =  (alpha/p)*(X)
+              X_PA_normal  = -(beta/p) *(X)
+              C_X_normal   = X_PB_normal*X_PA_normal+(1/(2.d0*p))
+        
+              Y            =  (y1 - y2)
+              Y_PB_normal  =  (alpha/p)*(Y)
+              Y_PA_normal  = -(beta/p) *(Y)
+              C_Y_normal   = Y_PB_normal*Y_PA_normal+(1/(2.d0*p))
+        
+              Z            =  (z1 - z2)
+              Z_PB_normal  =  (alpha/p)*(Z)
+              Z_PA_normal  = -(beta/p) *(Z)
+              C_Z_normal   = Z_PB_normal*Z_PA_normal+(1/(2.d0*p))
+        
+              const1    = alpha*beta/p * (5.d0 - 2.d0*alpha*beta/p*D_normal)
+              const2    = alpha*beta/p * (7.d0 - 2.d0*alpha*beta/p*D_normal)
+        
 
-  do i = 1 , atom1%num_exponent_p
-    alpha = atom1%exponent_p(i)
-    c1    = atom1%coefficient_p(i,index1)
-    do j = 1 , atom2%num_exponent_p
-      beta = atom2%exponent_p(j)
-      c2   = atom2%coefficient_p(j,index2)
-        if (c1*c2 == 0.d0) cycle  
-          p  = alpha + beta 
-          mu = alpha*beta/p 
-    
-          X            =  (x1 - x2)
-          X_PB_normal  =  (alpha/p)*(X)
-          X_PA_normal  = -(beta/p) *(X)
-          C_X_normal   = X_PB_normal*X_PA_normal+(1/(2.d0*p))
-    
-          Y            =  (y1 - y2)
-          Y_PB_normal  =  (alpha/p)*(Y)
-          Y_PA_normal  = -(beta/p) *(Y)
-          C_Y_normal   = Y_PB_normal*Y_PA_normal+(1/(2.d0*p))
-    
-          Z            =  (z1 - z2)
-          Z_PB_normal  =  (alpha/p)*(Z)
-          Z_PA_normal  = -(beta/p) *(Z)
-          C_Z_normal   = Z_PB_normal*Z_PA_normal+(1/(2.d0*p))
-
-          const1    = alpha*beta/p * (5.d0 - 2.d0*alpha*beta/p*D_normal)
-          const2    = alpha*beta/p * (7.d0 - 2.d0*alpha*beta/p*D_normal)
-
-          
-          S11              = const1 * (dsqrt(pi/p)**3.0d0)*exp(-mu*D_normal) * C_X_normal 
-          integral         = S11 + 2.d0*alpha*beta/p * (dsqrt(pi/p)**3.0d0) * X_PB_normal * X_PA_normal * exp(-mu*D_normal)
-          S_pp_normal(1,1) =  S_pp_normal(1,1) +  c1*c2*integral                                                           ! Px-Px 
-
-          S_pp_normal(1,2) =  S_pp_normal(1,2) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * X_PB_normal*Y_PA_normal                       ! Px-Py
-          S_pp_normal(1,3) =  S_pp_normal(1,3) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * X_PB_normal*Z_PA_normal       ! Px-Pz
-
-          S_pp_normal(2,1) =  S_pp_normal(2,1) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * Y_PB_normal*X_PA_normal       ! Py-Px
-          S11              =  const1 * (dsqrt(pi/p)**3.0d0)*exp(-mu*D_normal) * C_Y_normal 
-          integral         =  S11 + 2.d0*alpha*beta/p * (dsqrt(pi/p)**3.0d0) * Y_PB_normal * Y_PA_normal * exp(-mu*D_normal)
-          S_pp_normal(2,2) =  S_pp_normal(2,2) +  c1*c2 * integral                                                         ! Py-Py
-          S_pp_normal(2,3) =  S_pp_normal(2,3) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * Y_PB_normal*Z_PA_normal       ! Py-Pz
-
-          S_pp_normal(3,1) =  S_pp_normal(3,1) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * Z_PB_normal*X_PA_normal       ! Pz-Px
-          S_pp_normal(3,2) =  S_pp_normal(3,2) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * Z_PB_normal*Y_PA_normal       ! Pz-Py
-          S11              =  const1 * (dsqrt(pi/p)**3.0d0)*exp(-mu*D_normal) * C_Z_normal 
-          integral         =  S11 + 2.d0*alpha*beta/p * (dsqrt(pi/p)**3.0d0) * Z_PB_normal * Z_PA_normal * exp(-mu*D_normal)
-          S_pp_normal(3,3) =  S_pp_normal(3,3) +  c1*c2 * integral                                                         ! Pz-Pz
-    
-    
-    end do 
-  end do
+              S11              = const1 * (dsqrt(pi/p)**3.0d0)*exp(-mu*D_normal) * C_X_normal 
+              integral         = S11 + 2.d0*alpha*beta/p * (dsqrt(pi/p)**3.0d0) * X_PB_normal * X_PA_normal * exp(-mu*D_normal)
+              S_pp_normal(1,1) =  S_pp_normal(1,1) +  c1*c2*integral                                                           ! Px-Px 
+        
+              S_pp_normal(1,2) =  S_pp_normal(1,2) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * X_PB_normal*Y_PA_normal                       ! Px-Py
+              S_pp_normal(1,3) =  S_pp_normal(1,3) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * X_PB_normal*Z_PA_normal       ! Px-Pz
+        
+              S_pp_normal(2,1) =  S_pp_normal(2,1) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * Y_PB_normal*X_PA_normal       ! Py-Px
+              S11              =  const1 * (dsqrt(pi/p)**3.0d0)*exp(-mu*D_normal) * C_Y_normal 
+              integral         =  S11 + 2.d0*alpha*beta/p * (dsqrt(pi/p)**3.0d0) * Y_PB_normal * Y_PA_normal * exp(-mu*D_normal)
+              S_pp_normal(2,2) =  S_pp_normal(2,2) +  c1*c2 * integral                                                         ! Py-Py
+              S_pp_normal(2,3) =  S_pp_normal(2,3) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * Y_PB_normal*Z_PA_normal       ! Py-Pz
+        
+              S_pp_normal(3,1) =  S_pp_normal(3,1) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * Z_PB_normal*X_PA_normal       ! Pz-Px
+              S_pp_normal(3,2) =  S_pp_normal(3,2) +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * const2 * Z_PB_normal*Y_PA_normal       ! Pz-Py
+              S11              =  const1 * (dsqrt(pi/p)**3.0d0)*exp(-mu*D_normal) * C_Z_normal 
+              integral         =  S11 + 2.d0*alpha*beta/p * (dsqrt(pi/p)**3.0d0) * Z_PB_normal * Z_PA_normal * exp(-mu*D_normal)
+              S_pp_normal(3,3) =  S_pp_normal(3,3) +  c1*c2 * integral                                                         ! Pz-Pz
+        
+        
+        end do 
+      end do
 
 !-----------------------------------------------------------------!
 

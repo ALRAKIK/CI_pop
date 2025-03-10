@@ -1,4 +1,5 @@
 subroutine ERI_integral_4_function(one,two,three,four,value)
+      
       use torus_init
       use classification_ERI
 
@@ -114,6 +115,9 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
           yPB = yp - yb
           zPB = zp - zb
 
+          if (torus) call SSD(xp,xa,xPA)
+          if (torus) call SSD(xp,xb,xPB)
+
           do k = 1 , size(three%exponent)
             gamma = three%exponent(k)
             c3    = three%coefficient(k)
@@ -142,6 +146,8 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
               yQD = yq - yd
               zQD = zq - zd
 
+              if (torus) call SSD(xq,xc,xQC)
+              if (torus) call SSD(xq,xd,xQD)
 
               xPQ = xp - xq
               if (torus) call euc(xp,xq,xPQ)

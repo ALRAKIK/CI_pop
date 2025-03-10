@@ -24,10 +24,6 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
 
       call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
 
-
-      write(*,*) ""
-      write(*,*) ""
-
       call print_orbital_table(ERI,number_of_functions)
 
       open(1,file="./tmp/ERI.dat")
