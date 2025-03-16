@@ -99,6 +99,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       "|","#","|","      HF energy  ","|", "    Conv   ","|","   HL Gap  ","|", "    T contribution  ",&
       "|","   V contribution   ","|","   Two contribution ","|"
       write(outfile,*) repeat('-', 110)
+      
       do while(nSCF < maxSCF)
   
       !  Conv > thresh .and. 
@@ -149,7 +150,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       EHF = ET + EV + EJ + EK
 
-      if (abs(EHF - EHF_old) < thresh) exit
+      if (abs(EHF - EHF_old) < thresh .and. nSCF > maxSCF/2 ) exit
 
       if (nSCF > 2) then 
         EHF_old = EHF 

@@ -70,6 +70,35 @@ subroutine read_integrals(nBas,S,T,V,Hc,G)
 end subroutine
 
 
+subroutine read_overlap_T(nBas,S)
+
+      ! Read one- and two-electron integrals from files
+
+      implicit none
+
+      ! Input variables
+
+      integer,intent(in)            :: nBas
+
+      ! Local variables
+
+      integer                       :: mu,nu,la,si
+      double precision              :: Ov,Kin,Nuc,ERI
+
+      double precision,intent(out)  :: S(nBas,nBas)
+      
+      open( 8,file='./tmp/OV_tor.dat' )
+
+      S(:,:) = 0d0
+      do 
+        read(8,*,end=8) mu,nu,Ov
+        S(mu,nu) = Ov
+        S(nu,mu) = Ov
+      enddo
+      8 close(8)
+
+end subroutine
+
 !------------------------------------------------------------------------!
 subroutine get_X_from_overlap(N,over,X)
 

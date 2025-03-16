@@ -1,4 +1,4 @@
-subroutine overlap_matrix(number_of_atoms,geometry,atoms)
+subroutine overlap_matrix_tor(number_of_atoms,geometry,atoms)
 
       use atom_basis
 
@@ -54,7 +54,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
 
           do k = 1 , atom1%num_s_function
             do l = 1 , atom2%num_s_function
-              call overlap_integral_ss(r1,r2,atom1,atom2,k,l,SS)
+              call overlap_integral_ss_tor(r1,r2,atom1,atom2,k,l,SS)
               overlap(func_index(i) + k - 1, func_index(j) + l - 1) = SS    ! SS 
               overlap(func_index(j) + l - 1, func_index(i) + k - 1) = SS    ! SS 
             end do 
@@ -62,7 +62,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
 
           do k = 1 , atom1%num_s_function
             do l = 1 , atom2%num_p_function
-              call overlap_integral_sp(r1,r2,atom1,atom2,k,l,SP)
+              call overlap_integral_sp_tor(r1,r2,atom1,atom2,k,l,SP)
               idx_s = func_index(i) + k - 1 
               idx_p = func_index(j) + atom2%num_s_function - 1 + (l-1) * 3 
               overlap(  idx_s, idx_p+1) = SP(1)                             !  SPx
@@ -76,7 +76,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
 
           do k = 1 , atom1%num_p_function
             do l = 1 , atom2%num_s_function
-              call overlap_integral_ps(r1,r2,atom1,atom2,k,l,PS)
+              call overlap_integral_ps_tor(r1,r2,atom1,atom2,k,l,PS)
               idx_p = func_index(i) + atom1%num_s_function - 1 + (k-1) * 3  
               idx_s = func_index(j) + l - 1                                 
               overlap(idx_p+1,   idx_s) = PS(1)                               ! PxS
@@ -90,7 +90,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
 
           do k = 1 , atom1%num_p_function
             do l = 1 , atom2%num_p_function
-              call overlap_integral_pp(r1,r2,atom1,atom2,k,l,PP)
+              call overlap_integral_pp_tor(r1,r2,atom1,atom2,k,l,PP)
               idx_p1 = func_index(i) + atom1%num_s_function - 1 + (k-1) * 3  ! p-function index in atom1
               idx_p2 = func_index(j) + atom2%num_s_function - 1 + (l-1) * 3  ! p-function index in atom2
               
@@ -121,7 +121,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
         end do 
       end do 
 
-      open(1,file="./tmp/OV.dat")
+      open(1,file="./tmp/OV_tor.dat")
         do i = 1 , size(overlap,1)
           do j = i , size(overlap,1)
             write(1,'(I5,I5,f16.8)') i , j , overlap(i,j)
@@ -129,7 +129,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
         end do 
       close(1)
 
-      open(1,file="./tmp/OV_matrix.dat")
+      open(1,file="./tmp/OV_matrix_tor.dat")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(overlap,1))
       do i = 1 , size(overlap,1)
         write(1,'(i3,6x,1000(f16.12,2x))') i ,  (overlap(i,j),j=1,size(overlap,1))
@@ -139,4 +139,4 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
       deallocate(overlap)
 
 
-end subroutine
+end subroutine overlap_matrix_tor

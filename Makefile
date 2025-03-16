@@ -9,9 +9,9 @@ $(shell mkdir -p $(BDIR) $(ODIR)/module)
 
 # Compiler and flags
 FC = gfortran
-FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O2  -g -fbacktrace  -fcheck=all -fimplicit-none 
+FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O2  -g -fbacktrace  -fcheck=all -fimplicit-none
 MODDIR = -J$(ODIR) -I$(ODIR)  # Put and find modules in obj directory
-LIBS = -lblas -llapack
+LIBS = -lblas -llapack -L/opt/homebrew/Cellar/gsl/2.8/lib -lgsl -lgslcblas -lm
 
 # Find all module files
 MODULE_SRC = $(wildcard $(MODULE_DIR)/*.f90)
@@ -36,8 +36,8 @@ modules: $(MODULE_OBJ)
 
 # Compile the executable, ensuring modules are built first
 $(BDIR)/CI_pop: modules $(OTHER_OBJ) $(MAIN_OBJ)
-	$(FC) -o $@ $(ALL_OBJ) $(LIBS)
-
+	$(FC) -o $@ $(ALL_OBJ) $(LIBS) 
+	
 # Rule to compile module files
 $(ODIR)/module/%.o: $(MODULE_DIR)/%.f90
 	@mkdir -p $(dir $@)

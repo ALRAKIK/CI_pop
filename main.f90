@@ -3,28 +3,33 @@ program CI
       use files
       use torus_init
       use atom_basis
+      use classification_ERI
 
       implicit none 
 
-      integer                      :: i , j 
-      integer                      :: n_atoms , nBAS
-      integer                      :: nO      , n_electron 
+      integer                         :: i , j 
+      integer                         :: n_atoms , nBAS
+      integer                         :: nO      , n_electron 
 
-      double precision             :: geometry_tmp(100,3)
-      integer                      :: charge_tmp(100)
+      double precision                :: geometry_tmp(100,3)
+      integer                         :: charge_tmp(100)
+      integer                         :: number_of_functions
 
-      double precision,allocatable :: geometry(:,:)
-      integer         ,allocatable :: charge(:)
-      type(atom)      ,allocatable :: atoms(:)
+      double precision,allocatable    :: geometry(:,:)
+      integer         ,allocatable    :: charge(:)
+      type(atom)      ,allocatable    :: atoms(:)
+      type(atom)      ,allocatable    :: atoms_tor(:)
+      type(ERI_function),allocatable  :: AO (:)
 
-      double precision,allocatable :: S(:,:)
-      double precision,allocatable :: T(:,:)
-      double precision,allocatable :: V(:,:)
-      double precision,allocatable :: Hc(:,:)
-      double precision,allocatable :: X(:,:)
-      double precision,allocatable :: ERI(:,:,:,:)
-      double precision,allocatable :: e(:)
-      double precision,allocatable :: c(:,:)
+      double precision,allocatable    ::       S(:,:)
+      double precision,allocatable    ::     S_T(:,:)
+      double precision,allocatable    ::       T(:,:)
+      double precision,allocatable    ::       V(:,:)
+      double precision,allocatable    ::      Hc(:,:)
+      double precision,allocatable    ::       X(:,:)
+      double precision,allocatable    :: ERI(:,:,:,:)
+      double precision,allocatable    ::         e(:)
+      double precision,allocatable    ::       c(:,:)
 
 
       double precision             :: E_nuc , EHF
@@ -52,9 +57,12 @@ program CI
         geometry(i,3) = geometry_tmp(i,3)
       end do 
 
-      allocate(atoms(n_atoms))
+      allocate(atoms    (n_atoms))
+      allocate(atoms_tor(n_atoms))
 
       call basis(n_atoms,charge,atoms)
+
+      call basis_tor(n_atoms,charge,atoms_tor)
 
       open (outfile,file="results.out")
 
@@ -63,6 +71,13 @@ program CI
       do i = 1 , n_atoms
         write(outfile,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
       end do 
+
+      number_of_functions = 0 
+      do i = 1 , n_atoms
+        number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
+      end do 
+
+      allocate(AO(number_of_functions))
 
 !     -------------------------------------------------------------------     !
 !                         Parameters for the calculation 
@@ -83,15 +98,37 @@ program CI
 
       call header_under("Calculate the integerals",-1)
 
+      call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
+
+      call print_orbital_table(AO,number_of_functions)
+
       call cpu_time(start_HF)
 
-      call overlap_matrix(n_atoms,geometry,atoms)
+!      call overlap_matrix_tor(n_atoms,geometry,atoms_tor)
 
-      call kinetic_matrix(n_atoms,geometry,atoms)
+!     -------------------------------------------------------------------     !
+!                     calculate the without symmetry  
+!     -------------------------------------------------------------------     !
 
-      call nuclear_attraction_matrix(n_atoms,geometry,atoms)
-            
-      call ERI_integral(n_atoms,geometry,atoms)
+!      call overlap_matrix(n_atoms,geometry,atoms)
+!      call kinetic_matrix(n_atoms,geometry,atoms)
+!      call nuclear_attraction_matrix(n_atoms,geometry,atoms)      
+!      call ERI_integral(n_atoms,geometry,atoms)
+
+!     -------------------------------------------------------------------     !      
+
+!     -------------------------------------------------------------------     !
+!                     calculate the with translational symmetry  
+!     -------------------------------------------------------------------     !
+
+      call overlap_matrix_alt(n_atoms,number_of_functions,geometry,atoms,AO)
+      call kinetic_matrix_alt(n_atoms,number_of_functions,geometry,atoms,AO)
+      call nuclear_attraction_matrix_alt(n_atoms,number_of_functions,geometry,atoms,AO)
+      call ERI_integral_alt(n_atoms,geometry,atoms)
+      write(outfile,*) "Translation symmetry applied to integrals"
+      write(outfile,*) ""
+
+!     -------------------------------------------------------------------     !
 
       call cpu_time(end_HF)
 
@@ -99,7 +136,7 @@ program CI
 
       write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
       write(outfile,*)
-
+      
 !     -------------------------------------------------------------------     !
 !                        Nuclear repulsion energy  
 !     -------------------------------------------------------------------     !
@@ -121,8 +158,13 @@ program CI
       end do 
 
       allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas),X(nBas,nBas),ERI(nBas,nBas,nBas,nBas),e(nBas),c(nBas,nBas))
+      allocate(S_T(nBas,nBas))
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
+
+      call read_overlap_T(nBas,S_T)
+
+      call check_symmetric_matrix(nBas,S,T,V,HC)
 
       !------------------------------------------------------!
       !                                  (-1/2)         t    !
@@ -135,7 +177,7 @@ program CI
 !      call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
-
+      
       nO = n_electron/2 
       
       ! ---------------------------------------------------------------- !

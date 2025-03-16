@@ -1,6 +1,7 @@
 subroutine print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,Ex,EHF)
 
       ! Print one- and two-electron energies and other stuff for RHF calculation
+
       use files 
       implicit none
 
@@ -15,7 +16,9 @@ subroutine print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,Ex,EHF)
 
       HOMO = nO
       LUMO = HOMO + 1
+      
       Gap = e(LUMO) - e(HOMO)
+
 
       ! Dump results
 

@@ -12,6 +12,7 @@ subroutine PBC(x1,x2,X)
         X = Lx - dabs(X)
       end if
 
+
 end subroutine PBC
 
 subroutine bary_center(alpha,x1,beta,x2,p_R,xp)
@@ -42,7 +43,7 @@ subroutine bary_center(alpha,x1,beta,x2,p_R,xp)
 
       xp = xp * p_R
 
-      if (xp >= Lx) xp = xp - Lx 
+!      if (xp >= Lx) xp = xp - Lx 
 
 end subroutine bary_center
 

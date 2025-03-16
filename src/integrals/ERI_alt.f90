@@ -1,0 +1,76 @@
+subroutine ERI_integral_alt(number_of_atoms,geometry,atoms)
+
+      use atom_basis
+      use classification_ERI
+
+      implicit none 
+
+      integer                        :: i , j , k , l 
+      integer                        :: number_of_atoms
+      integer                        :: number_of_atoms_per_unitcell 
+      type(atom)                     :: atoms(number_of_atoms)
+      type(ERI_function),allocatable :: ERI  (:)
+
+      double precision               :: geometry(number_of_atoms,3)
+      double precision               :: value 
+      double precision,allocatable   :: two_electron(:,:,:,:)
+      double precision,allocatable   ::      two_eri(:,:,:,:)
+      integer                        :: number_of_functions
+      integer                        :: number_of_functions_per_unitcell 
+
+
+      number_of_atoms_per_unitcell = 1 
+
+      number_of_functions = 0 
+      do i = 1 , number_of_atoms
+        number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
+      end do 
+
+      number_of_functions_per_unitcell = 0 
+      do i = 1 , number_of_atoms_per_unitcell 
+        number_of_functions_per_unitcell = number_of_functions_per_unitcell + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
+      end do 
+
+      allocate(ERI(number_of_functions))
+      allocate(two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
+      allocate(     two_eri(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
+
+      call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
+
+!      call print_orbital_table(ERI,number_of_functions)
+
+      open(1,file="./tmp/ERI.dat")
+
+      do i = 1, number_of_functions_per_unitcell
+        do j = 1 , number_of_functions
+          do k = 1 , number_of_functions
+            do l = 1 , number_of_functions
+              call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l),two_electron(i,j,k,l))
+            end do 
+          end do 
+        end do 
+      end do 
+
+      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+      !                    symmetry of the integrals                    !
+      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+
+      call shift_integrals(two_electron,two_eri,number_of_functions,number_of_functions_per_unitcell)
+
+      do i = 1, number_of_functions
+        do j = 1 , number_of_functions
+          do k = 1 , number_of_functions
+            do l = 1 , number_of_functions
+              if (abs(two_eri(i,j,k,l)) > 1e-10 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_eri(i,j,k,l)
+            end do 
+          end do 
+        end do 
+      end do 
+
+      close(1)
+
+      deallocate(ERI)
+      deallocate(two_electron)
+      deallocate(two_eri)
+
+end subroutine

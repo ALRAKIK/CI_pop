@@ -130,8 +130,9 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
       close(1)
 
       open(1,file="./tmp/KI_matrix.dat")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(kinetic,1))
       do i = 1 , size(kinetic,1)
-        write(1,'(1000f16.12)')  (kinetic(i,j),j=1,size(kinetic,1))
+        write(1,'(i3,6x,1000(f16.12,2x))') i ,   (kinetic(i,j),j=1,size(kinetic,1))
       end do 
       close(1)
 
