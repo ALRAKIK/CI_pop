@@ -20,7 +20,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       ! Local variables
   
-      integer,parameter             :: maxSCF = 50
+      integer,parameter             :: maxSCF = 100
       double precision,parameter    :: thresh = 1d-5
       integer                       :: nSCF
       double precision              :: Conv
@@ -102,8 +102,6 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       
       do while(nSCF < maxSCF)
   
-      !  Conv > thresh .and. 
-
       !   Increment 
   
       nSCF = nSCF + 1

@@ -150,23 +150,48 @@ subroutine nuclear_attraction_integral_sp_alt(number_of_atoms,geometry,atoms,r1,
             Y_PB_normal  =  (alpha/p)*(Y)
             Z_PB_normal  =  (alpha/p)*(Z)
 
-            do k = 1 , number_of_atoms
-              
-              x_PC = xp - geometry(k,1) 
-              y_PC = yp - geometry(k,2)
-              z_PC = zp - geometry(k,3)
+            X = x1 - x2 
 
-              if (torus) call euc(xp,geometry(k,1),x_PC)
+            if (abs(X)  < 1e-10) then 
+
+            else 
+
+              do k = 1 , number_of_atoms
               
-              R2PC = x_PC*x_PC + y_PC*y_PC + z_PC*z_PC
+                x_PC = xp - geometry(k,1) 
+                y_PC = yp - geometry(k,2)
+                z_PC = zp - geometry(k,3)
+  
+                if (torus) call euc(xp,geometry(k,1),x_PC)
+                
+                R2PC = x_PC*x_PC + y_PC*y_PC + z_PC*z_PC
+              
+                charge_atom = (-1)*atoms(k)%charge
+              
+                if (AO2%orbital=="px") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (X_PB_normal * Boys_func(0,p*R2PC) - X_PC * Boys_func(1,p*R2PC) ) 
+                if (AO2%orbital=="py") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (Y_PB_normal * Boys_func(0,p*R2PC) - Y_PC * Boys_func(1,p*R2PC) ) 
+                if (AO2%orbital=="pz") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (Z_PB_normal * Boys_func(0,p*R2PC) - Z_PC * Boys_func(1,p*R2PC) ) 
             
-              charge_atom = (-1)*atoms(k)%charge
-            
-              if (AO2%orbital=="px") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (X_PB_normal * Boys_func(0,p*R2PC) - X_PC * Boys_func(1,p*R2PC) ) 
-              if (AO2%orbital=="py") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (Y_PB_normal * Boys_func(0,p*R2PC) - Y_PC * Boys_func(1,p*R2PC) ) 
-              if (AO2%orbital=="pz") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (Z_PB_normal * Boys_func(0,p*R2PC) - Z_PC * Boys_func(1,p*R2PC) ) 
-          
-            end do 
+              end do  
+            end if 
+
+!            do k = 1 , number_of_atoms
+!              
+!              x_PC = xp - geometry(k,1) 
+!              y_PC = yp - geometry(k,2)
+!              z_PC = zp - geometry(k,3)
+!
+!              if (torus) call euc(xp,geometry(k,1),x_PC)
+!              
+!              R2PC = x_PC*x_PC + y_PC*y_PC + z_PC*z_PC
+!            
+!              charge_atom = (-1)*atoms(k)%charge
+!            
+!              if (AO2%orbital=="px") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (X_PB_normal * Boys_func(0,p*R2PC) - X_PC * Boys_func(1,p*R2PC) ) 
+!              if (AO2%orbital=="py") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (Y_PB_normal * Boys_func(0,p*R2PC) - Y_PC * Boys_func(1,p*R2PC) ) 
+!              if (AO2%orbital=="pz") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (Z_PB_normal * Boys_func(0,p*R2PC) - Z_PC * Boys_func(1,p*R2PC) ) 
+!          
+!            end do 
 
         end do 
       end do
