@@ -16,7 +16,6 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
 
       double precision,allocatable :: NA(:,:)
       double precision             :: r1(3) , r2(3)
-      character(len=10)            :: num_str
 
       double precision,parameter   :: pi = dacos(-1.d0)
 

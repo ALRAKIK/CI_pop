@@ -5,9 +5,8 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
 
       implicit none 
 
-      integer                        :: i , j , k , l  , m 
+      integer                        :: i , j , k , l
       integer                        :: index_atom1 , index_sym
-      integer                        :: group , j_base , j_offset , j_orig
       integer                        :: number_of_atoms
       integer                        :: number_of_functions 
 
@@ -23,15 +22,6 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
 
       double precision,parameter     :: pi = dacos(-1.d0)
 
-
-      double precision               :: SS , SP(3) , PS(3) , PP(3,3)
-      integer                        :: total_functions
-
-      integer, parameter             :: u = 5, o = 50
-      integer, parameter             :: block_size_i = 9, block_size_j = 9  ! Blocks will be 5x5 to ensure symmetry
-      double precision,allocatable   :: blocks(:, :, :)
-      integer :: bi, bj, b, row, col, start_row, start_col , num_blocks
-    
       allocate(NA(number_of_functions,number_of_functions))
 
       NA(:,:) = 0.d0 
@@ -43,10 +33,6 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
       do i = 1 , number_of_atoms/2 + 1 
         index_sym = index_sym + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
       end do 
-
-      num_blocks = number_of_functions / index_atom1
-
-      allocate(blocks(block_size_i, block_size_j, num_blocks))
 
       index_sym = index_sym + 1 
 

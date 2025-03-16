@@ -12,7 +12,6 @@ subroutine ERI_integral_alt(number_of_atoms,geometry,atoms)
       type(ERI_function),allocatable :: ERI  (:)
 
       double precision               :: geometry(number_of_atoms,3)
-      double precision               :: value 
       double precision,allocatable   :: two_electron(:,:,:,:)
       double precision,allocatable   ::      two_eri(:,:,:,:)
       integer                        :: number_of_functions

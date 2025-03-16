@@ -82,8 +82,8 @@ subroutine read_overlap_T(nBas,S)
 
       ! Local variables
 
-      integer                       :: mu,nu,la,si
-      double precision              :: Ov,Kin,Nuc,ERI
+      integer                       :: mu,nu
+      double precision              :: Ov
 
       double precision,intent(out)  :: S(nBas,nBas)
       

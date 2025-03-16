@@ -1,4 +1,4 @@
-subroutine overlap_matrix_alt(number_of_atoms,number_of_functions,geometry,atoms,AO)
+subroutine overlap_matrix_alt(number_of_atoms,number_of_functions,atoms,AO)
 
       use atom_basis
       use classification_ERI
@@ -7,27 +7,16 @@ subroutine overlap_matrix_alt(number_of_atoms,number_of_functions,geometry,atoms
 
       integer                         :: i , j , k , l 
       integer                         :: index_atom1 , index_sym
-      integer                         :: group , j_base , j_offset , j_orig
       integer                         :: number_of_atoms
       integer                         :: number_of_functions
-      integer                         :: j_orig_counter
-
       
       type(atom)                      :: atoms(number_of_atoms)
 
       type(ERI_function)              :: AO (number_of_functions)
       type(ERI_function)              :: AO1 , AO2
 
-      double precision                :: geometry(number_of_atoms,3)
-
       double precision,allocatable    :: overlap(:,:)
       double precision                :: r1(3) , r2(3)
-
-
-      double precision                :: SS 
-      double precision                :: SP , PS(3)
-      double precision                :: PP(3,3)
-
 
       allocate(overlap(number_of_functions,number_of_functions))
     

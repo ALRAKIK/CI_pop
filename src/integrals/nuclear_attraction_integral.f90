@@ -23,7 +23,7 @@ subroutine nuclear_attraction_integral_ss(n_atoms,geometry,r1,r2,atom1,atom2,ato
       double precision             :: xp , yp , zp 
       double precision             :: X , Y , Z
       double precision             :: D_normal 
-      double precision             :: xPC , yPC , zPC , xPC_euc 
+      double precision             :: xPC , yPC , zPC
       double precision             :: Boys_func , R2PC
       double precision,intent(out) :: S_ss_normal
 
@@ -106,7 +106,7 @@ subroutine nuclear_attraction_integral_sp(n_atoms,geometry,r1,r2,atom1,atom2,ato
       double precision             :: X , Y , Z
       double precision             :: X_PB_normal , Y_PB_normal , Z_PB_normal
       double precision             :: D_normal 
-      double precision             :: X_PC_normal , Y_PC_normal , Z_PC_normal , X_PC_EUC 
+      double precision             :: X_PC_normal , Y_PC_normal , Z_PC_normal
       double precision             :: Boys_func , R2PC
       double precision,intent(out) :: S_sp_normal(3)
 

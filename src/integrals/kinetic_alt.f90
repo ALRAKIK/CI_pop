@@ -1,4 +1,4 @@
-subroutine kinetic_matrix_alt(number_of_atoms,number_of_functions,geometry,atoms,AO)
+subroutine kinetic_matrix_alt(number_of_atoms,number_of_functions,atoms,AO)
 
       use atom_basis
       use classification_ERI
@@ -7,11 +7,8 @@ subroutine kinetic_matrix_alt(number_of_atoms,number_of_functions,geometry,atoms
 
       integer                         :: i , j , k , l 
       integer                         :: index_atom1 , index_sym
-      integer                         :: group , j_base , j_offset , j_orig
       integer                         :: number_of_atoms
       integer                         :: number_of_functions
-
-      double precision                :: geometry(number_of_atoms,3)
 
       type(atom)                      :: atoms(number_of_atoms)
 
@@ -22,9 +19,7 @@ subroutine kinetic_matrix_alt(number_of_atoms,number_of_functions,geometry,atoms
       double precision,allocatable :: kinetic(:,:)
       double precision             :: r1(3) , r2(3)
 
-      double precision             :: SS 
-      double precision             :: SP(3) , PS(3)
-      double precision             :: PP(3,3)
+
 
 
       allocate(kinetic(number_of_functions,number_of_functions))

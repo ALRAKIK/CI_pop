@@ -140,7 +140,6 @@ subroutine kinetic_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
       double precision               :: X_PA_normal , Y_PA_normal , Z_PA_normal 
       double precision               :: C_X_normal  , C_Y_normal  , C_Z_normal 
       double precision               :: const1      , const2      , S11 , integral 
-      double precision               :: const
       double precision,intent(out)   :: S_pp_normal
 
       x1 = r1(1) ; x2 = r2(1) 

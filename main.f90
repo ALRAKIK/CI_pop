@@ -79,6 +79,9 @@ program CI
 
       allocate(AO(number_of_functions))
 
+      call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
+      call print_orbital_table(AO,number_of_functions)
+
 !     -------------------------------------------------------------------     !
 !                         Parameters for the calculation 
 !     -------------------------------------------------------------------     !
@@ -97,10 +100,6 @@ program CI
 !     -------------------------------------------------------------------     !
 
       call header_under("Calculate the integerals",-1)
-
-      call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
-
-      call print_orbital_table(AO,number_of_functions)
 
       call cpu_time(start_HF)
 
@@ -121,8 +120,8 @@ program CI
 !                     calculate the with translational symmetry  
 !     -------------------------------------------------------------------     !
 
-      call overlap_matrix_alt(n_atoms,number_of_functions,geometry,atoms,AO)
-      call kinetic_matrix_alt(n_atoms,number_of_functions,geometry,atoms,AO)
+      call overlap_matrix_alt(n_atoms,number_of_functions,atoms,AO)
+      call kinetic_matrix_alt(n_atoms,number_of_functions,atoms,AO)
       call nuclear_attraction_matrix_alt(n_atoms,number_of_functions,geometry,atoms,AO)
       call ERI_integral_alt(n_atoms,geometry,atoms)
       write(outfile,*) "Translation symmetry applied to integrals"
@@ -162,9 +161,9 @@ program CI
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
 
-      call read_overlap_T(nBas,S_T)
+!      call read_overlap_T(nBas,S_T)
 
-      call check_symmetric_matrix(nBas,S,T,V,HC)
+!      call check_symmetric_matrix(nBas,S,T,V,HC)
 
       !------------------------------------------------------!
       !                                  (-1/2)         t    !
