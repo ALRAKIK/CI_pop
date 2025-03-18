@@ -4,6 +4,8 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
 
       implicit none 
 
+      !-----------------------------------------------------------------!
+
       integer                      :: i , j , k , l 
       integer                      :: func_index(1:number_of_atoms)
       integer                      :: idx_s  , idx_p 
@@ -25,7 +27,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
       double precision             :: PP(3,3)
       integer                      :: total_functions
 
-
+      !-----------------------------------------------------------------!
 
       total_functions = 0 
 

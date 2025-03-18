@@ -89,7 +89,7 @@ program CI
 !                         Parameters for the calculation 
 !     -------------------------------------------------------------------     !
 
-      calculation_type = "OBC"
+      calculation_type = "SAO"
 
 !     -------------------------------------------------------------------     !
 !                            Plot the gussians                                !
@@ -103,10 +103,6 @@ program CI
 !                         calculate the integrals 
 !     -------------------------------------------------------------------     !
 
-      call header_under("Calculate the integerals",-1)
-
-      call cpu_time(start_HF)
-
 !      call overlap_matrix_tor(n_atoms,geometry,atoms_tor)
 
       !-----------------------------------------------------------------!
@@ -116,11 +112,13 @@ program CI
       if (calculation_type == "OBC") then 
         
         call header("calculation with OBC",-1)
-
+        call header_under("Calculate the integerals",-1)
+        call cpu_time(start_HF)
         call overlap_matrix(n_atoms,geometry,atoms)
         call kinetic_matrix(n_atoms,geometry,atoms)
         call nuclear_attraction_matrix(n_atoms,geometry,atoms)  
-        call ERI_integral(n_atoms,geometry,atoms)
+!        call ERI_integral(n_atoms,geometry,atoms)
+        call cpu_time(end_HF)
 
       end if 
 
@@ -129,14 +127,15 @@ program CI
       !-----------------------------------------------------------------!
 
       if (calculation_type == "SAO") then 
-        
-        call overlap_matrix(n_atoms,geometry,atoms)
-        call SAO_S_matrix(number_of_functions)
-        call kinetic_matrix(n_atoms,geometry,atoms)
-        call SAO_k_matrix(number_of_functions)
-        call nuclear_attraction_matrix(n_atoms,geometry,atoms)  
-        call SAO_NA_matrix(number_of_functions)
+        call header("Torus with SAO",-1)
+        call header_under("Calculate the integerals",-1)
+        call Torus_def()
+        call cpu_time(start_HF)
+        call overlap_matrix_SAO(n_atoms,number_of_functions,atoms,AO)
+        call kinetic_matrix_SAO(n_atoms,number_of_functions,atoms,AO)
+        call nuclear_attraction_matrix_SAO(n_atoms,number_of_functions,geometry,atoms,AO)
 !        call ERI_integral(n_atoms,geometry,atoms)
+        call cpu_time(end_HF)
 
       end if 
 
@@ -148,21 +147,20 @@ program CI
       if (calculation_type == "Torus") then 
 
         call header("Torus with PBC",-1)
+        call header_under("Calculate the integerals",-1)
         call Torus_def()
-
+        call cpu_time(start_HF)
         call overlap_matrix_torus(n_atoms,number_of_functions,atoms,AO)
         call kinetic_matrix_torus(n_atoms,number_of_functions,atoms,AO)
         call nuclear_attraction_matrix_torus(n_atoms,number_of_functions,geometry,atoms,AO)
         call ERI_integral_torus(n_atoms,geometry,atoms)
-
+        call cpu_time(end_HF)
         write(outfile,*) "Translation symmetry applied to integrals"
         write(outfile,*) ""
 
       end if 
 
       !-----------------------------------------------------------------!
-
-      call cpu_time(end_HF)
 
       t_HF = end_HF - start_HF
 
@@ -204,7 +202,7 @@ program CI
 
 !      call read_overlap_T(nBas,S_T)
 
-!      call check_symmetric_matrix(nBas,S,T,V,HC)
+      call check_symmetric_matrix(nBas,S,T,V,HC)
 
       !------------------------------------------------------!
       !                                  (-1/2)         t    !
@@ -217,9 +215,7 @@ program CI
       call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
-      
-
-      
+       
       ! ---------------------------------------------------------------- !
       !                                                                  !
       !                           HF code start                          !

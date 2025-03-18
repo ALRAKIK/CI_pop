@@ -85,6 +85,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       rcond         = 0d0
 
       EHF_old       = 0d0 
+      EHF           = 0d0 
   
       !------------------------------------------------------------------------
       ! Main SCF loop
