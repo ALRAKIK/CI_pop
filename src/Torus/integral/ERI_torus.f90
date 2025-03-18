@@ -1,11 +1,13 @@
-subroutine ERI_integral_alt(number_of_atoms,geometry,atoms)
+subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
 
       use atom_basis
       use classification_ERI
 
       implicit none 
 
-      integer                        :: i , j , k , l 
+      !-----------------------------------------------------------------!
+
+      integer                        :: i , j , k , l
       integer                        :: number_of_atoms
       integer                        :: number_of_atoms_per_unitcell 
       type(atom)                     :: atoms(number_of_atoms)
@@ -14,9 +16,11 @@ subroutine ERI_integral_alt(number_of_atoms,geometry,atoms)
       double precision               :: geometry(number_of_atoms,3)
       double precision,allocatable   :: two_electron(:,:,:,:)
       double precision,allocatable   ::      two_eri(:,:,:,:)
+      double precision               :: value
       integer                        :: number_of_functions
       integer                        :: number_of_functions_per_unitcell 
 
+      !-----------------------------------------------------------------!
 
       number_of_atoms_per_unitcell = 1 
 
@@ -36,20 +40,30 @@ subroutine ERI_integral_alt(number_of_atoms,geometry,atoms)
 
       call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
 
-!      call print_orbital_table(ERI,number_of_functions)
 
       open(1,file="./tmp/ERI.dat")
 
-      do i = 1, number_of_functions_per_unitcell
-        do j = 1 , number_of_functions
-          do k = 1 , number_of_functions
-            do l = 1 , number_of_functions
-              call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l),two_electron(i,j,k,l))
-            end do 
-          end do 
-        end do 
-      end do 
 
+      ! 2-fold symmetry implementation (k,l permutation only)
+
+      do i = 1, number_of_functions_per_unitcell
+        do j = 1, number_of_functions
+            do k = 1, number_of_functions
+                ! Only calculate for k ≤ l to avoid duplicates
+                do l = k, number_of_functions
+                    ! Calculate integral once
+                    call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l), value)
+                    
+                    ! Store in original position
+                    two_electron(i,j,k,l) = value
+                    
+                    ! Apply symmetry for k!=l
+                    two_electron(i,j,l,k) = value
+                end do
+            end do
+        end do
+      end do
+      
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
@@ -72,4 +86,4 @@ subroutine ERI_integral_alt(number_of_atoms,geometry,atoms)
       deallocate(two_electron)
       deallocate(two_eri)
 
-end subroutine
+end subroutine ERI_integral_torus

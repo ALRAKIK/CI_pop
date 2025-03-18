@@ -5,15 +5,19 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
 
       implicit none 
 
-      integer                        :: i , j , k , l 
-      integer                        :: number_of_atoms
-      type(atom)                     :: atoms(number_of_atoms)
-      type(ERI_function),allocatable :: ERI  (:)
+      !-----------------------------------------------------------------!
 
+      type(atom),intent(in)          :: atoms(number_of_atoms)
+      integer,intent(in)             :: number_of_atoms
+
+
+      type(ERI_function),allocatable :: ERI  (:)
+      integer                        :: i , j , k , l 
+      integer                        :: number_of_functions
       double precision               :: geometry(number_of_atoms,3)
       double precision               :: value 
-      integer                        :: number_of_functions
-
+      
+      !-----------------------------------------------------------------!
 
       number_of_functions = 0 
       do i = 1 , number_of_atoms
@@ -23,8 +27,6 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
       allocate(ERI(number_of_functions))
 
       call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
-
-!      call print_orbital_table(ERI,number_of_functions)
 
       open(1,file="./tmp/ERI.dat")
 
@@ -42,8 +44,5 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
       close(1)
 
       deallocate(ERI)
-
-      
-
 
 end subroutine

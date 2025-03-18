@@ -14,9 +14,9 @@ module torus_init
 
         double precision,parameter   :: pi = 3.14159265358979323846D00
 
-        Lx    = 24.0d0
-        Ly    = 24.0d0
-        Lz    = 24.0d0
+        Lx    = 5.60d0
+        Ly    = 5.60d0
+        Lz    = 5.60d0
 
         Torus = .TRUE. 
 

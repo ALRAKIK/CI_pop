@@ -1,17 +1,19 @@
 subroutine nuclear_attraction_integral_ss(n_atoms,geometry,r1,r2,atom1,atom2,atoms,index1,index2,S_ss_normal)
 
-      use torus_init
       use atom_basis
 
       implicit none 
 
-      double precision,intent(in)  :: r1(3) , r2(3)
-      type(atom),intent(in)        :: atom1 , atom2 
-      type(atom)                   :: atoms(n_atoms)
-      integer,intent(in)           :: n_atoms
-      double precision,intent(in)  :: geometry(n_atoms,3)
-      integer                      :: index1 , index2 
+      !-----------------------------------------------------------------!
 
+      type(atom),intent(in)        :: atoms(n_atoms)
+      type(atom),intent(in)        :: atom1 , atom2 
+      integer,intent(in)           :: n_atoms
+      double precision,intent(in)  :: r1(3) , r2(3)
+      double precision,intent(in)  :: geometry(n_atoms,3)
+      double precision,intent(out) :: S_ss_normal
+
+      integer                      :: index1 , index2 
       integer                      :: i , j  , k 
       integer                      :: charge_atom
       double precision,parameter   :: pi = 3.14159265358979323846D00
@@ -19,20 +21,21 @@ subroutine nuclear_attraction_integral_ss(n_atoms,geometry,r1,r2,atom1,atom2,ato
       double precision             :: c1    , c2 
       double precision             :: p,mu
       double precision             :: Two_PIP , P_R
-      double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision             :: x1 , x2 , X 
+      double precision             :: y1 , y2 , Y 
+      double precision             :: z1 , z2 , Z  
       double precision             :: xp , yp , zp 
-      double precision             :: X , Y , Z
       double precision             :: D_normal 
       double precision             :: xPC , yPC , zPC
       double precision             :: Boys_func , R2PC
-      double precision,intent(out) :: S_ss_normal
+      
+      !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -48,13 +51,13 @@ subroutine nuclear_attraction_integral_ss(n_atoms,geometry,r1,r2,atom1,atom2,ato
         do j = 1 , atom2%num_exponent_s
           beta = atom2%exponent_s(j)
           c2   = atom2%coefficient_s(j,index2)
+
               p       = alpha + beta 
               P_R     = 1.d0 / p
               mu      = alpha*beta*p_R
               Two_PIP = 2.0d0*pi*p_R
 
               xp = (alpha*x1+beta*x2)*p_R
-              if (torus) call bary_center(alpha,x1,beta,x2,p_R,xp)
               yp = (alpha*y1+beta*y2)*p_R
               zp = (alpha*z1+beta*z2)*p_R
         
@@ -63,8 +66,6 @@ subroutine nuclear_attraction_integral_ss(n_atoms,geometry,r1,r2,atom1,atom2,ato
                 xPC = xp - geometry(k,1) 
                 yPC = yp - geometry(k,2)
                 zPC = zp - geometry(k,3)
-
-                if (torus) call euc(xp,geometry(k,1),xPC)
                 
                 R2PC = xPC*xPC + yPC*yPC + zPC*zPC
               
@@ -77,23 +78,27 @@ subroutine nuclear_attraction_integral_ss(n_atoms,geometry,r1,r2,atom1,atom2,ato
         end do 
       end do
 
-!-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
 
 end subroutine
 
 subroutine nuclear_attraction_integral_sp(n_atoms,geometry,r1,r2,atom1,atom2,atoms,index1,index2,S_sp_normal)
 
-      use torus_init
       use atom_basis
+
       implicit none 
 
-      double precision,intent(in)  :: r1(3) , r2(3)
-      type(atom),intent(in)        :: atom1 , atom2 
-      type(atom)                   :: atoms(n_atoms)
-      integer,intent(in)           :: n_atoms
-      double precision,intent(in)  :: geometry(n_atoms,3)
-      integer                      :: index1 , index2 
+      !-----------------------------------------------------------------!
 
+      type(atom),intent(in)        :: atom1 , atom2 
+      type(atom),intent(in)        :: atoms(n_atoms)
+      integer,intent(in)           :: n_atoms
+      double precision,intent(in)  :: r1(3) , r2(3)
+      double precision,intent(in)  :: geometry(n_atoms,3)
+      double precision,intent(out) :: S_sp_normal(3)
+      
+      
+      integer                      :: index1 , index2 
       integer                      :: i , j  , k 
       integer                      :: charge_atom
       double precision,parameter   :: pi = dacos(-1.d0)
@@ -101,21 +106,23 @@ subroutine nuclear_attraction_integral_sp(n_atoms,geometry,r1,r2,atom1,atom2,ato
       double precision             :: c1    , c2 
       double precision             :: p,mu
       double precision             :: Two_PIP , P_R
-      double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision             :: x1 , x2 , X
+      double precision             :: y1 , y2 , Y 
+      double precision             :: z1 , z2 , Z 
       double precision             :: xp , yp , zp 
-      double precision             :: X , Y , Z
       double precision             :: X_PB_normal , Y_PB_normal , Z_PB_normal
       double precision             :: D_normal 
       double precision             :: X_PC_normal , Y_PC_normal , Z_PC_normal
       double precision             :: Boys_func , R2PC
-      double precision,intent(out) :: S_sp_normal(3)
+      
 
+      !-----------------------------------------------------------------!
+    
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -137,12 +144,10 @@ subroutine nuclear_attraction_integral_sp(n_atoms,geometry,r1,r2,atom1,atom2,ato
               Two_PIP = 2.0d0*pi*p_R
 
               xp = (alpha*x1+beta*x2)*p_R
-              if (torus) call bary_center(alpha,x1,beta,x2,p_R,xp)
               yp = (alpha*y1+beta*y2)*p_R
               zp = (alpha*z1+beta*z2)*p_R
         
               X = x1 - x2 
-              if (torus) call SSD(x1,x2,X)
               X_PB_normal  =  (alpha/p)*(X)
               Y_PB_normal  =  (alpha/p)*(Y)
               Z_PB_normal  =  (alpha/p)*(Z)
@@ -152,8 +157,6 @@ subroutine nuclear_attraction_integral_sp(n_atoms,geometry,r1,r2,atom1,atom2,ato
                 X_PC_normal = xp - geometry(k,1) 
                 Y_PC_normal = yp - geometry(k,2)
                 Z_PC_normal = zp - geometry(k,3)
-
-                if (torus) call euc(xp,geometry(k,1),X_PC_normal)
 
                 R2PC = X_PC_normal*X_PC_normal + Y_PC_normal*Y_PC_normal + Z_PC_normal*Z_PC_normal
               
@@ -169,23 +172,27 @@ subroutine nuclear_attraction_integral_sp(n_atoms,geometry,r1,r2,atom1,atom2,ato
       end do
 
 
-!-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
 
 end subroutine
 
 subroutine nuclear_attraction_integral_ps(n_atoms,geometry,r1,r2,atom1,atom2,atoms,index1,index2,S_ps_normal)
   
-      use torus_init
+      
       use atom_basis
+
       implicit none 
 
-      double precision,intent(in)  :: r1(3) , r2(3)
-      type(atom),intent(in)        :: atom1 , atom2 
-      type(atom)                   :: atoms(n_atoms)
-      integer,intent(in)           :: n_atoms
-      double precision,intent(in)  :: geometry(n_atoms,3)
-      integer                      :: index1 , index2 
+      !-----------------------------------------------------------------!
 
+      type(atom),intent(in)        :: atom1 , atom2 
+      type(atom),intent(in)        :: atoms(n_atoms)
+      integer,intent(in)           :: n_atoms
+      double precision,intent(in)  :: r1(3) , r2(3)
+      double precision,intent(in)  :: geometry(n_atoms,3)
+      double precision,intent(out) :: S_ps_normal(3)
+
+      integer                      :: index1 , index2 
       integer                      :: i , j  , k 
       integer                      :: charge_atom
       double precision,parameter   :: pi = dacos(-1.d0)
@@ -193,21 +200,22 @@ subroutine nuclear_attraction_integral_ps(n_atoms,geometry,r1,r2,atom1,atom2,ato
       double precision             :: c1    , c2 
       double precision             :: p,mu
       double precision             :: Two_PIP , P_R
-      double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision             :: x1 , x2 , X
+      double precision             :: y1 , y2 , Y 
+      double precision             :: z1 , z2 , Z
       double precision             :: xp , yp , zp 
-      double precision             :: X , Y , Z
       double precision             :: X_PA_normal , Y_PA_normal , Z_PA_normal
       double precision             :: D_normal 
       double precision             :: X_PC_normal , Y_PC_normal , Z_PC_normal 
       double precision             :: Boys_func , R2PC
-      double precision,intent(out) :: S_ps_normal(3)
+      
+      !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -229,12 +237,10 @@ subroutine nuclear_attraction_integral_ps(n_atoms,geometry,r1,r2,atom1,atom2,ato
               Two_PIP = 2.0d0*pi*p_R
         
               xp = (alpha*x1+beta*x2)*p_R
-              if (torus) call bary_center(alpha,x1,beta,x2,p_R,xp)
               yp = (alpha*y1+beta*y2)*p_R
               zp = (alpha*z1+beta*z2)*p_R
         
               X = x1 - x2 
-              if (torus) call SSD(x1,x2,X)
               X_PA_normal  = -(beta*p_R)*(X)
               Y_PA_normal  = -(beta*p_R)*(Y)
               Z_PA_normal  = -(beta*p_R)*(Z)
@@ -244,8 +250,6 @@ subroutine nuclear_attraction_integral_ps(n_atoms,geometry,r1,r2,atom1,atom2,ato
                 X_PC_normal = xp - geometry(k,1) 
                 Y_PC_normal = yp - geometry(k,2)
                 Z_PC_normal = zp - geometry(k,3)
-
-                if (torus) call euc(xp,geometry(k,1),X_PC_normal)
               
                 R2PC = X_PC_normal*X_PC_normal + Y_PC_normal*Y_PC_normal + Z_PC_normal*Z_PC_normal
               
@@ -261,24 +265,28 @@ subroutine nuclear_attraction_integral_ps(n_atoms,geometry,r1,r2,atom1,atom2,ato
       end do
 
 
-!-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
 
 end subroutine
 
 
 subroutine nuclear_attraction_integral_pp(n_atoms,geometry,r1,r2,atom1,atom2,atoms,index1,index2,S_pp_normal)
   
-      use torus_init
+
       use atom_basis
+
       implicit none 
 
-      double precision,intent(in)  :: r1(3) , r2(3)
+      !-----------------------------------------------------------------!
       type(atom),intent(in)        :: atom1 , atom2 
-      type(atom)                   :: atoms(n_atoms)
+      type(atom),intent(in)        :: atoms(n_atoms)
       integer,intent(in)           :: n_atoms
+      double precision,intent(in)  :: r1(3) , r2(3)
       double precision,intent(in)  :: geometry(n_atoms,3)
-      integer                      :: index1 , index2 
+      double precision,intent(out) :: S_pp_normal(3,3)
 
+
+      integer                      :: index1 , index2 
       integer                      :: i , j  , k 
       integer                      :: charge_atom
       double precision,parameter   :: pi = dacos(-1.d0)
@@ -286,9 +294,10 @@ subroutine nuclear_attraction_integral_pp(n_atoms,geometry,r1,r2,atom1,atom2,ato
       double precision             :: c1    , c2 
       double precision             :: p,mu
       double precision             :: Two_PIP , P_R
-      double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision             :: x1 , x2 , X
+      double precision             :: y1 , y2 , Y
+      double precision             :: z1 , z2 , Z
       double precision             :: xp , yp , zp 
-      double precision             :: X , Y , Z
       double precision             :: X_PA_normal , Y_PA_normal , Z_PA_normal
       double precision             :: X_PB_normal , Y_PB_normal , Z_PB_normal
       double precision             :: D_normal 
@@ -296,14 +305,15 @@ subroutine nuclear_attraction_integral_pp(n_atoms,geometry,r1,r2,atom1,atom2,ato
       double precision             :: term1 , term2 , term3
       double precision             :: const 
       double precision             :: Boys_func , R2PC
-      double precision,intent(out) :: S_pp_normal(3,3)
+      
+
+      !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -325,12 +335,9 @@ subroutine nuclear_attraction_integral_pp(n_atoms,geometry,r1,r2,atom1,atom2,ato
               Two_PIP = 2.0d0*pi*p_R
         
               xp = (alpha*x1+beta*x2)*p_R
-              if (torus) call bary_center(alpha,x1,beta,x2,p_R,xp)
               yp = (alpha*y1+beta*y2)*p_R
               zp = (alpha*z1+beta*z2)*p_R
         
-              X = x1 - x2 
-              if (torus) call SSD(x1,x2,X)
               X_PB_normal  =  (alpha*p_R)*(X)
               Y_PB_normal  =  (alpha*p_R)*(Y)
               Z_PB_normal  =  (alpha*p_R)*(Z)
@@ -344,8 +351,6 @@ subroutine nuclear_attraction_integral_pp(n_atoms,geometry,r1,r2,atom1,atom2,ato
                 X_PC_normal = xp - geometry(k,1) 
                 Y_PC_normal = yp - geometry(k,2)
                 Z_PC_normal = zp - geometry(k,3)
-
-                if (torus) call euc(xp,geometry(k,1),X_PC_normal)
               
                 R2PC = X_PC_normal*X_PC_normal + Y_PC_normal*Y_PC_normal + Z_PC_normal*Z_PC_normal
               
@@ -391,13 +396,12 @@ subroutine nuclear_attraction_integral_pp(n_atoms,geometry,r1,r2,atom1,atom2,ato
 
               ! / ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- / !  
 
-
               end do 
             
         end do 
       end do
 
 
-!-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
 
 end subroutine

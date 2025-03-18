@@ -7,6 +7,11 @@ program CI
 
       implicit none 
 
+      !-----------------------------------------------------------------!
+      !                         START variables                         !
+      !-----------------------------------------------------------------!
+
+
       integer                         :: i , j 
       integer                         :: n_atoms , nBAS
       integer                         :: nO      , n_electron 
@@ -32,18 +37,15 @@ program CI
       double precision,allocatable    ::       c(:,:)
 
 
-      double precision             :: E_nuc , EHF
-      double precision             :: start_HF,end_HF,t_HF
+      double precision                :: E_nuc , EHF
+      double precision                :: start_HF,end_HF,t_HF
+
+      character(len=5)                :: calculation_type 
 
 
-!     -------------------------------------------------------------------     !
-!                             Torus variables 
-!     -------------------------------------------------------------------     !      
-
-
-      logical                      :: type  
-
-!     -------------------------------------------------------------------     !
+      !-----------------------------------------------------------------!
+      !                        END variables                            !
+      !-----------------------------------------------------------------!    
 
       call read_geometry(n_atoms,charge_tmp,geometry_tmp)
 
@@ -82,18 +84,20 @@ program CI
       call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
       call print_orbital_table(AO,number_of_functions)
 
+
 !     -------------------------------------------------------------------     !
 !                         Parameters for the calculation 
 !     -------------------------------------------------------------------     !
 
-      type = .TRUE.
+      calculation_type = "OBC"
 
-      if (Type) then 
-        call header("Torus with PBC",-1)
-        call Torus_def()
-      else 
-        call header("calculation with OBC",-1)
-      end if 
+!     -------------------------------------------------------------------     !
+!                            Plot the gussians                                !
+!     -------------------------------------------------------------------     !
+
+
+!      call plot(n_atoms,geometry)
+
 
 !     -------------------------------------------------------------------     !
 !                         calculate the integrals 
@@ -105,29 +109,58 @@ program CI
 
 !      call overlap_matrix_tor(n_atoms,geometry,atoms_tor)
 
-!     -------------------------------------------------------------------     !
-!                     calculate the without symmetry  
-!     -------------------------------------------------------------------     !
+      !-----------------------------------------------------------------!
+      !                    calculate molecule                           !
+      !-----------------------------------------------------------------!
 
-!      call overlap_matrix(n_atoms,geometry,atoms)
-!      call kinetic_matrix(n_atoms,geometry,atoms)
-!      call nuclear_attraction_matrix(n_atoms,geometry,atoms)      
-!      call ERI_integral(n_atoms,geometry,atoms)
+      if (calculation_type == "OBC") then 
+        
+        call header("calculation with OBC",-1)
 
-!     -------------------------------------------------------------------     !      
+        call overlap_matrix(n_atoms,geometry,atoms)
+        call kinetic_matrix(n_atoms,geometry,atoms)
+        call nuclear_attraction_matrix(n_atoms,geometry,atoms)  
+        call ERI_integral(n_atoms,geometry,atoms)
 
-!     -------------------------------------------------------------------     !
-!                     calculate the with translational symmetry  
-!     -------------------------------------------------------------------     !
+      end if 
 
-      call overlap_matrix_alt(n_atoms,number_of_functions,atoms,AO)
-      call kinetic_matrix_alt(n_atoms,number_of_functions,atoms,AO)
-      call nuclear_attraction_matrix_alt(n_atoms,number_of_functions,geometry,atoms,AO)
-      call ERI_integral_alt(n_atoms,geometry,atoms)
-      write(outfile,*) "Translation symmetry applied to integrals"
-      write(outfile,*) ""
+      !-----------------------------------------------------------------!
+      !                        calculate SAO                            !
+      !-----------------------------------------------------------------!
 
-!     -------------------------------------------------------------------     !
+      if (calculation_type == "SAO") then 
+        
+        call overlap_matrix(n_atoms,geometry,atoms)
+        call SAO_S_matrix(number_of_functions)
+        call kinetic_matrix(n_atoms,geometry,atoms)
+        call SAO_k_matrix(number_of_functions)
+        call nuclear_attraction_matrix(n_atoms,geometry,atoms)  
+        call SAO_NA_matrix(number_of_functions)
+!        call ERI_integral(n_atoms,geometry,atoms)
+
+      end if 
+
+      !-----------------------------------------------------------------!
+      !           calculate the with Torus translational symmetry       !
+      !-----------------------------------------------------------------!
+
+
+      if (calculation_type == "Torus") then 
+
+        call header("Torus with PBC",-1)
+        call Torus_def()
+
+        call overlap_matrix_torus(n_atoms,number_of_functions,atoms,AO)
+        call kinetic_matrix_torus(n_atoms,number_of_functions,atoms,AO)
+        call nuclear_attraction_matrix_torus(n_atoms,number_of_functions,geometry,atoms,AO)
+        call ERI_integral_torus(n_atoms,geometry,atoms)
+
+        write(outfile,*) "Translation symmetry applied to integrals"
+        write(outfile,*) ""
+
+      end if 
+
+      !-----------------------------------------------------------------!
 
       call cpu_time(end_HF)
 
@@ -135,7 +168,7 @@ program CI
 
       write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
       write(outfile,*)
-      
+ 
 !     -------------------------------------------------------------------     !
 !                        Nuclear repulsion energy  
 !     -------------------------------------------------------------------     !
@@ -156,8 +189,16 @@ program CI
         n_electron = n_electron + atoms(i)%charge
       end do 
 
+      nO = n_electron/2 
+
+      !               ---------------------------------                 !
+      !                       Allocate the memory                       !
+      !               ---------------------------------                 !
+
       allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas),X(nBas,nBas),ERI(nBas,nBas,nBas,nBas),e(nBas),c(nBas,nBas))
       allocate(S_T(nBas,nBas))
+
+!     -------------------------------------------------------------------     !
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
 
@@ -173,11 +214,11 @@ program CI
 
       CALL HEADER ('The Overlap Matrix',-1)
 
-!      call matout(nBas,nBas,S)
+      call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
       
-      nO = n_electron/2 
+
       
       ! ---------------------------------------------------------------- !
       !                                                                  !

@@ -14,13 +14,13 @@ subroutine NRE(number_of_atoms,geometry,atoms,E)
       integer                        :: i , j 
       double precision               :: x , y , z , dist 
 
-
       E = 0.d0 
 
         do i = 1 , number_of_atoms-1 
           do j = i+1 , number_of_atoms
             x  = geometry(i,1) - geometry(j,1)
             if (torus) x  = (dsqrt(2.d0 * (1.d0 - dcos(ax*x)) / (ax * ax)))
+!            x  = (dsqrt(2.d0 * (1.d0 - dcos(ax*x)) / (ax * ax)))
             y  = geometry(i,2) - geometry(j,2)
             z  = geometry(i,3) - geometry(j,3)
             dist =  x*x+y*y+z*z

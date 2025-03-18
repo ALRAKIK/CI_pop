@@ -1,9 +1,11 @@
-subroutine kinetic_integral_ss_alt(r1,r2,AO1,AO2,S_ss_normal)
+subroutine kinetic_integral_ss_torus(r1,r2,AO1,AO2,S_ss_normal)
 
       use torus_init
       use classification_ERI
 
       implicit none 
+
+      !-----------------------------------------------------------------!
 
       double precision,intent(in)    :: r1(3) , r2(3)
       type(ERI_function),intent(in)  :: AO1 , AO2
@@ -19,12 +21,14 @@ subroutine kinetic_integral_ss_alt(r1,r2,AO1,AO2,S_ss_normal)
       double precision               :: const
       double precision,intent(out)   :: S_ss_normal
 
+      !-----------------------------------------------------------------!
+
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
+      call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -46,16 +50,18 @@ subroutine kinetic_integral_ss_alt(r1,r2,AO1,AO2,S_ss_normal)
         end do 
       end do
 
-  !-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
 
-end subroutine kinetic_integral_ss_alt
+end subroutine kinetic_integral_ss_torus
 
-subroutine kinetic_integral_sp_alt(r1,r2,AO1,AO2,S_sp_normal)
+subroutine kinetic_integral_sp_torus(r1,r2,AO1,AO2,S_sp_normal)
 
       use torus_init
       use classification_ERI
 
       implicit none 
+
+      !-----------------------------------------------------------------!
 
       double precision,intent(in)    :: r1(3) , r2(3)
       type(ERI_function),intent(in)  :: AO1 , AO2
@@ -72,14 +78,17 @@ subroutine kinetic_integral_sp_alt(r1,r2,AO1,AO2,S_sp_normal)
       double precision               :: const
       double precision,intent(out)   :: S_sp_normal
 
+      !-----------------------------------------------------------------!
+
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
+
+      call PBC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -96,7 +105,7 @@ subroutine kinetic_integral_sp_alt(r1,r2,AO1,AO2,S_sp_normal)
           mu = alpha*beta/p 
 
           X            =  (x1 - x2)
-          if (torus) call SSD(x1,x2,X)
+          call SSD(x1,x2,X)
           X_PB_normal  =  (alpha/p)*(X)
     
           Y            =  (y1 - y2)
@@ -114,16 +123,18 @@ subroutine kinetic_integral_sp_alt(r1,r2,AO1,AO2,S_sp_normal)
         end do 
       end do
 
-  !-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
 
-end subroutine kinetic_integral_sp_alt
+end subroutine kinetic_integral_sp_torus
 
-subroutine kinetic_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
+subroutine kinetic_integral_pp_torus(r1,r2,AO1,AO2,S_pp_normal)
 
       use torus_init
       use classification_ERI
 
       implicit none 
+
+      !-----------------------------------------------------------------!
 
       double precision,intent(in)    :: r1(3) , r2(3)
       type(ERI_function),intent(in)  :: AO1 , AO2
@@ -142,14 +153,17 @@ subroutine kinetic_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
       double precision               :: const1      , const2      , S11 , integral 
       double precision,intent(out)   :: S_pp_normal
 
+      !-----------------------------------------------------------------!
+
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
+
+      call PBC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -166,7 +180,10 @@ subroutine kinetic_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
           mu = alpha*beta/p 
         
           X            =  (x1 - x2)
-          if (torus) call SSD(x1,x2,X)
+
+          call SSD(x1,x2,X)
+
+
           X_PB_normal  =  (alpha/p)*(X)
           X_PA_normal  = -(beta/p) *(X)
           C_X_normal   = X_PB_normal*X_PA_normal+(1/(2.d0*p))
@@ -181,8 +198,8 @@ subroutine kinetic_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
           Z_PA_normal  = -(beta/p) *(Z)
           C_Z_normal   = Z_PB_normal*Z_PA_normal+(1/(2.d0*p))
     
-          const1    = alpha*beta/p * (5.d0 - 2.d0*alpha*beta/p*D_normal)
-          const2    = alpha*beta/p * (7.d0 - 2.d0*alpha*beta/p*D_normal)
+          const1       = alpha*beta/p * (5.d0 - 2.d0*alpha*beta/p*D_normal)
+          const2       = alpha*beta/p * (7.d0 - 2.d0*alpha*beta/p*D_normal)
 
           S11              = const1 * (dsqrt(pi/p)**3.0d0)*exp(-mu*D_normal) * C_X_normal 
           integral         = S11 + 2.d0*alpha*beta/p * (dsqrt(pi/p)**3.0d0) * X_PB_normal * X_PA_normal * exp(-mu*D_normal)
@@ -208,4 +225,4 @@ subroutine kinetic_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
     
 !-----------------------------------------------------------------!
 
-end subroutine kinetic_integral_pp_alt
+end subroutine kinetic_integral_pp_torus

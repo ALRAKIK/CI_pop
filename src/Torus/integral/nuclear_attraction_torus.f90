@@ -1,9 +1,11 @@
-subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geometry,atoms,AO)
+subroutine nuclear_attraction_matrix_torus(number_of_atoms,number_of_functions,geometry,atoms,AO)
 
       use atom_basis
       use classification_ERI
 
       implicit none 
+
+      !-----------------------------------------------------------------!
 
       integer                        :: i , j , k , l
       integer                        :: index_atom1 , index_sym
@@ -22,6 +24,9 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
 
       double precision,parameter     :: pi = dacos(-1.d0)
 
+      !-----------------------------------------------------------------!
+
+      
       allocate(NA(number_of_functions,number_of_functions))
 
       NA(:,:) = 0.d0 
@@ -50,7 +55,7 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call nuclear_attraction_integral_ss_alt(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
+                call nuclear_attraction_integral_ss_torus(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
               end do 
             end do 
 
@@ -60,7 +65,7 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
             
               do k = 1 , size  (AO1%exponent)
                 do l = 1 , size  (AO2%exponent)
-                  call nuclear_attraction_integral_sp_alt(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
+                  call nuclear_attraction_integral_sp_torus(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
                 end do 
               end do
 
@@ -70,7 +75,7 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call nuclear_attraction_integral_sp_alt(number_of_atoms,geometry,atoms,r2,r1,AO2,AO1,NA(i,j))
+                call nuclear_attraction_integral_sp_torus(number_of_atoms,geometry,atoms,r2,r1,AO2,AO1,NA(i,j))
               end do 
             end do
 
@@ -80,7 +85,7 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call nuclear_attraction_integral_pp_alt(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
+                call nuclear_attraction_integral_pp_torus(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
               end do 
             end do
 
@@ -129,4 +134,4 @@ subroutine nuclear_attraction_matrix_alt(number_of_atoms,number_of_functions,geo
       deallocate(NA)
 
 
-end subroutine nuclear_attraction_matrix_alt
+end subroutine nuclear_attraction_matrix_torus

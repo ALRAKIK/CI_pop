@@ -1,46 +1,38 @@
 subroutine ERI_integral_4_function(one,two,three,four,value)
       
-      use torus_init
       use classification_ERI
 
       implicit none 
-      
+
+      !-----------------------------------------------------------------!
+
       type(ERI_function),intent(in)   :: one , two , three , four 
+      double precision,intent(out)    :: value 
 
       integer                         ::  i , j   , k  , l 
-
+      character(LEN=2)                :: o1 , o2 , o3 , o4 
       double precision,parameter      :: pi     = 3.14159265358979323846D00
       double precision,parameter      :: R2PI52 = 2.0d0*pi**(5.0d0/2.0d0)
       
-
       double precision                :: xa , ya , za 
       double precision                :: xb , yb , zb
       double precision                :: xc , yc , zc
       double precision                :: xd , yd , zd
-
       double precision                :: xAB , xCD 
       double precision                :: yAB , yCD
       double precision                :: zAB , zCD
-
       double precision                ::  DAB ,  DCD
       double precision                :: D2AB , D2CD 
-
       double precision                :: xp , xq 
       double precision                :: yp , yq
       double precision                :: zp , zq
-
       double precision                :: xpa , ypa , zpa
       double precision                :: xpb , ypb , zpb 
       double precision                :: xqc , yqc , zqc 
       double precision                :: xqd , yqd , zqd 
-
       double precision                :: c1 , c2 , c3 , c4 
-
       double precision                :: mu1 , mu2 
-
       double precision                :: E_AB , E_CD 
-
-
       double precision                :: alpha , beta , gamma , delta 
       double precision                :: p , q  , ip , iq 
       double precision                :: p_plus_q  , ip_plus_q
@@ -52,18 +44,11 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
       double precision                :: F_in 
       double precision                :: Boys_func
       double precision                :: F0 , F1 , F2 , F3 , F4 
-
       double precision                :: xPQ , yPQ , zPQ
-
-
       double precision                :: R2PQ
-
-
-      character(LEN=2)                :: o1 , o2 , o3 , o4 
       double precision                :: value_s 
 
-      double precision,intent(out)    :: value 
-
+      !-----------------------------------------------------------------!
 
       value = 0.d0 
             
@@ -76,9 +61,6 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
       xAB = xa - xb ; xCD = xc - xd
       yAB = ya - yb ; yCD = yc - yd
       zAB = za - zb ; zCD = zc - zd 
-
-      if (torus) call PBC(xa,xb,xAB)
-      if (torus) call PBC(xc,xd,xCD)
 
       D2AB = (xAB*xAB + yAB*yAB  + zAB*zAB)
       D2CD = (xCD*xCD + yCD*yCD  + zCD*zCD)
@@ -103,7 +85,6 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
           E_AB = dexp(-mu1*D2AB)
 
           xp  = ( xa * alpha + xb * beta ) * ip
-          if (torus) call bary_center(alpha,xa,beta,xb,ip,xp)
           yp  = ( ya * alpha + yb * beta ) * ip
           zp  = ( za * alpha + zb * beta ) * ip
 
@@ -114,9 +95,6 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
           xPB = xp - xb 
           yPB = yp - yb
           zPB = zp - zb
-
-          if (torus) call SSD(xp,xa,xPA)
-          if (torus) call SSD(xp,xb,xPB)
 
           do k = 1 , size(three%exponent)
             gamma = three%exponent(k)
@@ -134,7 +112,6 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
               E_CD = dexp(-mu2*D2CD)
 
               xq = ( xc * gamma + xd * delta )* iq
-              if (torus) call bary_center(gamma,xc,delta,xd,iq,xq)
               yq = ( yc * gamma + yd * delta )* iq
               zq = ( zc * gamma + zd * delta )* iq
 
@@ -146,11 +123,7 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
               yQD = yq - yd
               zQD = zq - zd
 
-              if (torus) call SSD(xq,xc,xQC)
-              if (torus) call SSD(xq,xd,xQD)
-
               xPQ = xp - xq
-              if (torus) call euc(xp,xq,xPQ)
               yPQ = yp - yq
               zPQ = zp - zq
                
@@ -289,11 +262,6 @@ subroutine ERI_value(o1,o2,o3,o4&
                       &,xPQ,yPQ,zPQ,value_s)
 
       end if
-
-
-
-
-
 
 end subroutine
 

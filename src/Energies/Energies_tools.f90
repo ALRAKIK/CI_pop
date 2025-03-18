@@ -225,7 +225,7 @@ end subroutine ADAt
 subroutine diagonalize_matrix(N,A,e)
 
       ! Diagonalize a square matrix
-
+      use files
       implicit none
 
       ! Input variables
@@ -249,7 +249,7 @@ subroutine diagonalize_matrix(N,A,e)
       call dsyev('V','U',N,A,N,e,work,lwork,info)
 
       if(info /= 0) then
-        write(20,'(a)') 'Problem in diagonalize_matrix (dsyev)!!'
+        write(outfile,'(a)') 'Problem in diagonalize_matrix (dsyev)!!'
         stop
       endif
 

@@ -1,37 +1,43 @@
-subroutine overlap_integral_ss_alt(r1,r2,AO1,AO2,S_ss_normal)
+subroutine overlap_integral_ss_torus(r1,r2,AO1,AO2,S_ss_normal)
 
       use torus_init
       use classification_ERI
 
       implicit none 
 
-      double precision,intent(in)    :: r1(3) , r2(3)
-      type(ERI_function),intent(in)  :: AO1 , AO2
+      !-----------------------------------------------------------------!
 
-      integer                        :: i , j 
-      double precision,parameter     :: pi = 3.14159265358979323846D00
-      double precision               :: alpha , beta
-      double precision               :: c1    , c2 
-      double precision               :: p,mu
-      double precision               :: x1 , x2 , y1 , y2 , z1 , z2 
-      double precision               :: X , Y , Z
-      double precision               :: D_normal 
-      double precision,intent(out)   :: S_ss_normal
+      double precision  ,intent(in)    :: r1(3) , r2(3)
+      type(ERI_function),intent(in)    :: AO1 , AO2
+      double precision  ,intent(out)   :: S_ss_normal
+
+      integer                          :: i , j 
+      double precision,parameter       :: pi = 3.14159265358979323846D00
+      double precision                 :: alpha , beta
+      double precision                 :: c1    , c2 
+      double precision                 :: p,mu
+      double precision                 :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision                 :: X , Y , Z
+      double precision                 :: D_normal 
+      
+      !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
+
+      call PBC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
       !-----------------------------------------------------------------!
 
       S_ss_normal = 0.d0
+
       do i = 1 , size(AO1%exponent)
         alpha =  AO1%exponent(i)
         c1    =  AO1%coefficient(i)
@@ -46,38 +52,43 @@ subroutine overlap_integral_ss_alt(r1,r2,AO1,AO2,S_ss_normal)
     
       !-----------------------------------------------------------------!
     
-end subroutine overlap_integral_ss_alt
+end subroutine overlap_integral_ss_torus
 
 
-subroutine overlap_integral_sp_alt(r1,r2,AO1,AO2,S_sp_normal)
+subroutine overlap_integral_sp_torus(r1,r2,AO1,AO2,S_sp_normal)
 
       use torus_init
       use classification_ERI
 
       implicit none 
 
-      double precision,intent(in)    :: r1(3) , r2(3)
-      type(ERI_function),intent(in)  :: AO1 , AO2
+      !-----------------------------------------------------------------!
 
-      integer                        :: i , j 
-      double precision,parameter     :: pi = 3.14159265358979323846D00
-      double precision               :: alpha , beta
-      double precision               :: c1    , c2 
-      double precision               :: p,mu
-      double precision               :: x1 , x2 , y1 , y2 , z1 , z2 
-      double precision               :: X , Y , Z
-      double precision               :: D_normal 
-      double precision               :: X_PB_normal    , Y_PB_normal , Z_PB_normal
-      double precision,intent(out)   :: S_sp_normal
+      double precision  ,intent(in)   :: r1(3) , r2(3)
+      type(ERI_function),intent(in)   :: AO1 , AO2
+      double precision  ,intent(out)  :: S_sp_normal
+
+      integer                         :: i , j 
+      double precision,parameter      :: pi = 3.14159265358979323846D00
+      double precision                :: alpha , beta
+      double precision                :: c1    , c2 
+      double precision                :: p,mu
+      double precision                :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision                :: X , Y , Z
+      double precision                :: D_normal 
+      double precision                :: X_PB_normal    , Y_PB_normal , Z_PB_normal
+      
+      !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
+
+      call PBC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -96,7 +107,9 @@ subroutine overlap_integral_sp_alt(r1,r2,AO1,AO2,S_sp_normal)
           mu = alpha*beta/p 
 
           X            =  (x1 - x2)
-          if (torus) call SSD(x1,x2,X)
+          
+          call SSD(x1,x2,X)
+
           X_PB_normal  =  (alpha/p)*(X)
 
           Y            =  (y1 - y2)
@@ -114,39 +127,44 @@ subroutine overlap_integral_sp_alt(r1,r2,AO1,AO2,S_sp_normal)
 
       !-----------------------------------------------------------------!
 
-end subroutine overlap_integral_sp_alt
+end subroutine overlap_integral_sp_torus
 
-subroutine overlap_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
+subroutine overlap_integral_pp_torus(r1,r2,AO1,AO2,S_pp_normal)
 
       use torus_init
       use classification_ERI
 
       implicit none 
 
-      double precision,intent(in)    :: r1(3) , r2(3)
-      type(ERI_function),intent(in)  :: AO1 , AO2
+      !-----------------------------------------------------------------!
 
-      integer                        :: i , j 
-      double precision,parameter     :: pi = 3.14159265358979323846D00
-      double precision               :: alpha , beta
-      double precision               :: c1    , c2 
-      double precision               :: p,mu
-      double precision               :: x1 , x2 , y1 , y2 , z1 , z2 
-      double precision               :: X , Y , Z
-      double precision               :: D_normal 
-      double precision               :: X_PB_normal    , Y_PB_normal , Z_PB_normal
-      double precision               :: X_PA_normal    , Y_PA_normal , Z_PA_normal
-      double precision               :: C_X_normal     , C_Y_normal  , C_Z_normal
-      double precision,intent(out)   :: S_pp_normal
+      double precision  ,intent(in)    :: r1(3) , r2(3)
+      type(ERI_function),intent(in)    :: AO1 , AO2
+      double precision  ,intent(out)   :: S_pp_normal
+
+      integer                          :: i , j 
+      double precision,parameter       :: pi = 3.14159265358979323846D00
+      double precision                 :: alpha , beta
+      double precision                 :: c1    , c2 
+      double precision                 :: p,mu
+      double precision                 :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision                 :: X , Y , Z
+      double precision                 :: D_normal 
+      double precision                 :: X_PB_normal    , Y_PB_normal , Z_PB_normal
+      double precision                 :: X_PA_normal    , Y_PA_normal , Z_PA_normal
+      double precision                 :: C_X_normal     , C_Y_normal  , C_Z_normal
+      
+      !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
       y1 = r1(2) ; y2 = r2(2)
       z1 = r1(3) ; z2 = r2(3)
 
       X            = (x1 - x2)
-      if (torus) call PBC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
+
+      call PBC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -165,7 +183,7 @@ subroutine overlap_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
           mu = alpha*beta/p 
 
           X            =  (x1 - x2)
-          if (torus) call SSD(x1,x2,X)
+          call SSD(x1,x2,X)
           X_PB_normal  =  (alpha/p)*(X)
           X_PA_normal  = -(beta/p) *(X)
           C_X_normal   = X_PB_normal*X_PA_normal+(1/(2.d0*p))
@@ -197,4 +215,4 @@ subroutine overlap_integral_pp_alt(r1,r2,AO1,AO2,S_pp_normal)
 
       !-----------------------------------------------------------------!
 
-end subroutine overlap_integral_pp_alt
+end subroutine overlap_integral_pp_torus
