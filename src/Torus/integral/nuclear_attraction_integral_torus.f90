@@ -172,9 +172,9 @@ subroutine nuclear_attraction_integral_sp_torus(number_of_atoms,geometry,atoms,r
 
             X = x1 - x2 
 
-            if (abs(X)  < 1e-10) then 
+!            if (abs(X)  < 1e-10) then 
 
-            else 
+!            else 
 
               do k = 1 , number_of_atoms
               
@@ -193,7 +193,7 @@ subroutine nuclear_attraction_integral_sp_torus(number_of_atoms,geometry,atoms,r
                 if (AO2%orbital=="pz") S_sp_normal =  S_sp_normal +  c1 * c2 * charge_atom * Two_PIP * exp(-mu*D_normal) * (Z_PB_normal * Boys_func(0,p*R2PC) - Z_PC * Boys_func(1,p*R2PC) ) 
             
               end do  
-            end if 
+!            end if 
 
         end do 
       end do

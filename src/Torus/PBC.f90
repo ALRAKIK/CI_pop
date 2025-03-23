@@ -6,10 +6,10 @@ subroutine PBC(x1,x2,X)
       double precision,intent(in)   :: x1 , x2 
       double precision,intent(out)  :: X
 
-      X = x1 - x2                       
-              
+      X = x1 - x2        
+                    
       if (dabs(X) > 0.5d0*Lx) then
-        X = Lx - dabs(X)
+        X =  Lx - dabs(X)
       end if
 
 

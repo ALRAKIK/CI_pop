@@ -1,5 +1,6 @@
 subroutine nuclear_attraction_matrix_torus(number_of_atoms,number_of_functions,geometry,atoms,AO)
 
+      use torus_init
       use atom_basis
       use classification_ERI
 
@@ -8,7 +9,7 @@ subroutine nuclear_attraction_matrix_torus(number_of_atoms,number_of_functions,g
       !-----------------------------------------------------------------!
 
       integer                        :: i , j , k , l
-      integer                        :: index_atom1 , index_sym
+      integer                        :: index_atom1 , index_sym , index_unitcell 
       integer                        :: number_of_atoms
       integer                        :: number_of_functions 
 
@@ -41,7 +42,13 @@ subroutine nuclear_attraction_matrix_torus(number_of_atoms,number_of_functions,g
 
       index_sym = index_sym + 1 
 
-      do i = 1 , index_atom1
+      index_unitcell = 0 
+
+      do i = 1 , number_of_atom_in_unitcell
+        index_unitcell = index_unitcell  + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
+      end do 
+
+      do i = 1 , index_unitcell 
         do j = 1 , number_of_functions
 
           AO1 = AO(i)
@@ -98,15 +105,15 @@ subroutine nuclear_attraction_matrix_torus(number_of_atoms,number_of_functions,g
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      do  i = 1 , index_atom1
+      do  i = 1 , index_unitcell
         do j = 1 , number_of_functions
           if (abs(NA(i,j)) < 1e-10) NA(i,j) = 0.d0 
         end do 
       end do 
 
-      do i = index_atom1 + 1   , number_of_functions
-        do j = index_atom1 + 1 , number_of_functions
-          NA(i,j) = NA(i-index_atom1,j-index_atom1)
+      do i = index_unitcell + 1   , number_of_functions
+        do j = index_unitcell + 1 , number_of_functions
+          NA(i,j) = NA(i-index_unitcell,j-index_unitcell)
         end do 
       end do 
 

@@ -1,5 +1,6 @@
 subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
 
+      use torus_init
       use atom_basis
       use classification_ERI
 
@@ -22,15 +23,13 @@ subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
 
       !-----------------------------------------------------------------!
 
-      number_of_atoms_per_unitcell = 1 
-
       number_of_functions = 0 
       do i = 1 , number_of_atoms
         number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
 
       number_of_functions_per_unitcell = 0 
-      do i = 1 , number_of_atoms_per_unitcell 
+      do i = 1 , number_of_atom_in_unitcell
         number_of_functions_per_unitcell = number_of_functions_per_unitcell + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
 
@@ -43,16 +42,16 @@ subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
 
       open(1,file="./tmp/ERI.dat")
 
-
       ! 2-fold symmetry implementation (k,l permutation only)
 
       do i = 1, number_of_functions_per_unitcell
+!      do i = 1, number_of_functions
         do j = 1, number_of_functions
             do k = 1, number_of_functions
                 ! Only calculate for k ≤ l to avoid duplicates
                 do l = k, number_of_functions
                     ! Calculate integral once
-                    call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l), value)
+                    call ERI_integral_4_function_torus(ERI(i),ERI(j),ERI(k),ERI(l), value)
                     
                     ! Store in original position
                     two_electron(i,j,k,l) = value

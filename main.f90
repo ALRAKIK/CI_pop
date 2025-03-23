@@ -26,15 +26,16 @@ program CI
       type(atom)      ,allocatable    :: atoms_tor(:)
       type(ERI_function),allocatable  :: AO (:)
 
-      double precision,allocatable    ::       S(:,:)
-      double precision,allocatable    ::     S_T(:,:)
-      double precision,allocatable    ::       T(:,:)
-      double precision,allocatable    ::       V(:,:)
-      double precision,allocatable    ::      Hc(:,:)
-      double precision,allocatable    ::       X(:,:)
-      double precision,allocatable    :: ERI(:,:,:,:)
-      double precision,allocatable    ::         e(:)
-      double precision,allocatable    ::       c(:,:)
+      double precision,allocatable    ::          S(:,:)
+      double precision,allocatable    ::        S_T(:,:)
+      double precision,allocatable    ::          T(:,:)
+      double precision,allocatable    ::          V(:,:)
+      double precision,allocatable    ::         Hc(:,:)
+      double precision,allocatable    ::          X(:,:)
+      double precision,allocatable    ::    ERI(:,:,:,:)
+      double precision,allocatable    ::            e(:)
+      double precision,allocatable    ::          c(:,:)
+      double precision,allocatable    :: S_SAO_diag(:,:)
 
 
       double precision                :: E_nuc , EHF
@@ -47,6 +48,7 @@ program CI
       !                        END variables                            !
       !-----------------------------------------------------------------!    
 
+      call build_super_molecule()
       call read_geometry(n_atoms,charge_tmp,geometry_tmp)
 
       allocate(geometry(n_atoms,3))
@@ -84,12 +86,11 @@ program CI
       call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
       call print_orbital_table(AO,number_of_functions)
 
-
 !     -------------------------------------------------------------------     !
 !                         Parameters for the calculation 
 !     -------------------------------------------------------------------     !
 
-      calculation_type = "SAO"
+      calculation_type = "Torus"
 
 !     -------------------------------------------------------------------     !
 !                            Plot the gussians                                !
@@ -130,13 +131,14 @@ program CI
         call header("Torus with SAO",-1)
         call header_under("Calculate the integerals",-1)
         call Torus_def()
+        allocate(S_SAO_diag(number_of_functions,number_of_functions))
         call cpu_time(start_HF)
-        call overlap_matrix_SAO(n_atoms,number_of_functions,atoms,AO)
-        call kinetic_matrix_SAO(n_atoms,number_of_functions,atoms,AO)
-        call nuclear_attraction_matrix_SAO(n_atoms,number_of_functions,geometry,atoms,AO)
-!        call ERI_integral(n_atoms,geometry,atoms)
+        call overlap_matrix_SAO(n_atoms,number_of_functions,atoms,AO,S_SAO_diag)
+        call kinetic_matrix_SAO(n_atoms,number_of_functions,atoms,AO,S_SAO_diag)
+        call nuclear_attraction_matrix_SAO(n_atoms,number_of_functions,geometry,atoms,AO,S_SAO_diag)
+        call ERI_integral_SAO(n_atoms,number_of_functions,geometry,atoms,S_SAO_diag)
         call cpu_time(end_HF)
-
+        deallocate(S_SAO_diag)
       end if 
 
       !-----------------------------------------------------------------!
@@ -149,6 +151,9 @@ program CI
         call header("Torus with PBC",-1)
         call header_under("Calculate the integerals",-1)
         call Torus_def()
+        write(outfile,*) ""
+        write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx 
+        write(outfile,*) ""
         call cpu_time(start_HF)
         call overlap_matrix_torus(n_atoms,number_of_functions,atoms,AO)
         call kinetic_matrix_torus(n_atoms,number_of_functions,atoms,AO)
@@ -212,7 +217,7 @@ program CI
 
       CALL HEADER ('The Overlap Matrix',-1)
 
-      call matout(nBas,nBas,S)
+!      call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
        
@@ -234,5 +239,8 @@ program CI
       ! ---------------------------------------------------------------- !
 
       close(outfile)
+
+      call system("rm torus_parameters.inp")
+      call system("rm supermolecule.mol")
 
 end program CI 

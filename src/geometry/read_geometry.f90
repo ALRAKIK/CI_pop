@@ -10,7 +10,8 @@ subroutine read_geometry(number_of_atoms,charge,geometry)
       character(len=2),allocatable :: type(:)
       
       
-      open(1,file="mol.mol") 
+!      open(1,file="mol.mol")
+      open(1,file="supermolecule.mol")
 
       number_of_atoms = 0
 
@@ -25,7 +26,8 @@ subroutine read_geometry(number_of_atoms,charge,geometry)
 
       allocate(type(number_of_atoms))      
 
-      open(1,file="mol.mol")
+!      open(1,file="mol.mol")
+      open(1,file="supermolecule.mol")
       do i = 1 , number_of_atoms
         read(1,*) type(i) , geometry(i,1) , geometry(i,2) , geometry(i,3)
       end do 

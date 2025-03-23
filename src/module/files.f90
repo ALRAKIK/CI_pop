@@ -2,6 +2,6 @@ module files
 
       implicit none 
 
-      integer       :: outfile = 50
+      integer       :: outfile = 1101
 
 end module files 

@@ -1,4 +1,4 @@
-subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO)
+subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO,S_SAO_diag)
 
       use atom_basis
       use classification_ERI
@@ -11,6 +11,7 @@ subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO)
       integer           ,intent(in)  :: nbas 
       type(ERI_function),intent(in)  :: AO (nbas)
       type(atom)        ,intent(in)  :: atoms(n_atoms)
+      double precision  ,intent(out) :: S_SAO_diag(nbas,nbas)
 
       
       type(ERI_function)  :: AO1 , AO2
@@ -18,7 +19,7 @@ subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO)
       integer             :: mu , k , k_prime 
       integer             :: i , j , l  , index_atom1
       
-      double precision    :: S(nbas,nbas) , SAO(nbas,nbas)
+      double precision    :: S(nbas,nbas) , SAO(nbas,nbas) , S_temp(nbas,nbas)
 
       double precision    :: r1(3) , r2(3)
 
@@ -31,7 +32,8 @@ subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO)
 
       index_atom1 = atoms(1)%num_s_function + 3*atoms(1)%num_p_function
 
-      S(:,:) = 0d0 
+      S(:,:)   = 0d0 
+      SAO(:,:) = 0d0
 
       do i = 1 , index_atom1
         do j = 1 , nbas 
@@ -56,10 +58,18 @@ subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO)
         end do 
       end do 
 
+      S_temp(:,:) = S(:,:)
+
+      do k = 1 , nbas 
+          do mu = 1 , nbas 
+            S_SAO_diag(k,k) = S_SAO_diag(k,k) + dcos(((2*pi)/nbas)*(k-1)*(mu-1)) * S_temp(1,mu)
+          end do 
+      end do 
+
       do k = 1 , nbas 
         do k_prime  = 1 , nbas 
           do mu = 1 , nbas 
-            SAO(k,k_prime) = SAO(k,k_prime) + Kronecker_delta(k,k_prime) * dcos(((2*pi)/nbas)*k_prime*(mu-1)) * S(1,mu)
+            SAO(k,k_prime) = SAO(k,k_prime) + Kronecker_delta(k-k_prime) * dcos(((2*pi)/nbas)*(k_prime-1)*(mu-1)) * S(1,mu) / S_SAO_diag(k,k)
           end do 
         end do 
       end do 
@@ -69,6 +79,13 @@ subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO)
         do j = i , size(SAO,1)
           write(1,'(I5,I5,f16.8)') i , j , SAO(i,j)
         end do 
+      end do 
+      close(1)
+
+      open(1,file="./tmp/OV_matrix.dat")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(S,1))
+      do i = 1 , size(S,1)
+        write(1,'(i3,6x,1000(f16.12,2x))') i ,  (S(i,j),j=1,size(S,1))
       end do 
       close(1)
 
