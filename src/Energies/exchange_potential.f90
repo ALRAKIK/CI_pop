@@ -17,7 +17,7 @@ subroutine exchange_potential(nBas,P,ERI,K)
       ! Output variables
 
       double precision,intent(out)  :: K(nBas,nBas)
-
+      
       K(:,:) = 0d0
 
       do nu=1,nBas

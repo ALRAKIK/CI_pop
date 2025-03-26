@@ -40,6 +40,8 @@ subroutine nuclear_attraction_integral_ss_SAO(number_of_atoms,geometry,atoms,r1,
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
+      call PBC(x1,x2,X)
+
       D_normal     = (X*X+Y*Y+Z*Z)
 
       !-----------------------------------------------------------------!
@@ -59,6 +61,7 @@ subroutine nuclear_attraction_integral_ss_SAO(number_of_atoms,geometry,atoms,r1,
             Two_PIP = 2.0d0*pi*p_R
 
             xp = (alpha*x1+beta*x2)*p_R
+            call bary_center(alpha,x1,beta,x2,p_R,xp)
             yp = (alpha*y1+beta*y2)*p_R
             zp = (alpha*z1+beta*z2)*p_R
 

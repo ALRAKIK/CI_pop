@@ -63,6 +63,9 @@ subroutine ERI_integral_4_function_SAO(one,two,three,four,value)
       yAB = ya - yb ; yCD = yc - yd
       zAB = za - zb ; zCD = zc - zd 
 
+      call PBC(xa,xb,xAB)
+      call PBC(xc,xd,xCD)
+
       D2AB = (xAB*xAB + yAB*yAB  + zAB*zAB)
       D2CD = (xCD*xCD + yCD*yCD  + zCD*zCD)
 
@@ -86,6 +89,7 @@ subroutine ERI_integral_4_function_SAO(one,two,three,four,value)
           E_AB = dexp(-mu1*D2AB)
 
           xp  = ( xa * alpha + xb * beta ) * ip
+          call bary_center(alpha,xa,beta,xb,ip,xp)
           yp  = ( ya * alpha + yb * beta ) * ip
           zp  = ( za * alpha + zb * beta ) * ip
 
@@ -96,6 +100,9 @@ subroutine ERI_integral_4_function_SAO(one,two,three,four,value)
           xPB = xp - xb 
           yPB = yp - yb
           zPB = zp - zb
+
+          call SSD(xp,xa,xPA)
+          call SSD(xp,xb,xPB)
 
           do k = 1 , size(three%exponent)
             gamma = three%exponent(k)
@@ -113,6 +120,7 @@ subroutine ERI_integral_4_function_SAO(one,two,three,four,value)
               E_CD = dexp(-mu2*D2CD)
 
               xq = ( xc * gamma + xd * delta )* iq
+              call bary_center(gamma,xc,delta,xd,iq,xq)
               yq = ( yc * gamma + yd * delta )* iq
               zq = ( zc * gamma + zd * delta )* iq
 
@@ -128,7 +136,10 @@ subroutine ERI_integral_4_function_SAO(one,two,three,four,value)
               yPQ = yp - yq
               zPQ = zp - zq
                
-              call euc(xp,xq,XPQ)
+              call SSD(xq,xc,xQC)
+              call SSD(xq,xd,xQD)
+
+              call euc(xp,xq,xPQ)
               
               R2PQ = (xPQ*xPQ + yPQ*yPQ + zPQ*zPQ)
 

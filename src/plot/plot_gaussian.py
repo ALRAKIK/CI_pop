@@ -355,6 +355,201 @@ def plot_gaussian_overlap(basis_info, length, positions, periodic=False, output_
         plt.close()
         print(f"Saved: {filename}")
 
+def plot_gaussian_pairs(basis_info, length, positions, periodic=False, output_dir="plot_tmp"):
+    """Plot pairs of different Gaussian orbitals at different positions"""
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Create a high-resolution grid for plotting
+    x = np.linspace(0, length, 1000)
+    
+    # Need at least two positions to show pairs
+    if len(positions) < 2:
+        print("Need at least two positions to show pairs")
+        return
+    
+    # Process s-type orbitals pairs (different orbital types)
+    for i in range(len(basis_info['s_functions']) - 1):
+        for j in range(i + 1, len(basis_info['s_functions'])):
+            s_func1 = basis_info['s_functions'][i]
+            s_func2 = basis_info['s_functions'][j]
+            
+            # For each pair of positions
+            for pos_idx1 in range(len(positions) - 1):
+                for pos_idx2 in range(pos_idx1 + 1, len(positions)):
+                    pos1 = positions[pos_idx1]
+                    pos2 = positions[pos_idx2]
+                    
+                    plt.figure(figsize=(10, 8))
+                    
+                    # Calculate values for orbital 1 at position 1
+                    values1 = compute_contracted_gaussian(
+                        x, s_func1['primitives'], center=pos1, 
+                        periodic=periodic, L=length
+                    )
+                    
+                    # Calculate values for orbital 2 at position 2
+                    values2 = compute_contracted_gaussian(
+                        x, s_func2['primitives'], center=pos2, 
+                        periodic=periodic, L=length
+                    )
+                    
+                    # Normalize both s-orbitals
+                    max_val1 = np.max(np.abs(values1))
+                    if max_val1 > 0:
+                        values1 = values1 / max_val1
+                    
+                    max_val2 = np.max(np.abs(values2))
+                    if max_val2 > 0:
+                        values2 = values2 / max_val2
+                    
+                    # Plot both Gaussians
+                    plt.plot(x, values1, 'b-', linewidth=2, label=f"{i+1}s at Position {pos1}")
+                    plt.plot(x, values2, 'r-', linewidth=2, label=f"{j+1}s at Position {pos2}")
+                    
+                    # Find the minimum value at each point (the overlap)
+                    overlap = np.minimum(values1, values2)
+                    
+                    # Shade the overlap area
+                    plt.fill_between(x, 0, overlap, color='purple', alpha=0.3, label="Overlap")
+                    
+                    # Set title and labels
+                    title_prefix = "Periodic" if periodic else "Regular"
+                    plt.title(f"{title_prefix} Pair {i+1}s-{j+1}s Orbitals at Positions {pos1}-{pos2}", 
+                             fontsize=16)
+                    plt.xlabel('Distance (Bohr)', fontsize=14)
+                    plt.ylabel('Normalized Amplitude', fontsize=14)  # Updated label
+                    plt.grid(True)
+                    plt.legend()
+                    plt.tight_layout()
+                    
+                    # Save with a unique name and close the figure
+                    prefix = "periodic" if periodic else "regular"
+                    filename = os.path.join(output_dir, 
+                                           f'{prefix}_pair_{i+1}s_{j+1}s_pos_{pos1}_{pos2}.png')
+                    plt.savefig(filename, dpi=300)
+                    plt.close()
+                    print(f"Saved: {filename}")
+    
+    # Process p-type orbitals pairs (different orbital types)
+    for i in range(len(basis_info['p_functions']) - 1):
+        for j in range(i + 1, len(basis_info['p_functions'])):
+            p_func1 = basis_info['p_functions'][i]
+            p_func2 = basis_info['p_functions'][j]
+            
+            # For each pair of positions
+            for pos_idx1 in range(len(positions) - 1):
+                for pos_idx2 in range(pos_idx1 + 1, len(positions)):
+                    pos1 = positions[pos_idx1]
+                    pos2 = positions[pos_idx2]
+                    
+                    plt.figure(figsize=(10, 8))
+                    
+                    # Calculate p-orbital values for position 1
+                    if periodic:
+                        # For each Gaussian primitive
+                        p_values1 = np.zeros_like(x, dtype=float)
+                        
+                        for primitive in p_func1['primitives']:
+                            exponent = primitive['exponent']
+                            coefficient = primitive['coefficient']
+                            
+                            # Get the correct periodic distance (preserving sign)
+                            d_periodic = get_periodic_distance(x, pos1, length)
+                            
+                            # Calculate the p-orbital: (x-xA) * exp(-α(x-xA)²)
+                            gaussian_value = coefficient * np.exp(-exponent * d_periodic**2)
+                            p_orbital_value = d_periodic * gaussian_value
+                            
+                            p_values1 += p_orbital_value
+                    else:
+                        # For regular p-type orbitals
+                        values = compute_contracted_gaussian(
+                            x, p_func1['primitives'], center=pos1,
+                            periodic=False
+                        )
+                        
+                        # Apply the p-orbital angular factor (x - center)
+                        p_values1 = values * (x - pos1)
+                    
+                    # Calculate p-orbital values for position 2
+                    if periodic:
+                        # For each Gaussian primitive
+                        p_values2 = np.zeros_like(x, dtype=float)
+                        
+                        for primitive in p_func2['primitives']:
+                            exponent = primitive['exponent']
+                            coefficient = primitive['coefficient']
+                            
+                            # Get the correct periodic distance (preserving sign)
+                            d_periodic = get_periodic_distance(x, pos2, length)
+                            
+                            # Calculate the p-orbital: (x-xA) * exp(-α(x-xA)²)
+                            gaussian_value = coefficient * np.exp(-exponent * d_periodic**2)
+                            p_orbital_value = d_periodic * gaussian_value
+                            
+                            p_values2 += p_orbital_value
+                    else:
+                        # For regular p-type orbitals
+                        values = compute_contracted_gaussian(
+                            x, p_func2['primitives'], center=pos2,
+                            periodic=False
+                        )
+                        
+                        # Apply the p-orbital angular factor (x - center)
+                        p_values2 = values * (x - pos2)
+                    
+                    # Normalize both p-orbitals
+                    max_val1 = np.max(np.abs(p_values1))
+                    if max_val1 > 0:
+                        p_values1 = p_values1 / max_val1
+                    
+                    max_val2 = np.max(np.abs(p_values2))
+                    if max_val2 > 0:
+                        p_values2 = p_values2 / max_val2
+                    
+                    # Plot both p-orbitals
+                    plt.plot(x, p_values1, 'b-', linewidth=2, label=f"{i+1}p at Position {pos1}")
+                    plt.plot(x, p_values2, 'r-', linewidth=2, label=f"{j+1}p at Position {pos2}")
+                    
+                    # Calculate overlap where both have the same sign
+                    same_sign_mask = np.sign(p_values1) == np.sign(p_values2)
+                    overlap = np.where(same_sign_mask, 
+                                      np.where(np.abs(p_values1) < np.abs(p_values2), p_values1, p_values2),
+                                      0)
+                    
+                    # Shade the positive overlap
+                    pos_mask = overlap > 0
+                    if np.any(pos_mask):
+                        plt.fill_between(x, 0, overlap, where=pos_mask, color='purple', alpha=0.3)
+                    
+                    # Shade the negative overlap
+                    neg_mask = overlap < 0
+                    if np.any(neg_mask):
+                        plt.fill_between(x, overlap, 0, where=neg_mask, color='purple', alpha=0.3)
+                    
+                    # Add a single overlap entry to the legend
+                    plt.plot([], [], color='purple', alpha=0.3, label="Overlap")
+                    
+                    # Set title and labels
+                    title_prefix = "Periodic" if periodic else "Regular"
+                    plt.title(f"{title_prefix} Pair {i+1}p-{j+1}p Orbitals at Positions {pos1}-{pos2}", 
+                             fontsize=16)
+                    plt.xlabel('Distance (Bohr)', fontsize=14)
+                    plt.ylabel('Normalized Amplitude', fontsize=14)
+                    plt.grid(True)
+                    plt.legend()
+                    plt.tight_layout()
+                    
+                    # Save with a unique name and close the figure
+                    prefix = "periodic" if periodic else "regular"
+                    filename = os.path.join(output_dir, 
+                                           f'{prefix}_pair_{i+1}p_{j+1}p_pos_{pos1}_{pos2}.png')
+                    plt.savefig(filename, dpi=300)
+                    plt.close()
+                    print(f"Saved: {filename}")
+
+
 
 def main():
     basis_filename = "./tmp/Basis_scratch"
@@ -406,6 +601,11 @@ def main():
     plot_gaussian_overlap(basis_info, length, positions, periodic=True, output_dir=plot_dir)
     
     print(f"\nAll plots have been saved to {plot_dir}/ folder. No plots were displayed.")
+
+    plot_gaussian_pairs(basis_info, length, positions, periodic=False, output_dir=plot_dir)
+
+    plot_gaussian_pairs(basis_info, length, positions, periodic=True, output_dir=plot_dir)
+
 
 
 if __name__ == "__main__":

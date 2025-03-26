@@ -317,3 +317,38 @@ function trace_matrix(n,A) result(Tr)
   
 end function trace_matrix
 !------------------------------------------------------------------------
+subroutine sort_matrix_diagonal(n,matrix)
+
+      implicit none 
+
+      integer, intent(in) :: n
+      double precision,intent(inout)  :: matrix(n,n)
+      integer :: i, j
+      double precision       :: diag_elements(n)
+      
+
+      double precision :: temp
+  
+
+      do i = 1, n
+        diag_elements(i) = matrix(i,i)
+      end do
+ 
+
+      do i = 1, n-1
+          do j = 1, n-i
+              if (diag_elements(j) > diag_elements(j+1)) then
+                  temp = diag_elements(j)
+                  diag_elements(j) = diag_elements(j+1)
+                  diag_elements(j+1) = temp
+              end if
+          end do
+      end do
+
+      matrix (:,:) = 0.d0 
+      
+      do i = 1, n
+        matrix(i,i) = diag_elements(i)
+      end do
+
+end subroutine sort_matrix_diagonal

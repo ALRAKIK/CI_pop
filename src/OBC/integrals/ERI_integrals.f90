@@ -49,7 +49,7 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
       double precision                :: value_s 
 
       !-----------------------------------------------------------------!
-
+      
       value = 0.d0 
             
       xa =   one%x ; ya =   one%y ; za =   one%z 
@@ -171,7 +171,6 @@ subroutine ERI_integral_4_function(one,two,three,four,value)
 
 end subroutine
 
-
 subroutine ERI_value(o1,o2,o3,o4&
                     &,F0,F1,F2,F3,F4&
                     &,u,v,tu,tv,p,q,pq&
@@ -191,6 +190,8 @@ subroutine ERI_value(o1,o2,o3,o4&
       double precision,intent(in)  :: xQC,yQC,zQC,xQD,yQD,zQD
 
       double precision,intent(in)  :: xPQ , yPQ , zPQ
+
+      integer :: bit_pattern
 
       double precision,intent(out) :: value_s
 
@@ -213,7 +214,7 @@ subroutine ERI_value(o1,o2,o3,o4&
                       &,xPA,yPA,zPA,xPB,yPB,zPB&
                       &,xQC,yQC,zQC,xQD,yQD,zQD&
                       &,xPQ,yPQ,zPQ,value_s)
-
+        
       end if
       
       ! ////////////////////////// p p s s //////////////////////////// !
@@ -250,7 +251,7 @@ subroutine ERI_value(o1,o2,o3,o4&
 
       end if
 
-            ! ////////////////////////// p p p s //////////////////////////// !
+      ! ////////////////////////// p p p s //////////////////////////// !
    
       if (o1(:1) == "p" .and. o2(:1)=="p" .and.   o3(:1)=="p" .and.  o4(:1)=="p") then
           
@@ -371,7 +372,6 @@ subroutine ERI_psss(o1,o2,o3,o4&
         value = F1*u*zPQ + zQD * F0 
       end if
 
-
 end subroutine
 
 
@@ -410,11 +410,13 @@ subroutine ERI_ppss(o1,o2,o3,o4&
       end if
 
       ! Combination 3: p_x s s p_x
+      
       if (o1 == "px" .and. o2 == "s" .and. o3 == "s" .and. o4 == "px") then
         value = F1*(pq + u*xPA*xPQ - v*xPQ*xQD) - F2*u*v*xPQ**2 + xPA*xQD * F0
       end if
 
       ! Combination 4: p_x p_y s s
+      
       if (o1 == "px" .and. o2 == "py" .and. o3 == "s" .and. o4 == "s") then
         value = F1*v*(-xPA*yPQ - xPQ*yPB) + F2*v**2*xPQ*yPQ + xPA*yPB * F0
       end if
@@ -462,7 +464,7 @@ subroutine ERI_ppss(o1,o2,o3,o4&
       ! Combination 13: s p_x p_y s
       if (o1 == "s" .and. o2 == "px" .and. o3 == "py" .and. o4 == "s") then
         value = F1*(u*xPB*yPQ - v*xPQ*yQC) - F2*u*v*xPQ*yPQ + xPB*yQC * F0
-          end if
+      end if
         
       ! Combination 14: s p_x s p_y
       if (o1 == "s" .and. o2 == "px" .and. o3 == "s" .and. o4 == "py") then
@@ -695,7 +697,7 @@ subroutine ERI_ppps(o1,o2,o3,o4&
       double precision,intent(in)  :: u , v , tu , tv , p , q , pq
       
       double precision,intent(out) :: value
-      
+
       ! ////////////////////////// p p p s //////////////////////////// !
 
       ! Combination 1: p_x p_x p_x s
@@ -1238,6 +1240,7 @@ subroutine ERI_ppps(o1,o2,o3,o4&
         value = F1*(pq*(zQC + zQD) - tv*zPB + u*(zPB*zPQ*zQC + zPB*zPQ*zQD) + v*(-zPQ*zQC*zQD - zPQ/(2*q))) + F2*(tv*v*zPQ + u**2*zPB*zPQ**2 + u*(2*pq*zPQ + v*(-zPQ**2*zQC - zPQ**2*zQD))) - F3*u**2*v*zPQ**3 + (zPB*zQC*zQD + zPB/(2*q)) * F0
       end if
 
+
 end subroutine
 
 subroutine ERI_pppp(o1,o2,o3,o4&
@@ -1668,8 +1671,5 @@ subroutine ERI_pppp(o1,o2,o3,o4&
       if (o1 == "pz" .and. o2 == "pz" .and. o3 == "pz" .and. o4 == "pz") then
         value = F1*(pq*(zPA*zQC + zPA*zQD + zPB*zQC + zPB*zQD) - tu*zQC*zQD - tv*zPA*zPB + u*(zPA*zPB*zPQ*zQC + zPA*zPB*zPQ*zQD + zPQ*zQC/(2*p) + zPQ*zQD/(2*p)) + v*(-zPA*zPQ*zQC*zQD - zPB*zPQ*zQC*zQD - zPA*zPQ/(2*q) - zPB*zPQ/(2*q)) - tu/(2*q) - tv/(2*p)) + F2*(2*pq**2 + tu*tv + u**2*(zPA*zPB*zPQ**2 + zPQ**2/(2*p)) + u*(pq*(2*zPA*zPQ + 2*zPB*zPQ) - tu*zPQ*zQC - tu*zPQ*zQD + v*(-zPA*zPQ**2*zQC - zPA*zPQ**2*zQD - zPB*zPQ**2*zQC - zPB*zPQ**2*zQD)) + v**2*(zPQ**2*zQC*zQD + zPQ**2/(2*q)) + v*(pq*(-2*zPQ*zQC - 2*zPQ*zQD) + tv*zPA*zPQ + tv*zPB*zPQ)) + F3*(-tv*v**2*zPQ**2 + u**2*(-tu*zPQ**2 + v*(-zPA*zPQ**3 - zPB*zPQ**3)) + u*(-4*pq*v*zPQ**2 + v**2*(zPQ**3*zQC + zPQ**3*zQD))) + F4*u**2*v**2*zPQ**4 + (zPA*zPB*zQC*zQD + zPA*zPB/(2*q) + zQC*zQD/(2*p) + 1/(4*p*q)) * F0 
       end if
-
-
-
 
 end subroutine

@@ -183,7 +183,8 @@ subroutine nuclear_attraction_integral_sp_torus(number_of_atoms,geometry,atoms,r
                 z_PC = zp - geometry(k,3)
   
                 if (torus) call euc(xp,geometry(k,1),x_PC)
-                
+
+
                 R2PC = x_PC*x_PC + y_PC*y_PC + z_PC*z_PC
               
                 charge_atom = (-1)*atoms(k)%charge

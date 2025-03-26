@@ -12,7 +12,7 @@ program CI
       !-----------------------------------------------------------------!
 
 
-      integer                         :: i , j 
+      integer                         :: i , j
       integer                         :: n_atoms , nBAS
       integer                         :: nO      , n_electron 
 
@@ -81,10 +81,24 @@ program CI
         number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
 
+      nBAS = 0 
+      do i = 1 , n_atoms
+        nBAS = nBAS + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
+      end do 
+
       allocate(AO(number_of_functions))
 
       call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
       call print_orbital_table(AO,number_of_functions)
+
+      !               ---------------------------------                 !
+      !                       Allocate the memory                       !
+      !               ---------------------------------                 !
+
+      allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas),X(nBas,nBas),ERI(nBas,nBas,nBas,nBas),e(nBas),c(nBas,nBas))
+      allocate(S_T(nBas,nBas))
+
+!     -------------------------------------------------------------------     !
 
 !     -------------------------------------------------------------------     !
 !                         Parameters for the calculation 
@@ -118,8 +132,11 @@ program CI
         call overlap_matrix(n_atoms,geometry,atoms)
         call kinetic_matrix(n_atoms,geometry,atoms)
         call nuclear_attraction_matrix(n_atoms,geometry,atoms)  
-!        call ERI_integral(n_atoms,geometry,atoms)
+        call ERI_integral(n_atoms,geometry,atoms)
         call cpu_time(end_HF)
+        t_HF = end_HF - start_HF
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
+        write(outfile,*)
 
       end if 
 
@@ -138,6 +155,9 @@ program CI
         call nuclear_attraction_matrix_SAO(n_atoms,number_of_functions,geometry,atoms,AO,S_SAO_diag)
         call ERI_integral_SAO(n_atoms,number_of_functions,geometry,atoms,S_SAO_diag)
         call cpu_time(end_HF)
+        t_HF = end_HF - start_HF
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
+        write(outfile,*)
         deallocate(S_SAO_diag)
       end if 
 
@@ -154,23 +174,17 @@ program CI
         write(outfile,*) ""
         write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx 
         write(outfile,*) ""
-        call cpu_time(start_HF)
         call overlap_matrix_torus(n_atoms,number_of_functions,atoms,AO)
         call kinetic_matrix_torus(n_atoms,number_of_functions,atoms,AO)
         call nuclear_attraction_matrix_torus(n_atoms,number_of_functions,geometry,atoms,AO)
         call ERI_integral_torus(n_atoms,geometry,atoms)
-        call cpu_time(end_HF)
-        write(outfile,*) "Translation symmetry applied to integrals"
         write(outfile,*) ""
 
       end if 
 
       !-----------------------------------------------------------------!
 
-      t_HF = end_HF - start_HF
-
-      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
-      write(outfile,*)
+      
  
 !     -------------------------------------------------------------------     !
 !                        Nuclear repulsion energy  
@@ -182,26 +196,12 @@ program CI
 !                Read the one and the two electron integrals     
 !     -------------------------------------------------------------------     !
 
-      nBAS = 0 
-      do i = 1 , n_atoms
-        nBAS = nBAS + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do 
-
       n_electron = 0 
       do i = 1 , n_atoms
         n_electron = n_electron + atoms(i)%charge
       end do 
 
       nO = n_electron/2 
-
-      !               ---------------------------------                 !
-      !                       Allocate the memory                       !
-      !               ---------------------------------                 !
-
-      allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas),X(nBas,nBas),ERI(nBas,nBas,nBas,nBas),e(nBas),c(nBas,nBas))
-      allocate(S_T(nBas,nBas))
-
-!     -------------------------------------------------------------------     !
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
 
@@ -227,9 +227,15 @@ program CI
       !                                                                  !
       ! ---------------------------------------------------------------- ! 
 
+      if (calculation_type == "SAO") then 
       call cpu_time(start_HF)
+        call RHF_SAO(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+      call cpu_time(end_HF)
+      else 
+        call cpu_time(start_HF)
         call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
       call cpu_time(end_HF)
+      end if 
 
       t_HF = end_HF - start_HF
       write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',t_HF,' seconds'

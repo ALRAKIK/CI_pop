@@ -1,4 +1,4 @@
-subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
+subroutine RHF_SAO(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       ! Perform a restricted Hartree-Fock calculation
 
@@ -20,7 +20,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       ! Local variables
   
-      integer,parameter             :: maxSCF = 100
+      integer,parameter             :: maxSCF = 2
       double precision,parameter    :: thresh = 1d-5
       integer                       :: nSCF
       double precision              :: Conv
@@ -66,13 +66,51 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       F(:,:) = Hc(:,:)
 
+       write(outfile,'(a)') ""
+       write(outfile,'(a)') "The FOCK matrix :"
+       write(outfile,'(a)') ""
+       call matout(size(F,1),size(F,1),F)
+       write(outfile,'(a)') ""
+
+!      call sort_matrix_diagonal(size(F,1),F)
+
+      write(outfile,'(a)') ""
+      write(outfile,'(a)') "The FOCK matrix :"
+      write(outfile,'(a)') ""
+      call matout(size(F,1),size(F,1),F)
+      write(outfile,'(a)') ""
+
       cp(:,:) = matmul(transpose(X(:,:)), matmul(F(:,:), X(:,:)))
 
       call diagonalize_matrix(nBAS, cp, e)
+
+      write(outfile,'(a)') ""
+      write(outfile,'(a)') "The cp matrix :"
+      write(outfile,'(a)') ""
+      call matout(size(cp,1),size(cp,1),cp)
+      write(outfile,'(a)') ""
+      write(outfile,'(f18.6)') e 
+
+      
+
       
       c(:,:) = matmul(X(:,:), cp(:,:))
+
+      write(outfile,'(a)') ""
+      write(outfile,'(a)') "The c matrix :"
+      write(outfile,'(a)') ""
+      call matout(size(c,1),size(c,1),c)
+      write(outfile,'(a)') ""
+
       
+
       P(:,:) = 2d0 * matmul(c(:,1:nO), transpose(c(:,1:nO)))
+
+      write(outfile,'(a)') ""
+      write(outfile,'(a)') "The density matrix :"
+      write(outfile,'(a)') ""
+      call matout(size(p,1),size(p,1),P)
+      write(outfile,'(a)') ""
 
       ! Initialization
   
@@ -114,6 +152,32 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       !   Compute the exchange potential K
       call exchange_potential(nBas,P,ERI,K)
       ! ****************** !
+
+
+      write(outfile,'(a)') ""
+      write(outfile,'(a)') "The hartree potential :"
+      write(outfile,'(a)') ""
+      call matout(size(J,1),size(J,1),J)
+      write(outfile,'(a)') ""
+
+      write(outfile,'(a)') ""
+      write(outfile,'(a)') "The exchange potential :"
+      write(outfile,'(a)') ""
+      call matout(size(K,1),size(K,1),K)
+      write(outfile,'(a)') ""
+!
+      write(outfile,'(a)') ""
+      write(outfile,'(a)') "The kinetic :"
+      write(outfile,'(a)') ""
+      call matout(size(T,1),size(T,1),T)
+      write(outfile,'(a)') ""
+!
+!
+      write(outfile,'(a)') ""
+      write(outfile,'(a)') "The nuclear attraction :"
+      write(outfile,'(a)') ""
+      call matout(size(V,1),size(V,1),V)
+      write(outfile,'(a)') ""
 
       !   Build Fock operator
     
@@ -185,6 +249,12 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       !   Compute the density matrix P 
 
+!      write(outfile,'(a)') ""
+!      write(outfile,'(a)') "The density matrix :"
+!      write(outfile,'(a)') ""
+!      call matout(size(p,1),size(p,1),P)
+!      write(outfile,'(a)') ""
+
       P(:,:) = 2d0*matmul(c(:,1:nO),transpose(c(:,1:nO)))
 
       !   Dump results
@@ -217,5 +287,5 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
         call print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,EK,EHF)
   
-end subroutine RHF
+end subroutine RHF_SAO
   

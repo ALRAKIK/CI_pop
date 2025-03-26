@@ -12,7 +12,7 @@ subroutine hartree_potential(nBas,P,ERI,J)
 
       ! Local variables
 
-      integer                       :: mu,nu,la,si
+      integer                       :: mu,nu,la,si 
 
       ! Output variables
 
@@ -29,6 +29,5 @@ subroutine hartree_potential(nBas,P,ERI,J)
           end do
         end do
       end do
-
 
 end subroutine hartree_potential

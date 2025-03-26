@@ -43,7 +43,6 @@ subroutine ERI_integral_SAO(number_of_atoms,nbas,geometry,atoms,S_SAO_diag)
 
       two_electron(:,:,:,:) = 0.d0 
 
-
       open(1,file="./tmp/ERI.dat")
       open(2,file="./tmp/ERI_SAO.dat")
 
@@ -51,6 +50,7 @@ subroutine ERI_integral_SAO(number_of_atoms,nbas,geometry,atoms,S_SAO_diag)
       ! 2-fold symmetry implementation (k,l permutation only)
 
       do i = 1, number_of_functions_per_unitcell
+!      do i = 1, nbas 
         do j = 1, nbas
             do k = 1, nbas
                 ! Only calculate for k ≤ l to avoid duplicates
@@ -98,9 +98,9 @@ subroutine ERI_integral_SAO(number_of_atoms,nbas,geometry,atoms,S_SAO_diag)
               do mu = 1 , nbas 
                 do rho =1 , nbas 
                   do sigma = 1 , nbas 
-                    phase = ((2*pi)/nbas)*((kp-1)*(mu-1)-(kpp-1)*(rho-1)-(kppp-1)*(sigma-1))
+                    phase = ((2.d0*pi)/nbas)*((kp-1)*(mu-1)-(kpp-1)*(rho-1)-(kppp-1)*(sigma-1))
                     two_eri(k,kp,kpp,kppp) =  two_eri(k,kp,kpp,kppp) + &
-                                              dcos(phase) * two_electron(1,mu,rho,sigma) * norm * 1/nbas 
+                                              dcos(phase) * two_electron(1,mu,rho,sigma) * norm  * (1.d0/nbas)
                   end do 
                 end do 
               end do 

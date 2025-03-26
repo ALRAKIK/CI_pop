@@ -30,6 +30,8 @@ subroutine overlap_integral_ss_SAO(r1,r2,AO1,AO2,S_ss_normal)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
+      call PBC(x1,x2,X)
+
       D_normal     = (X*X+Y*Y+Z*Z)
 
       !-----------------------------------------------------------------!

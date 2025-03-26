@@ -1,5 +1,6 @@
 subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO,S_SAO_diag)
 
+      use files
       use atom_basis
       use classification_ERI
 
@@ -65,6 +66,12 @@ subroutine overlap_matrix_SAO(n_atoms,nbas,atoms,AO,S_SAO_diag)
             S_SAO_diag(k,k) = S_SAO_diag(k,k) + dcos(((2*pi)/nbas)*(k-1)*(mu-1)) * S_temp(1,mu)
           end do 
       end do 
+
+       write(outfile,'(a)') ""
+       write(outfile,'(a)') "The Normalization matrix :"
+       write(outfile,'(a)') ""
+       call matout(size(S_SAO_diag,1),size(S_SAO_diag,1),S_SAO_diag)
+       write(outfile,'(a)') ""
 
       do k = 1 , nbas 
         do k_prime  = 1 , nbas 
