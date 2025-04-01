@@ -51,6 +51,8 @@ program CI
       call build_super_molecule()
       call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type)
 
+      if (calculation_type == "Torus") call Torus_def()
+
       allocate(geometry(n_atoms,3))
       allocate(charge(n_atoms))
 
@@ -102,7 +104,7 @@ program CI
 !                            Plot the gussians                                !
 !     -------------------------------------------------------------------     !
 
-      call plot(n_atoms,geometry)
+!      call plot(n_atoms,geometry)
 
 !     -------------------------------------------------------------------     !
 !                         calculate the integrals 
@@ -194,9 +196,9 @@ program CI
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
 
-      call read_overlap_T(nBas,S_T)
+!      call read_overlap_T(nBas,S_T)
 
-      call check_symmetric_matrix(nBas,S,T,V,HC)
+!      call check_symmetric_matrix(nBas,S,T,V,HC)
 
       !------------------------------------------------------!
       !                                  (-1/2)         t    !
@@ -206,7 +208,7 @@ program CI
 
       CALL HEADER ('The Overlap Matrix',-1)
 
-!      call matout(nBas,nBas,S)
+      !call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
        

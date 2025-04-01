@@ -1,15 +1,15 @@
 subroutine  plot(n_atoms,geometry)
 
       use atom_basis
+
       use torus_init
+
       implicit none 
 
       integer,intent(in)               :: n_atoms 
       double precision,intent(in)      :: geometry(n_atoms,3)
 
       call system("rm -r plot_tmp")
-
-      call Torus_def()
 
       
       open(30,file="./tmp/parameter.dat")

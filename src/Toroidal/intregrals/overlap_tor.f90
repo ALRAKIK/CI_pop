@@ -1,6 +1,7 @@
 subroutine overlap_matrix_tor(number_of_atoms,geometry,atoms)
 
       use atom_basis
+      use torus_init
 
       implicit none 
 
@@ -23,7 +24,6 @@ subroutine overlap_matrix_tor(number_of_atoms,geometry,atoms)
       double precision             :: SP(3) , PS(3)
       double precision             :: PP(3,3)
       integer                      :: total_functions
-
 
 
       total_functions = 0 
