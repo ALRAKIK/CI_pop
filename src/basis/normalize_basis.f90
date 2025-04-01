@@ -128,12 +128,16 @@ subroutine normalize_basis_tor()
       double precision,allocatable  :: exponent(:) , contraction(:,:) , contractionN(:,:) 
       double precision              :: Lx , Ly , Lz 
 
+
+      open(4,file="torus_parameters.inp")
+        read(4,*) Lx 
+      close(4)
+
+      Ly = Lx ; Lz = Lx 
+
       open(1,file="./tmp/Basis_scratch_tor")
       open(2,file="./tmp/Basis_normalized_tor")
 
-      Lx = 24.d0
-      Ly = 24.d0
-      Lz = 24.d0 
 
       do
       

@@ -17,8 +17,7 @@ subroutine overlap_matrix_tor(number_of_atoms,geometry,atoms)
       double precision,allocatable :: overlap(:,:)
       double precision             :: r1(3) , r2(3)
 
-      double precision,parameter   :: pi = dacos(-1.d0)
-
+      double precision,parameter   :: pi = 3.14159265358979323846D00
 
       double precision             :: SS 
       double precision             :: SP(3) , PS(3)

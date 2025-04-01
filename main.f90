@@ -102,13 +102,13 @@ program CI
 !                            Plot the gussians                                !
 !     -------------------------------------------------------------------     !
 
-!      call plot(n_atoms,geometry)
+      call plot(n_atoms,geometry)
 
 !     -------------------------------------------------------------------     !
 !                         calculate the integrals 
 !     -------------------------------------------------------------------     !
 
-!      call overlap_matrix_tor(n_atoms,geometry,atoms_tor)
+      call overlap_matrix_tor(n_atoms,geometry,atoms_tor)
 
       !-----------------------------------------------------------------!
       !                    calculate molecule                           !
@@ -194,9 +194,7 @@ program CI
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
 
-!      call read_infinite_overlap(nBAS,S_T) 
-
-!      call read_overlap_T(nBas,S_T)
+      call read_overlap_T(nBas,S_T)
 
       call check_symmetric_matrix(nBas,S,T,V,HC)
 

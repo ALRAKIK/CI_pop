@@ -49,6 +49,7 @@ subroutine overlap_integral_ss_tor(r1,r2,atom1,atom2,index1,index2,S_ss_normal)
       !-----------------------------------------------------------------!
  
       S_ss_normal = 0.d0
+      
       do i = 1 , atom1%num_exponent_s
         alpha = atom1%exponent_s(i)
         c1    = atom1%coefficient_s(i,index1)

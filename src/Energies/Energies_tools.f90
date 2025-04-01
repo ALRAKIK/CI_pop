@@ -100,85 +100,6 @@ subroutine read_overlap_T(nBas,S)
 end subroutine
 
 !------------------------------------------------------------------------!
-
-subroutine read_infinite_overlap(nBas,S)
-
-      ! Read one- and two-electron integrals from files
-
-      use files 
-      implicit none
-
-      ! Input variables
-
-      integer,intent(in)            :: nBas
-
-      ! Local variables
-
-      integer                       :: mu
-      integer                       :: i , o 
-      double precision              :: Evec(nbas,nbas)
-      double precision              :: Eval(nbas)
-      double precision,parameter    :: thresh = 1d-6
-
-      double precision,intent(out)  :: S(nBas,nBas)
-
-      open( 8,file='OV.dat' )
-
-      S(:,:) = 0d0
-      read(8,*) 
-        do i = 1 , nbas 
-          read(8,*) mu , S(i,:)
-        end do 
-      close(8)
-
-      Evec(:,:) = S(:,:)
-
-      call diagonalize_matrix(Nbas,Evec,Eval)
-
-      call header_under("The Overlap Eigenvalues infinite",-1)
-
-      write(outfile, "(5f16.8)") (Eval(i), i=1,nbas)
-
-      write(outfile,*) ""
-      write(outfile,*) ""
-      write(outfile,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
-      write(outfile,*) ""
-
-      if (Minval(Eval) < 0.d0) then 
-        call header("Error",-1)
-          write(outfile,'(a80)')'*******************************************************************************************'
-          write(outfile,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
-          write(outfile,'(a80)')'*******************************************************************************************'
-          stop            
-      end if
-
-      do i = 1 , Nbas
-          if (Eval(i) > thresh) then
-            Eval(i) = dsqrt(1.d0 / Eval(i))
-          end if
-      end do
-    
-      call ADAt(Nbas,Evec,Eval,S)
-
-      open(1,file="./tmp/X_infinite.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(S,1))
-      do i = 1 , size(S,1)
-        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (S(i,o),o=1,size(S,1))
-      end do 
-      close(1)
-
-      open(2,file="./tmp/eigen_values_infinite.dat")
-        do i = 1 , nbas 
-        write(2,*) Eval(i)
-        end do 
-      close(2)
-
-      
-
-end subroutine
-
-
-!------------------------------------------------------------------------!
 subroutine get_X_from_overlap(N,over,X)
 
       use files 
@@ -235,7 +156,7 @@ subroutine get_X_from_overlap(N,over,X)
     
       call ADAt(N,Evec,Eval,X)
 
-      open(1,file="./tmp/X_before.dat")
+      open(1,file="./tmp/X.dat")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(X,1))
       do i = 1 , size(X,1)
         write(1,'(i3,6x,1000(f16.10,2x))') i ,  (X(i,o),o=1,size(X,1))
@@ -248,14 +169,12 @@ subroutine get_X_from_overlap(N,over,X)
       end do 
       close(2)
 
-
       Xt = matmul(transpose(X),(matmul(over,X)))
-
 
       ! --------------------------------------------------------------- !
 
-      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
-      call matout(N,N,Xt)
+!      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
+!      call matout(N,N,Xt)
 
       ! --------------------------------------------------------------- !
   
