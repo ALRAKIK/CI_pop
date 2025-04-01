@@ -16,7 +16,7 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
       integer                      :: idx_s  , idx_p 
       integer                      :: idx_p1 , idx_p2
       integer                      :: total_functions
-      double precision,parameter   :: pi = dacos(-1.d0)
+      double precision,parameter   :: pi     = 3.14159265358979323846D00
       double precision             :: r1(3) , r2(3)
       double precision,allocatable :: NA(:,:)
       double precision             :: SS , SP(3) , PS(3) , PP(3,3)

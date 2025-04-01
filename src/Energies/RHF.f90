@@ -37,6 +37,9 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       integer                       :: max_diis = 5
       integer                       :: n_diis
+      integer                       :: i  , o
+      integer                       :: mu , nu 
+      double precision              :: sum 
       double precision              :: rcond
       double precision,allocatable  :: err_diis(:,:)
       double precision,allocatable  :: F_diis(:,:)
@@ -66,13 +69,86 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       F(:,:) = Hc(:,:)
 
+      open(1,file="./tmp/FOCK_matrix.dat")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(F,1))
+      do i = 1 , size(F,1)
+        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (F(i,o),o=1,size(F,1))
+      end do 
+      close(1)
+
+      open(1,file="./tmp/X.dat")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(X,1))
+      do i = 1 , size(X,1)
+        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (X(i,o),o=1,size(X,1))
+      end do 
+      close(1)
+
       cp(:,:) = matmul(transpose(X(:,:)), matmul(F(:,:), X(:,:)))
+
+      open(1,file="./tmp/C_prime.dat")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(cp,1))
+      do i = 1 , size(cp,1)
+        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (cp(i,o),o=1,size(cp,1))
+      end do 
+      close(1)
 
       call diagonalize_matrix(nBAS, cp, e)
       
       c(:,:) = matmul(X(:,:), cp(:,:))
+
+      open(1,file="./tmp/C.dat")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(c,1))
+      do i = 1 , size(c,1)
+        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (c(i,o),o=1,size(c,1))
+      end do 
+      close(1)
       
       P(:,:) = 2d0 * matmul(c(:,1:nO), transpose(c(:,1:nO)))
+
+      open(1,file="./tmp/density_matrix.dat")
+        write(1,'(15x,1000(i3,15x))') (i,i=1,size(P,1))
+        do i = 1 , size(P,1)
+          write(1,'(i3,6x,1000(f16.10,2x))') i ,  (P(i,o),o=1,size(P,1))
+        end do 
+      close(1)
+
+
+
+      ! --------------------------------------------------------------- !
+      !              check that P_{mu nu} S_{mu nu} = N 
+      ! --------------------------------------------------------------- !
+
+      sum = 0.d0 
+      do mu = 1 , nbas 
+        do nu = 1 , nbas 
+          sum = sum + P(mu,nu)*S(mu,nu)
+        end do 
+      end do 
+
+      call header_under("P_{mu nu} S_{mu nu} = N",-1)
+
+      write(outfile,"(a,f16.8)") "P_{mu nu} S_{mu nu} =  " , sum 
+
+      ! --------------------------------------------------------------- !
+
+      ! --------------------------------------------------------------- !
+      !              apply the density on the functions 
+      ! --------------------------------------------------------------- !
+
+      sum = 0.d0 
+      do mu = 1 , nbas 
+        do nu = 1 , nbas 
+          do o = 1 , nbas 
+            sum = sum + P(mu,nu)*S(mu,o)*S(nu,o)
+          end do 
+        end do 
+      end do 
+
+      call header_under("P_{mu nu} S_{mu s} S_{nu s}",-1)
+
+      write(outfile,"(a,f16.8)") "P_{mu nu} S_{mu s} S_{nu s} =  " , sum 
+
+      ! --------------------------------------------------------------- !
 
       ! Initialization
   
@@ -172,11 +248,12 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       !   Transform for the Fock matrix F in the orthogonal basis 
       
-      Fp = matmul(transpose(X),matmul(F,X))
+      Fp(:,:) = matmul(transpose(X(:,:)), matmul(F(:,:),X(:,:)))
             
       !   Diagonalize F' to get MO coefficients (eigenvectors in the orthogonal basis) c' and MO energies (eigenvalues) e
 
       cp(:,:) = Fp(:,:)
+
       call diagonalize_matrix(nBas,cp,e)
 
       !   Back-transform the MO coefficients c in the original non-orthogonal basis

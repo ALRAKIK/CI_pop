@@ -13,11 +13,25 @@ subroutine build_super_molecule()
       character(len=2),allocatable   :: super_atoms(:)
       character(len=100)             :: line
       logical                        :: reading_cell 
+      character(len=5)               :: type_of_calculation
+      double precision               :: rx , theta 
+      double precision,parameter     :: pi     = 3.14159265358979323846D00
 
 
       open(1,file="unitcell.mol")
 
-      read(1,*) number_of_unitcell , distance_between_unitcells , L 
+      read(1,*) type_of_calculation , number_of_unitcell , distance_between_unitcells , L 
+
+      if (type_of_calculation == "Ring") then
+        write(*,'(a)') "Type of calculation: Ring"
+      else if (type_of_calculation == "Torus") then
+        write(*,'(a)') "Type of calculation: Torus"
+      else if (type_of_calculation == "OBC") then 
+        write(*,'(a)') "Type of calculation: OBC"
+      else 
+        write(*,'(a)') "Error: Unknown type of calculation. Please use either 'Torus','Ring' or 'OBC' ."
+        stop
+      end if
 
       do
         read(1, '(A)',iostat=io_stat) line
@@ -103,5 +117,39 @@ subroutine build_super_molecule()
         write(3,"(I2)")    num_atoms
       close(3)
 
+
+      if (type_of_calculation == "Ring") then 
+
+      atom_index = 0
+      rx         = L / (2.d0*pi) 
+
+      do i = 0, number_of_unitcell-1
+        do j = 1, num_atoms
+            atom_index = atom_index + 1
+            super_atoms(atom_index) = a_names(j)
+            theta = (i * distance_between_unitcells + unitcell(j, 1) )* 2.d0*pi / (number_of_unitcell * distance_between_unitcells)
+            super_geometry(atom_index, 1) = rx * cos(theta)
+            super_geometry(atom_index, 2) = rx * sin(theta)
+            super_geometry(atom_index, 3) = 0.d0
+        end do
+      end do
+
+      open(2,file="supermolecule.mol")
+      do i = 1, num_atoms * number_of_unitcell
+        write(2, '(A2,4x,3(F12.8,4x))') super_atoms(i), super_geometry(i, 1), &
+                                 super_geometry(i, 2), super_geometry(i, 3)
+      end do
+      close(2)
+
+      open(3,file="torus_parameters.inp")
+        write(3,"(f12.8)") L
+        write(3,"(I2)")    num_atoms
+      close(3)
+
+      end if 
+
+      open(4 , file =  "general_parameters.dat" )
+        write (4,'(a5)') type_of_calculation
+      close(4)
 
 end subroutine

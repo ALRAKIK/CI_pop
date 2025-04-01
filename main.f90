@@ -49,7 +49,7 @@ program CI
       !-----------------------------------------------------------------!    
 
       call build_super_molecule()
-      call read_geometry(n_atoms,charge_tmp,geometry_tmp)
+      call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type)
 
       allocate(geometry(n_atoms,3))
       allocate(charge(n_atoms))
@@ -99,20 +99,10 @@ program CI
       allocate(S_T(nBas,nBas))
 
 !     -------------------------------------------------------------------     !
-
-!     -------------------------------------------------------------------     !
-!                         Parameters for the calculation 
-!     -------------------------------------------------------------------     !
-
-      calculation_type = "Torus"
-
-!     -------------------------------------------------------------------     !
 !                            Plot the gussians                                !
 !     -------------------------------------------------------------------     !
 
-
 !      call plot(n_atoms,geometry)
-
 
 !     -------------------------------------------------------------------     !
 !                         calculate the integrals 
@@ -124,8 +114,7 @@ program CI
       !                    calculate molecule                           !
       !-----------------------------------------------------------------!
 
-      if (calculation_type == "OBC") then 
-        
+      if (calculation_type == "OBC" .or. calculation_type == "Ring" ) then 
         call header("calculation with OBC",-1)
         call header_under("Calculate the integerals",-1)
         call cpu_time(start_HF)
@@ -179,7 +168,7 @@ program CI
         call nuclear_attraction_matrix_torus(n_atoms,number_of_functions,geometry,atoms,AO)
         call ERI_integral_torus(n_atoms,geometry,atoms)
         write(outfile,*) ""
-
+        call system("rm torus_parameters.inp")
       end if 
 
       !-----------------------------------------------------------------!
@@ -204,6 +193,8 @@ program CI
       nO = n_electron/2 
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
+
+!      call read_infinite_overlap(nBAS,S_T) 
 
 !      call read_overlap_T(nBas,S_T)
 
@@ -246,7 +237,5 @@ program CI
 
       close(outfile)
 
-      call system("rm torus_parameters.inp")
-      call system("rm supermolecule.mol")
 
 end program CI 
