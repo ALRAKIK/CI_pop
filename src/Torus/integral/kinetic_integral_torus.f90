@@ -29,6 +29,7 @@ subroutine kinetic_integral_ss_torus(r1,r2,AO1,AO2,S_ss_normal)
 
       X            = (x1 - x2)
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -89,6 +90,7 @@ subroutine kinetic_integral_sp_torus(r1,r2,AO1,AO2,S_sp_normal)
       Z            = (z1 - z2)
 
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -106,6 +108,7 @@ subroutine kinetic_integral_sp_torus(r1,r2,AO1,AO2,S_sp_normal)
 
           X            =  (x1 - x2)
           call SSD(x1,x2,X)
+!          call EUC(x1,x2,X)
           X_PB_normal  =  (alpha/p)*(X)
     
           Y            =  (y1 - y2)
@@ -164,6 +167,7 @@ subroutine kinetic_integral_pp_torus(r1,r2,AO1,AO2,S_pp_normal)
       Z            = (z1 - z2)
 
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -182,6 +186,7 @@ subroutine kinetic_integral_pp_torus(r1,r2,AO1,AO2,S_pp_normal)
           X            =  (x1 - x2)
 
           call SSD(x1,x2,X)
+!          call EUC(x1,x2,X)
 
 
           X_PB_normal  =  (alpha/p)*(X)

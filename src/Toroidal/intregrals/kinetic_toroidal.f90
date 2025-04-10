@@ -1,4 +1,4 @@
-subroutine kinetic_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
+subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
 
       use torus_init
       use atom_basis
@@ -59,7 +59,7 @@ subroutine kinetic_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
         
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call kinetic_integral_ss_torus(r1,r2,AO1,AO2,kinetic(i,j))
+                call kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,kinetic(i,j))
               end do 
             end do 
 
@@ -69,7 +69,7 @@ subroutine kinetic_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call kinetic_integral_sp_torus(r1,r2,AO1,AO2,kinetic(i,j))
+                call kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,kinetic(i,j))
               end do 
             end do
 
@@ -79,7 +79,7 @@ subroutine kinetic_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
                 
             do k = 1, size(AO1%exponent)
               do l = 1, size(AO2%exponent)
-                call kinetic_integral_sp_torus(r2, r1, AO2, AO1, kinetic(i,j))
+                call kinetic_integral_sp_toroidal(r2, r1, AO2, AO1, kinetic(i,j))
               end do 
             end do
 
@@ -89,7 +89,7 @@ subroutine kinetic_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
                 
             do k = 1, size(AO1%exponent)
               do l = 1, size(AO2%exponent)
-                call kinetic_integral_pp_torus(r1, r2, AO1, AO2, kinetic(i,j))
+                call kinetic_integral_pp_toroidal(r1, r2, AO1, AO2, kinetic(i,j))
               end do 
             end do
 
@@ -132,4 +132,4 @@ subroutine kinetic_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
 
       deallocate(kinetic)
 
-end subroutine kinetic_matrix_torus
+end subroutine kinetic_matrix_toroidal

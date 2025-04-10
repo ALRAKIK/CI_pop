@@ -67,7 +67,9 @@ subroutine ERI_integral_4_function_torus(one,two,three,four,value)
       zAB = za - zb ; zCD = zc - zd 
 
       call PBC(xa,xb,xAB)
+!      call EUC(xa,xb,XAB)
       call PBC(xc,xd,xCD)
+!      call EUC(xc,xd,XCD)
 
       D2AB = (xAB*xAB + yAB*yAB  + zAB*zAB)
       D2CD = (xCD*xCD + yCD*yCD  + zCD*zCD)
@@ -105,7 +107,9 @@ subroutine ERI_integral_4_function_torus(one,two,three,four,value)
           zPB = zp - zb
 
           call SSD(xp,xa,xPA)
+!          call EUC(xp,xa,XPA)
           call SSD(xp,xb,xPB)
+!          call EUC(xp,xb,XPB)
 
           do k = 1 , size(three%exponent)
             gamma = three%exponent(k)
@@ -140,7 +144,9 @@ subroutine ERI_integral_4_function_torus(one,two,three,four,value)
               zPQ = zp - zq
 
               call SSD(xq,xc,xQC)
+!              call EUC(xq,xc,XQC)
               call SSD(xq,xd,xQD)
+!              call EUC(xq,xd,XQD)
 
               call euc(xp,xq,xPQ)
                

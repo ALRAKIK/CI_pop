@@ -31,6 +31,7 @@ subroutine overlap_integral_ss_torus(r1,r2,AO1,AO2,S_ss_normal)
       Z            = (z1 - z2)
 
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -89,6 +90,7 @@ subroutine overlap_integral_sp_torus(r1,r2,AO1,AO2,S_sp_normal)
       Z            = (z1 - z2)
 
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -109,6 +111,7 @@ subroutine overlap_integral_sp_torus(r1,r2,AO1,AO2,S_sp_normal)
           X            =  (x1 - x2)
           
           call SSD(x1,x2,X)
+!          call EUC(x1,x2,X)
 
           X_PB_normal  =  (alpha/p)*(X)
 
@@ -165,6 +168,7 @@ subroutine overlap_integral_pp_torus(r1,r2,AO1,AO2,S_pp_normal)
       Z            = (z1 - z2)
 
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -184,6 +188,7 @@ subroutine overlap_integral_pp_torus(r1,r2,AO1,AO2,S_pp_normal)
 
           X            =  (x1 - x2)
           call SSD(x1,x2,X)
+!          call EUC(x1,x2,X)
           X_PB_normal  =  (alpha/p)*(X)
           X_PA_normal  = -(beta/p) *(X)
           C_X_normal   = X_PB_normal*X_PA_normal+(1/(2.d0*p))
@@ -199,15 +204,15 @@ subroutine overlap_integral_pp_torus(r1,r2,AO1,AO2,S_pp_normal)
           C_Z_normal   = Z_PB_normal*Z_PA_normal+(1/(2.d0*p))
 
           if (AO1%orbital == "px" .and. AO2%orbital == "px") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * C_X_normal                   
-          if (AO1%orbital == "px" .and. AO2%orbital == "py") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * X_PB_normal*Y_PA_normal
-          if (AO1%orbital == "px" .and. AO2%orbital == "pz") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * X_PB_normal*Z_PA_normal
+          if (AO1%orbital == "px" .and. AO2%orbital == "py") S_pp_normal =  0.d0 !S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * X_PB_normal*Y_PA_normal
+          if (AO1%orbital == "px" .and. AO2%orbital == "pz") S_pp_normal =  0.d0 !S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * X_PB_normal*Z_PA_normal
 
-          if (AO1%orbital == "py" .and. AO2%orbital == "px") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * Y_PB_normal*X_PA_normal
+          if (AO1%orbital == "py" .and. AO2%orbital == "px") S_pp_normal =  0.d0 !S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * Y_PB_normal*X_PA_normal
           if (AO1%orbital == "py" .and. AO2%orbital == "py") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * C_Y_normal             
-          if (AO1%orbital == "py" .and. AO2%orbital == "pz") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * Y_PB_normal*Z_PA_normal
+          if (AO1%orbital == "py" .and. AO2%orbital == "pz") S_pp_normal =  0.d0 !S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * Y_PB_normal*Z_PA_normal
 
-          if (AO1%orbital == "pz" .and. AO2%orbital == "px") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * Z_PB_normal*X_PA_normal
-          if (AO1%orbital == "pz" .and. AO2%orbital == "py") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * Z_PB_normal*Y_PA_normal
+          if (AO1%orbital == "pz" .and. AO2%orbital == "px") S_pp_normal =  0.d0 !S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * Z_PB_normal*X_PA_normal
+          if (AO1%orbital == "pz" .and. AO2%orbital == "py") S_pp_normal =  0.d0 !S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * Z_PB_normal*Y_PA_normal
           if (AO1%orbital == "pz" .and. AO2%orbital == "pz") S_pp_normal =  S_pp_normal +  c1*c2*(dsqrt(pi/p)**3)*exp(-mu*D_normal) * C_Z_normal             
 
         end do 

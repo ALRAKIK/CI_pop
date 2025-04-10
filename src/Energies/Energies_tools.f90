@@ -376,3 +376,37 @@ subroutine sort_matrix_diagonal(n,matrix)
       end do
 
 end subroutine sort_matrix_diagonal
+
+
+
+subroutine split_matrix(nBas, matrix)
+
+      implicit none
+
+      integer, intent(in)             :: nBas
+      double precision, intent(inout) :: matrix(nBas,nBas)
+      integer                         :: i , j 
+        
+      do i = 1 , nbas 
+        do j = 4,nbas,5
+          if (.not. (i == 4 .or. i == 9 .or. i ==14 .or. i ==19 .or. i ==24 .or. i ==29 .or. i ==34 .or. i ==39 .or. i == 44 .or. i == 49 )) then 
+            matrix(i,j) = 0.d0 
+            matrix(j,i) = 0.d0 
+          end if 
+        end do 
+      end do 
+    
+end subroutine split_matrix
+
+
+subroutine split_matrix_ERI(nBas, matrix)
+
+  implicit none
+
+  integer, intent(in)             :: nBas
+  double precision, intent(inout) :: matrix(nBas,nBas,nBas,nBas)
+  integer                         :: i , j 
+    
+
+
+end subroutine split_matrix_ERI

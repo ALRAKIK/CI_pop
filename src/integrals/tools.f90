@@ -46,10 +46,12 @@ subroutine print_orbital_table(ERI,number_of_functions)
 
       use files 
       use classification_ERI
+
       implicit none
+
       type(ERI_function)  :: ERI(number_of_functions)
       integer, intent(in) :: number_of_functions
-      integer :: i, j
+      integer             :: i, j
         
       call header_under("Atomic Orbitals", -1)
         

@@ -40,6 +40,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       integer                       :: i  , o
       integer                       :: mu , nu 
       double precision              :: sum 
+      double precision              :: sum_o(nbas)
       double precision              :: rcond
       double precision,allocatable  :: err_diis(:,:)
       double precision,allocatable  :: F_diis(:,:)
@@ -135,18 +136,22 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       !              apply the density on the functions 
       ! --------------------------------------------------------------- !
 
-      sum = 0.d0 
-      do mu = 1 , nbas 
-        do nu = 1 , nbas 
-          do o = 1 , nbas 
-            sum = sum + P(mu,nu)*S(mu,o)*S(nu,o)
+      sum_o(:) = 0.d0 
+
+      do o = 1 , nbas
+        do mu = 1 , nbas 
+          do nu = 1 , nbas 
+            sum_o(o) = sum_o(o) + P(mu,nu)*S(mu,o)*S(nu,o)
           end do 
         end do 
       end do 
 
       call header_under("P_{mu nu} S_{mu s} S_{nu s}",-1)
 
-      write(outfile,"(a,f16.8)") "P_{mu nu} S_{mu s} S_{nu s} =  " , sum 
+      write(outfile,"(a)") "P_{mu nu} S_{mu s} S_{nu s} :  "
+      do i = 1 , nbas 
+        write(outfile,"(40x,i3,1x,f16.8)") i , sum_o(i)
+      end do 
 
       ! --------------------------------------------------------------- !
 
@@ -225,7 +230,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       EHF = ET + EV + EJ + EK
 
-      if (abs(EHF - EHF_old) < thresh .and. nSCF > maxSCF/2 ) exit
+      if (abs(EHF - EHF_old) < thresh .and. nSCF > maxSCF/4 ) exit
 
       if (nSCF > 2) then 
         EHF_old = EHF 

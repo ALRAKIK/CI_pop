@@ -35,7 +35,7 @@ subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type)
       call system("rm supermolecule.mol")
 
       open(4, file = "general_parameters.dat")
-      read (4,*) calculation_type
+        read (4,*) calculation_type
       close(4)
 
       call system("rm general_parameters.dat")

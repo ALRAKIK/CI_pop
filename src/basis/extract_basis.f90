@@ -71,7 +71,7 @@ subroutine extract_basis_tor(number_of_atoms,charge)
       end do 
       
       open(1,file="Basis")
-      open(2,file="./tmp/Basis_scratch_tor")
+      open(2,file="./tmp/Basis_scratch")
 
       do 
 
@@ -93,4 +93,4 @@ subroutine extract_basis_tor(number_of_atoms,charge)
 
 close(2)
 
-end subroutine 
+end subroutine

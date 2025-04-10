@@ -50,12 +50,13 @@ subroutine read_basis_class(atom_type)
 
 end subroutine read_basis_class
 
-subroutine read_basis_class_tor(atom_type)
+subroutine read_basis_class_tor(atom_type,num)
         
       use atom_basis
+      
       implicit none
 
-      integer             :: i , j 
+      integer             :: i , j , num 
       type(atom)          :: atom_type
       character(len=100)  :: lines 
 
@@ -66,9 +67,11 @@ subroutine read_basis_class_tor(atom_type)
       atom_type%num_s_function = 0
       atom_type%num_p_function = 0
 
-    
-      open(1, file="./tmp/Basis_normalized_tor")
-
+      if (num == 1) then 
+        open(1, file="./tmp/Basis_normalized")
+      else 
+        open(1, file="./tmp/Basis_normalized_p")
+      end if 
         do 
 
           read(1,'(A)',end=3) lines 

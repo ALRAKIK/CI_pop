@@ -28,8 +28,10 @@ subroutine build_super_molecule()
         write(*,'(a)') "Type of calculation: Torus"
       else if (type_of_calculation == "OBC") then 
         write(*,'(a)') "Type of calculation: OBC"
+      else if (type_of_calculation == "Tori") then 
+        write(*,'(a)') "Type of calculation: Toroidal"
       else 
-        write(*,'(a)') "Error: Unknown type of calculation. Please use either 'Torus','Ring' or 'OBC' ."
+        write(*,'(a)') "Error: Unknown type of calculation. Please use either 'Torus','Ring','Tori' or 'OBC' ."
         stop
       end if
 
@@ -113,7 +115,7 @@ subroutine build_super_molecule()
       close(2)
 
       open(3,file="torus_parameters.inp")
-        write(3,"(f12.8)") L
+        write(3,"(f24.16)") L
         write(3,"(I2)")    num_atoms
       close(3)
 

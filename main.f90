@@ -23,11 +23,10 @@ program CI
       double precision,allocatable    :: geometry(:,:)
       integer         ,allocatable    :: charge(:)
       type(atom)      ,allocatable    :: atoms(:)
-      type(atom)      ,allocatable    :: atoms_tor(:)
+      type(atom)      ,allocatable    :: norm_helper(:)
       type(ERI_function),allocatable  :: AO (:)
 
       double precision,allocatable    ::          S(:,:)
-      double precision,allocatable    ::        S_T(:,:)
       double precision,allocatable    ::          T(:,:)
       double precision,allocatable    ::          V(:,:)
       double precision,allocatable    ::         Hc(:,:)
@@ -49,9 +48,10 @@ program CI
       !-----------------------------------------------------------------!    
 
       call build_super_molecule()
+
       call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type)
 
-      if (calculation_type == "Torus") call Torus_def()
+      if (calculation_type == "Torus" .or. calculation_type == "Tori") call Torus_def()
 
       allocate(geometry(n_atoms,3))
       allocate(charge(n_atoms))
@@ -64,11 +64,13 @@ program CI
       end do 
 
       allocate(atoms    (n_atoms))
-      allocate(atoms_tor(n_atoms))
+      allocate(norm_helper(n_atoms))
 
-      call basis(n_atoms,charge,atoms)
-
-      call basis_tor(n_atoms,charge,atoms_tor)
+      if (calculation_type == "Tori") then 
+        call basis_tor(n_atoms,charge,atoms,norm_helper)
+      else
+        call basis(n_atoms,charge,atoms)
+      end if 
 
       open (outfile,file="results.out")
 
@@ -90,15 +92,22 @@ program CI
 
       allocate(AO(number_of_functions))
 
-      call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
+      if (calculation_type == "Tori") then 
+        call classification_orbital_tor(n_atoms,number_of_functions,geometry,atoms,norm_helper,AO)
+      else
+        call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
+      end if
+
+!      call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
       call print_orbital_table(AO,number_of_functions)
+
+!      call check_openmp_enabled()
 
       !               ---------------------------------                 !
       !                       Allocate the memory                       !
       !               ---------------------------------                 !
 
       allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas),X(nBas,nBas),ERI(nBas,nBas,nBas,nBas),e(nBas),c(nBas,nBas))
-      allocate(S_T(nBas,nBas))
 
 !     -------------------------------------------------------------------     !
 !                            Plot the gussians                                !
@@ -109,8 +118,6 @@ program CI
 !     -------------------------------------------------------------------     !
 !                         calculate the integrals 
 !     -------------------------------------------------------------------     !
-
-      call overlap_matrix_tor(n_atoms,geometry,atoms_tor)
 
       !-----------------------------------------------------------------!
       !                    calculate molecule                           !
@@ -128,7 +135,6 @@ program CI
         t_HF = end_HF - start_HF
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
         write(outfile,*)
-
       end if 
 
       !-----------------------------------------------------------------!
@@ -175,8 +181,35 @@ program CI
 
       !-----------------------------------------------------------------!
 
+      !-----------------------------------------------------------------!
+      !        calculate the with Toroidal translational symmetry       !
+      !-----------------------------------------------------------------!
+
+
+      if (calculation_type == "Tori") then 
+
+        call header("Toroidal Gaussian",-1)
+        call header_under("Calculate the integerals",-1)
+        call Torus_def()
+        write(outfile,*) ""
+        write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx 
+        write(outfile,*) ""
+        call cpu_time(start_HF)
+        call overlap_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
+!        call kinetic_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
+!        call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
+        call cpu_time(end_HF)
+        t_HF = end_HF - start_HF
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',t_HF,' seconds'
+!        call ERI_integral_toroidal(n_atoms,geometry,atoms)
+!        call overlap_matrix_toroidal_num(n_atoms,number_of_functions,atoms,AO)
+!        write(outfile,*) ""
+        call system("rm torus_parameters.inp")
+      end if 
       
- 
+      !-----------------------------------------------------------------!
+
+      
 !     -------------------------------------------------------------------     !
 !                        Nuclear repulsion energy  
 !     -------------------------------------------------------------------     !
@@ -196,6 +229,12 @@ program CI
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
 
+!      call split_matrix(nBas,S)
+!      call split_matrix(nBas,T)
+!      call split_matrix(nBas,V)
+!      call split_matrix(nBas,HC)
+!      call split_matrix_ERI(nBas,ERI)
+
 !      call read_overlap_T(nBas,S_T)
 
 !      call check_symmetric_matrix(nBas,S,T,V,HC)
@@ -208,7 +247,7 @@ program CI
 
       CALL HEADER ('The Overlap Matrix',-1)
 
-      !call matout(nBas,nBas,S)
+      call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
        

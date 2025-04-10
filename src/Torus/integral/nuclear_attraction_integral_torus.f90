@@ -41,6 +41,7 @@ subroutine nuclear_attraction_integral_ss_torus(number_of_atoms,geometry,atoms,r
       Z            = (z1 - z2)
 
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -136,6 +137,7 @@ subroutine nuclear_attraction_integral_sp_torus(number_of_atoms,geometry,atoms,r
       Z            = (z1 - z2)
 
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
 
       D_normal     = (X*X+Y*Y+Z*Z)
 
@@ -165,6 +167,7 @@ subroutine nuclear_attraction_integral_sp_torus(number_of_atoms,geometry,atoms,r
             X = x1 - x2
 
             call SSD(x1,x2,X)
+!            call EUC(x1,x2,X)
 
             X_PB_normal  =  (alpha/p)*(X)
             Y_PB_normal  =  (alpha/p)*(Y)
@@ -249,6 +252,7 @@ subroutine nuclear_attraction_integral_pp_torus(number_of_atoms,geometry,atoms,r
 
       X            = (x1 - x2)
       call PBC(x1,x2,X)
+!      call EUC(x1,x2,X)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
@@ -280,6 +284,7 @@ subroutine nuclear_attraction_integral_pp_torus(number_of_atoms,geometry,atoms,r
             X = x1 - x2
 
             call SSD(x1,x2,X)
+!            call EUC(x1,x2,X)
 
             X_PB_normal  =  (alpha*p_R)*(X)
             Y_PB_normal  =  (alpha*p_R)*(Y)

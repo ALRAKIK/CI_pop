@@ -1,4 +1,4 @@
-subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
+subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
 
       use omp_lib
       use files
@@ -10,7 +10,7 @@ subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
 
       !-----------------------------------------------------------------!
 
-      integer                        :: i , j , k , l
+      integer                        :: i , j , k , l , num_int , num_total_int
       integer                        :: number_of_atoms
       type(atom)                     :: atoms(number_of_atoms)
       type(ERI_function),allocatable :: ERI  (:)
@@ -22,6 +22,10 @@ subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
       double precision               :: start_time, end_time
       integer                        :: number_of_functions
       integer                        :: number_of_functions_per_unitcell 
+      integer                        :: index_sym
+
+      integer                        :: days, hours, minutes, seconds , t 
+
 
       !-----------------------------------------------------------------!
 
@@ -44,37 +48,51 @@ subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
 
       call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
 
+      index_sym   = 0 
+    
+      do i = 1 , number_of_atoms/2 + 1 
+        index_sym = index_sym + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
+      end do 
+
       ! 2-fold symmetry implementation (k,l permutation only)
 
-!$omp parallel
+      !$omp parallel
       if (omp_get_thread_num() == 0) then
         print *, "Running with", omp_get_num_threads(), "threads"
       endif
-!$omp end parallel
+      !$omp end parallel
 
       start_time = omp_get_wtime()
 
-!$omp parallel do collapse(2) private(j, k, l, value) shared(two_electron, ERI) schedule(dynamic,16)
+      num_int = 0
+      num_total_int = number_of_functions_per_unitcell * (number_of_functions) * (number_of_functions) * (number_of_functions+1) / 2 
 
-      do i = 1, number_of_functions_per_unitcell
-        do j = 1, number_of_functions
-            do k = 1, number_of_functions
-                do l = k, number_of_functions                                               ! Only calculate for k ≤ l to avoid duplicates
-                    call ERI_integral_4_function_torus(ERI(i),ERI(j),ERI(k),ERI(l), value)
-                    two_electron(i,j,k,l) = value
-                    two_electron(i,j,l,k) = value
-                end do
+            do i = 1, number_of_functions_per_unitcell
+              do j = 1, number_of_functions
+                  do k = 1, number_of_functions
+                      do l = k, number_of_functions
+                          call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
+                          num_int = num_int + 1
+                          two_electron(i,j,k,l) = value
+                          two_electron(i,j,l,k) = value
+                          call progress_bar(num_int,num_total_int)
+                      end do
+                  end do
+              end do
             end do
-        end do
-      end do
-
-!$omp end parallel do
+          
 
       end_time = omp_get_wtime()
 
       write(outfile,"(a)") "Translation symmetry applied to integrals"
       write(outfile,"(a)") "" 
-      write(outfile,'(A65,1X,F9.3,A8)') '2 el-integrals calculation time = ',end_time - start_time,' seconds'
+      ! write(outfile,'(A65,1X,F9.3,A8)') '2 el-integrals calculation time = ',end_time - start_time,' seconds'
+      t = int(end_time - start_time)
+      days= (t/86400)
+      hours=mod(t,86400)/3600
+      minutes=mod(mod(t,86400),3600)/60
+      seconds=mod(mod(mod(t,86400),3600),60)
+      write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') '2 el-integrals calculation time = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec     "
       write(outfile,"(a)") "" 
 
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
@@ -99,4 +117,19 @@ subroutine ERI_integral_torus(number_of_atoms,geometry,atoms)
       deallocate(two_electron)
       deallocate(two_eri)
 
-end subroutine ERI_integral_torus
+end subroutine ERI_integral_toroidal
+
+subroutine progress_bar(num_int,num_total_int)
+
+      implicit none 
+
+      integer,intent(in) :: num_int , num_total_int
+      integer            :: i
+
+      do i = 1 , 10 
+        if (num_int == i*num_total_int/10) then
+          write(*,"(I3,a)") i*10 , " % done"
+        end if
+      end do 
+
+end subroutine progress_bar
