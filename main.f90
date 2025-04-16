@@ -196,12 +196,12 @@ program CI
         write(outfile,*) ""
         call cpu_time(start_HF)
         call overlap_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
-!        call kinetic_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
-!        call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
+        call kinetic_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
+        call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
         call cpu_time(end_HF)
         t_HF = end_HF - start_HF
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',t_HF,' seconds'
-!        call ERI_integral_toroidal(n_atoms,geometry,atoms)
+        call ERI_integral_toroidal(n_atoms,geometry,atoms)
 !        call overlap_matrix_toroidal_num(n_atoms,number_of_functions,atoms,AO)
 !        write(outfile,*) ""
         call system("rm torus_parameters.inp")

@@ -34,6 +34,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
       double precision                :: kc1 , kc2 
       double precision                :: mu_x, mu_y , mu_z
       double precision                :: nu_x, nu_y , nu_z
+      double precision                :: mu  , nu 
 
 
 
@@ -64,7 +65,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
 
           !kc1   = dexp(-(alpha+beta)*1.d0/(2.d0*pi**2)*(Lx**2+Ly**2+Lz**2))
-          kc1   = dexp(-(alpha+beta)*1.d0/(2.d0*pi**2)*(Lx**2))
+          kc1   = dexp(-(alpha+beta)*(Lx**2)/(2.d0*pi**2))
 
           mu_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(XAB)))+eta
           !mu_y  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(YAB)))+eta
@@ -80,6 +81,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           yp    = 0.d0 
           zp    = 0.d0 
 
+          mu = alpha+beta 
+
           
           do k = 1 , size(three%exponent)
             gamma = three%exponent(k)
@@ -92,7 +95,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
 
               !kc2   = dexp(-(gamma+delta)*1.d0/(2.d0*pi**2)*(Lx**2+Ly**2+Lz**2))
-              kc2   = dexp(-(gamma+delta)*1.d0/(2.d0*pi**2)*(Lx**2))
+              kc2   = dexp(-(gamma+delta)*(Lx**2)/(2.d0*pi**2))
 
               nu_x  = dsqrt(gamma**2+delta**2+2.d0*gamma*delta*dcos(ax*(XCD)))+eta
               !nu_y  = dsqrt(gamma**2+delta**2+2.d0*gamma*delta*dcos(ay*(YCD)))+eta
@@ -108,11 +111,16 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               yq    = 0.d0 
               zq    = 0.d0 
 
-              const  = (c1*c2*c3*c4) * kc1 * kc2 
+              !const  = (c1*c2*c3*c4) * kc1 * kc2 
+               const  = (c1*c2*c3*c4) * kc1 * kc2 * Lx**2 * 2.d0 * pi**(3.0d0/2.0d0)
 
-              call grid_integrate_ERI(mu_x,mu_y,mu_z,xp,yp,zp,&
-                                   &nu_x,nu_y,nu_z,xq,yq,zq,&
-                                   &value_s)
+               nu    = gamma + delta
+
+              !call grid_integrate_ERI(mu_x,mu_y,mu_z,xp,yp,zp,&
+              !                     &nu_x,nu_y,nu_z,xq,yq,zq,&
+              !                     &value_s)
+
+              call grid_integrate_ERI_mod(mu,nu,mu_x,nu_x,value_s)
 
               value = value + const * value_s
               
@@ -325,6 +333,86 @@ subroutine grid_integrate_ERI(gamma_x_1, gamma_y_1, gamma_z_1, xp, yp, zp, &
       result = dx1 * dy1 * dz1 * dx2 * dy2 * dz2 * sum_f
     
 end subroutine grid_integrate_ERI
+
+
+subroutine grid_integrate_ERI_mod(sigma,nu,sigma_x,nu_x,result)
+    
+      use omp_lib
+      use torus_init
+      use, intrinsic :: ieee_arithmetic
+    
+      implicit none
+    
+      ! Input parameters
+      double precision, intent(in)  :: sigma_x , sigma
+      double precision, intent(in)  :: nu_x , nu
+      
+
+      ! Output parameters
+      double precision, intent(out) :: result
+    
+      ! Local variables
+      integer                       :: i
+      double precision              :: sum_f
+      double precision              :: t
+      double precision              :: dt
+      double precision              :: I_0_sigma_x
+      double precision              :: I_0_nu_x
+      double precision              :: I_0_t_x
+      double precision              :: t_range
+      integer, parameter            :: nt = 1000
+
+      INTERFACE
+
+      FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
+        USE iso_c_binding
+        REAL(C_DOUBLE), VALUE :: x_val
+        REAL(C_DOUBLE) :: gsl_sf_bessel_I0
+      END FUNCTION gsl_sf_bessel_I0
+    
+      FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
+        USE iso_c_binding
+        REAL(C_DOUBLE), VALUE :: x_val
+        REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
+      END FUNCTION gsl_sf_bessel_I0_scaled
+    
+      END INTERFACE
+      
+
+      ! Initialize sum
+
+      sum_f = 0.0d0
+
+      t_range = 20.d0 
+      dt = t_range/dble(nt)
+
+
+!!$OMP PARALLEL DO REDUCTION(+:sum_f) PRIVATE(i,I_0_gamma_x) COLLAPSE(1) SCHEDULE(static)
+
+      do i = 0, nt-1
+
+        t =  i * dt
+
+        I_0_sigma_x = gsl_sf_bessel_I0_scaled(2.d0*sigma_x/ax**2)
+        I_0_sigma_x = I_0_sigma_x * exp(2.d0*sigma_x/ax**2)
+
+        I_0_nu_x    = gsl_sf_bessel_I0_scaled(2.d0*nu_x/ax**2)
+        I_0_nu_x    = I_0_nu_x * exp(2.d0*nu_x/ax**2)
+
+        I_0_t_x     = gsl_sf_bessel_I0_scaled(2.d0*t**2/ax**2)
+        I_0_t_x     = I_0_t_x * exp(2.d0*t**2/ax**2)
+
+        sum_f = sum_f + 1.d0/((sigma*nu)+(sigma+nu)*t**2) * dexp(-2.d0*t**2/ax**2) * I_0_sigma_x * I_0_nu_x * I_0_t_x
+
+      end do
+
+!!$OMP END PARALLEL DO
+
+      ! Calculate the final result - multiply by volume element
+      result =  dt *  sum_f
+    
+end subroutine grid_integrate_ERI_mod
+
 
 
 subroutine check_openmp_enabled()
