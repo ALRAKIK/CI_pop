@@ -60,7 +60,7 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
           c2   =   AO2%coefficient(j)
             
             !kc       = dexp(-(alpha+beta)*Lx**2/(2.d0*pi**2))
-            kc       = 2.d0*sqrt(pi)*dexp(-(alpha+beta)*Lx**2/(2.d0*pi**2)) * Lx 
+            !kc       = 2.d0*sqrt(pi)*dexp(-(alpha+beta)*Lx**2/(2.d0*pi**2)) * Lx 
 
             gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))+eta
             gamma_y  = alpha+beta
@@ -80,8 +80,9 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
 
               !call grid_integrate_NA_ss(gamma_x,gamma_y,gamma_z,xp,yp,zp,xc,yc,zc,NA)
               
+              kc       = 2.d0*sqrt(pi) * Lx
+
               call grid_integrate_NA_ss_mod(gamma_x,xp-xc,gamma_y, NA)
-            
               S_ss_normal =  S_ss_normal +  c1 * c2 * charge_atom * kc * NA
             
             end do 
@@ -431,6 +432,7 @@ subroutine grid_integrate_NA_ss_mod(gamma_x,x,p, result)
       double precision              :: t_range
       integer, parameter            :: nt = 1000
 
+
       INTERFACE
 
       FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
@@ -456,7 +458,7 @@ subroutine grid_integrate_NA_ss_mod(gamma_x,x,p, result)
       dt = t_range/dble(nt)
 
 
-!!$OMP PARALLEL DO REDUCTION(+:sum_f) PRIVATE(i,I_0_gamma_x) COLLAPSE(1) SCHEDULE(static)
+!$OMP PARALLEL DO REDUCTION(+:sum_f) PRIVATE(i,t,dx,I_0_gamma_x) COLLAPSE(1) SCHEDULE(static)
 
       do i = 0, nt-1
 
@@ -466,17 +468,19 @@ subroutine grid_integrate_NA_ss_mod(gamma_x,x,p, result)
 
 
         I_0_gamma_x = gsl_sf_bessel_I0_scaled(dx)
-        I_0_gamma_x = I_0_gamma_x * exp(dx)
+        !I_0_gamma_x = I_0_gamma_x * exp(dx)
 
-        if (ieee_is_finite(I_0_gamma_x) .eqv. .false.) then
-          exit
-        end if
+        !if (ieee_is_finite(I_0_gamma_x) .eqv. .false.) then
+        !  exit
+        !end if
 
-        sum_f = sum_f + 1.d0/(p+t**2) * dexp(-2.d0*t**2/ax**2) * I_0_gamma_x
+        sum_f = sum_f + 1.d0/(p+t**2) * dexp(-2.d0*(t**2+p)/ax**2 + dx)  * I_0_gamma_x
+
+        !print*, t , dexp(-2.d0*(t**2+p)/ax**2 + dx)  , I_0_gamma_x
 
       end do
 
-!!$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 
       ! Calculate the final result - multiply by volume element
       result =  dt *  sum_f

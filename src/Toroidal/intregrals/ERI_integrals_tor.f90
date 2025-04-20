@@ -9,6 +9,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
       !-----------------------------------------------------------------!
 
       type(ERI_function),intent(in)   :: one , two , three , four 
+
       double precision,intent(out)    :: value 
 
       integer                         ::  i , j   , k  , l
@@ -112,14 +113,19 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               zq    = 0.d0 
 
               !const  = (c1*c2*c3*c4) * kc1 * kc2 
-               const  = (c1*c2*c3*c4) * kc1 * kc2 * Lx**2 * 2.d0 * pi**(3.0d0/2.0d0)
+              ! const  = (c1*c2*c3*c4) * kc1 * kc2 * Lx**2 * 2.d0 * pi**(3.0d0/2.0d0)
+
+              !const  = kc1 * kc2 * Lx**2 
+               
 
                nu    = gamma + delta
 
+              !const  = (c1*c2*c3*c4) * kc1 * kc2
               !call grid_integrate_ERI(mu_x,mu_y,mu_z,xp,yp,zp,&
               !                     &nu_x,nu_y,nu_z,xq,yq,zq,&
               !                     &value_s)
 
+              const   = (c1*c2*c3*c4) * 2.d0 * pi**(3.0d0/2.0d0) * Lx**2
               call grid_integrate_ERI_mod(mu,nu,mu_x,nu_x,value_s)
 
               value = value + const * value_s
@@ -349,18 +355,22 @@ subroutine grid_integrate_ERI_mod(sigma,nu,sigma_x,nu_x,result)
       
 
       ! Output parameters
+
       double precision, intent(out) :: result
     
       ! Local variables
       integer                       :: i
-      double precision              :: sum_f
+      
       double precision              :: t
       double precision              :: dt
       double precision              :: I_0_sigma_x
       double precision              :: I_0_nu_x
       double precision              :: I_0_t_x
       double precision              :: t_range
-      integer, parameter            :: nt = 1000
+
+      double precision              :: sum_f
+
+      integer, parameter            :: nt = 10000
 
       INTERFACE
 
@@ -387,26 +397,28 @@ subroutine grid_integrate_ERI_mod(sigma,nu,sigma_x,nu_x,result)
       dt = t_range/dble(nt)
 
 
-!!$OMP PARALLEL DO REDUCTION(+:sum_f) PRIVATE(i,I_0_gamma_x) COLLAPSE(1) SCHEDULE(static)
+!$OMP PARALLEL DO REDUCTION(+:sum_f) PRIVATE(i,t,I_0_sigma_x,I_0_nu_x,I_0_t_x) SCHEDULE(static)
 
       do i = 0, nt-1
 
         t =  i * dt
 
         I_0_sigma_x = gsl_sf_bessel_I0_scaled(2.d0*sigma_x/ax**2)
-        I_0_sigma_x = I_0_sigma_x * exp(2.d0*sigma_x/ax**2)
+        !I_0_sigma_x = I_0_sigma_x * exp(2.d0*sigma_x/ax**2)
 
         I_0_nu_x    = gsl_sf_bessel_I0_scaled(2.d0*nu_x/ax**2)
-        I_0_nu_x    = I_0_nu_x * exp(2.d0*nu_x/ax**2)
+        !I_0_nu_x    = I_0_nu_x * exp(2.d0*nu_x/ax**2)
 
         I_0_t_x     = gsl_sf_bessel_I0_scaled(2.d0*t**2/ax**2)
-        I_0_t_x     = I_0_t_x * exp(2.d0*t**2/ax**2)
+        !I_0_t_x     = I_0_t_x * exp(2.d0*t**2/ax**2)
 
-        sum_f = sum_f + 1.d0/((sigma*nu)+(sigma+nu)*t**2) * dexp(-2.d0*t**2/ax**2) * I_0_sigma_x * I_0_nu_x * I_0_t_x
+        !sum_f = sum_f + 1.d0/((sigma*nu)+(sigma+nu)*t**2) * dexp(-2.d0*t**2/ax**2) * I_0_sigma_x * I_0_nu_x * I_0_t_x
+
+        sum_f = sum_f + 1.d0/((sigma*nu)+(sigma+nu)*t**2) * I_0_sigma_x * I_0_nu_x * I_0_t_x  * exp(2.d0*(nu_x+sigma_x-nu-sigma)/ax**2)
 
       end do
 
-!!$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 
       ! Calculate the final result - multiply by volume element
       result =  dt *  sum_f
