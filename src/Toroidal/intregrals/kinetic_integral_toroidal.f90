@@ -202,6 +202,7 @@ end subroutine kinetic_integral_ss_toroidal
 subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
       use torus_init
+      use gsl_bessel_mod
       use classification_ERI
       use HeavisideModule
 
@@ -226,35 +227,6 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       double precision               :: I_2_gamma_x
       double precision               :: I_3_gamma_x 
       double precision               :: X_k , Y_k , Z_k 
-
-
-      INTERFACE
-
-        FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0
-        END FUNCTION gsl_sf_bessel_I0
-      
-        FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
-        END FUNCTION gsl_sf_bessel_I0_scaled
-      
-        FUNCTION gsl_sf_bessel_I1(x_val) BIND(C, NAME="gsl_sf_bessel_I1")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I1
-        END FUNCTION gsl_sf_bessel_I1
-
-        FUNCTION gsl_sf_bessel_I1_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I1_scaled")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I1_scaled
-        END FUNCTION gsl_sf_bessel_I1_scaled
-      
-      END INTERFACE
 
       !-----------------------------------------------------------------!
 
@@ -282,36 +254,23 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
               xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
             
-              I_0_gamma_x = gsl_sf_bessel_I0_scaled(2.d0*gamma_x/(ax**2))
-              I_1_gamma_x = gsl_sf_bessel_I1_scaled(2.d0*gamma_x/(ax**2))
-              I_2_gamma_x = I_0_gamma_x - (2.d0/(gamma_x * (Lx**2/(2.d0*pi**2))))*I_1_gamma_x
-              if (I_2_gamma_x < 1e-9)  I_2_gamma_x = 0.0d0 
-              I_3_gamma_X = I_1_gamma_x - (4.0d0/(gamma_x *(Lx**2/(2.d0*pi**2))))*I_2_gamma_x 
-              if (I_3_gamma_x < 1e-9)  I_3_gamma_x = 0.0d0
-
+              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
+              I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
+              I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
+              I_3_gamma_X = bessi_scaled(3, 2.d0*gamma_x/(ax**2))
 
               const       =  c1*c2
-              const       =  sign(dabs(const)**(1.0d0/3.0d0),const)
 
-              X_k = sin(ax * (xp-x2)) * I_1_gamma_x + 3.0d0 * (beta/ax**2) * sin(2.0d0 * ax * (xp-x2)) * I_2_gamma_x
+              X_k = ax*ax*sin(ax * (xp-x2)) * I_1_gamma_x + 3.0d0 * beta * sin(2.0d0 * ax * (xp-x2)) * I_2_gamma_x
+              X_k = X_k - (2.d0*beta/ax)**2 * (0.25d0) * ( 3.0d0 * sin(ax * (xp-x2)) * I_1_gamma_x - sin(3.0d0 * ax * (xp-x2)) * I_3_gamma_x)
+              X_k = X_k  * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2)
+              X_k = X_k  * 0.5d0 * (pi/(alpha+beta)) / ax 
 
-              X_k = X_k - (beta/ax**2)**2 * ( 3.0d0 * sin(ax * (xp-x2)) * I_1_gamma_x - sin(3.0d0 * ax * (xp-x2)) * I_3_gamma_x)
+              Y_K = (alpha*beta/(alpha+beta)) * (pi/(alpha+beta)) * (dsin(ax*(xp-x2))/ax) * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) * I_1_gamma_x
+              Z_K = (alpha*beta/(alpha+beta)) * (pi/(alpha+beta)) * (dsin(ax*(xp-x2))/ax) * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) * I_1_gamma_x
+              
 
-              X_k = X_k * const * Lx   * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) * ax 
-                           
-              X_k = X_k * const * dsqrt(pi/(alpha+beta)) 
-              X_k = X_k * const * dsqrt(pi/(alpha+beta))
-
-              X_k = X_k / 2.d0 
-
-
-              Y_K =       const * (dsin(ax*(xp-x2))/ax) * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) * I_1_gamma_x
-              Y_K = Y_K * const * dsqrt(pi/(alpha+beta)) 
-              Y_K = Y_K * const * (1-(beta/(alpha+beta)))
-!
-              Z_K = Y_K 
-
-              if (AO2%orbital=="px") S_sp_normal =  S_sp_normal + (X_k+Y_k+Z_K)
+              if (AO2%orbital=="px") S_sp_normal =  S_sp_normal + const*(X_k+Y_k+Z_K)
               if (AO2%orbital=="py") S_sp_normal =  0.d0
               if (AO2%orbital=="pz") S_sp_normal =  0.d0
 
@@ -326,6 +285,7 @@ end subroutine kinetic_integral_sp_toroidal
 
 subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
+      use gsl_bessel_mod
       use torus_init
       use classification_ERI
       use HeavisideModule
@@ -354,33 +314,6 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
       double precision               :: I_4_gamma_x
       double precision               :: X_k , Y_K , Z_K 
 
-      INTERFACE
-
-        FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0
-        END FUNCTION gsl_sf_bessel_I0
-      
-        FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
-        END FUNCTION gsl_sf_bessel_I0_scaled
-      
-        FUNCTION gsl_sf_bessel_I1(x_val) BIND(C, NAME="gsl_sf_bessel_I1")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I1
-        END FUNCTION gsl_sf_bessel_I1
-
-        FUNCTION gsl_sf_bessel_I1_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I1_scaled")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I1_scaled
-        END FUNCTION gsl_sf_bessel_I1_scaled
-      
-      END INTERFACE
 
       !-----------------------------------------------------------------!
 
@@ -404,59 +337,55 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           c2   =   AO2%coefficient(j)
 
           const       =  c1*c2
-          const       =  sign(dabs(const)**(1.0d0/3.0d0),const)
-
             
               gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))+eta
 
-              xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax
+              xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2)) 
             
-              I_0_gamma_x = gsl_sf_bessel_I0_scaled(2.d0*gamma_x/(ax**2))
-              I_1_gamma_x = gsl_sf_bessel_I1_scaled(2.d0*gamma_x/(ax**2))
-              I_2_gamma_x = I_0_gamma_x - (2.d0/(gamma_x * (Lx**2/(2.d0*pi**2))))*I_1_gamma_x
-              if (I_2_gamma_x < 1e-9)  I_2_gamma_x = 0.0d0 
-              I_3_gamma_X = I_1_gamma_x - (4.0d0/(gamma_x *(Lx**2/(2.d0*pi**2))))*I_2_gamma_x 
-              if (I_3_gamma_x < 1e-9)  I_3_gamma_x = 0.0d0
-              I_4_gamma_X = I_2_gamma_x - (6.0d0/(gamma_x *(Lx**2/(2.d0*pi**2))))*I_3_gamma_x 
-              if (I_4_gamma_x < 1e-9)  I_4_gamma_x = 0.0d0
+              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
+              I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
+              I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
+              I_3_gamma_X = bessi_scaled(3, 2.d0*gamma_x/(ax**2))
+              I_4_gamma_X = bessi_scaled(4, 2.d0*gamma_x/(ax**2))
 
 
               X_K = 3.d0*cos(ax*(x2-x1))*I_0_gamma_x - 3.d0*cos(ax*(2.d0*xp-x1-x2))*I_2_gamma_x
               X_K = X_K - cos(ax*(2.d0*xp-3.d0*x2-x1)) * I_2_gamma_x + cos(ax*(4.d0*xp-3.d0*x2-x1)) * I_4_gamma_x
-              X_K = X_K * 0.25d0 * (2.d0*beta/ax**2) **2 * (-1.d0)  
-              X_K = X_K + 1.5d0  * (2.d0*beta/ax**2) * ( cos(ax*(xp-2.d0*x2-x1)) * I_1_gamma_x - cos(ax*(3.d0*xp-2.d0*x2-x1)) * I_3_gamma_x )
+              X_K = X_K * 0.25d0 * (2.d0*beta/ax)**2 * (-1.d0) /(ax*ax)   
+              X_K = X_K + (3.d0*beta/ax**2) * ( cos(ax*(xp-2.d0*x2+x1)) * I_1_gamma_x - cos(ax*(3.d0*xp-2.d0*x2-x1)) * I_3_gamma_x )
               X_K = X_K + cos(ax*(x2-x1)) * I_0_gamma_x - cos(ax*(2*xp-x1-x2)) * I_2_gamma_x
-              X_K = X_K * const * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
-              X_k = X_k * 0.25d0 
+              X_k = X_k * 0.25d0
+              X_K = X_K * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
+               
 
-              Y_K = (dsin(ax*(xp-x2))/ax)*(dsin(ax*(xp-x1))/ax)*I_0_gamma_x + dcos(ax*(2*xp-x1-x2))*(ax**2/(2*gamma_x))*I_1_gamma_x/ax**2
-              Y_K = Y_K * const * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
-              Y_K = Y_K * beta * (1-(beta/(alpha+beta)))
-      
-              Z_K = Y_K       
+              Y_K = (dsin(ax*(xp-x2)))*(dsin(ax*(xp-x1)))*I_0_gamma_x + dcos(ax*(2*xp-x1-x2))*(ax**2/(2*gamma_x))*I_1_gamma_x
+              Y_K = Y_K * ((alpha*beta)/(alpha+beta)) /ax/ax 
+              Y_K = Y_K * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
+              
+              Z_K = (dsin(ax*(xp-x2)))*(dsin(ax*(xp-x1)))*I_0_gamma_x + dcos(ax*(2*xp-x1-x2))*(ax**2/(2*gamma_x))*I_1_gamma_x
+              Z_K = Z_K * ((alpha*beta)/(alpha+beta)) /ax/ax 
+              Z_K = Z_K * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
 
-              if (AO1%orbital == "px" .and. AO2%orbital == "px") S_pp_normal =  S_pp_normal + (X_k+Y_k+Z_K) 
+              if (AO1%orbital == "px" .and. AO2%orbital == "px") S_pp_normal =  S_pp_normal + const*(X_k+Y_k+Z_K) 
               if (AO1%orbital == "px" .and. AO2%orbital == "py") S_pp_normal =  0.d0
               if (AO1%orbital == "px" .and. AO2%orbital == "pz") S_pp_normal =  0.d0
 
-              X_K = (cos(ax*(xp-x2)) * I_1_gamma_x + (beta/ax**2) * ( cos(2*ax*(xp-x2)) * I_2_gamma_x - I_0_gamma_x ) )
-              X_K = X_K * const * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta)) / (2.d0*(alpha+beta))
-              
+              X_K = 0.d0 
+              Y_K = 0.d0 
+              Z_K = 0.d0 
 
-              Y_K = (dsin(ax*(xp-x2))/ax)*(dsin(ax*(xp-x1))/ax)*I_0_gamma_x + dcos(ax*(2*xp-x1-x2))*(ax**2/(2*gamma_x))*I_1_gamma_x/ax**2
-              Y_K = Y_K * const * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
-              Y_K = Y_K * beta * (1-(beta/(alpha+beta))) / (2.d0*(alpha+beta))
-      
-              Z_K = Y_K  
+              X_K = 0.5d0 * beta                      * (pi/(alpha+beta)) * (1.d0/(alpha+beta)) * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (cos(ax*(xp-x2)) * I_1_gamma_x + (beta/ax**2) * ( cos(2*ax*(xp-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+              Y_K = 1.5d0 * (alpha*beta/(alpha+beta)) * (pi/(alpha+beta)) * (1.d0/(alpha+beta)) * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x
+              Z_K = 0.5d0 * (alpha*beta/(alpha+beta)) * (pi/(alpha+beta)) * (1.d0/(alpha+beta)) * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x 
 
 
               if (AO1%orbital == "py" .and. AO2%orbital == "px") S_pp_normal =  0.d0
-              if (AO1%orbital == "py" .and. AO2%orbital == "py") S_pp_normal =  S_pp_normal + (X_k+Y_k+Z_K)
+              if (AO1%orbital == "py" .and. AO2%orbital == "py") S_pp_normal =  S_pp_normal + const*(X_k+Y_k+Z_K)
               if (AO1%orbital == "py" .and. AO2%orbital == "pz") S_pp_normal =  0.d0
 
               if (AO1%orbital == "pz" .and. AO2%orbital == "px") S_pp_normal =  0.d0
               if (AO1%orbital == "pz" .and. AO2%orbital == "py") S_pp_normal =  0.d0
-              if (AO1%orbital == "pz" .and. AO2%orbital == "pz") S_pp_normal =  S_pp_normal + (X_k+Y_k+Z_K)
+              if (AO1%orbital == "pz" .and. AO2%orbital == "pz") S_pp_normal =  S_pp_normal + const*(X_k+Y_k+Z_K)
             
         end do 
       end do 

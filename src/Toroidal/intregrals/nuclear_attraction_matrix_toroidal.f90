@@ -77,17 +77,17 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
                 call nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atoms,r2,r1,AO2,AO1,NA(i,j))
               end do 
             end do
-
           end if
 
           if (AO1%orbital(:1) =="p" .and. AO2%orbital(:1) == "p") then
+          
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
                 call nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
               end do 
             end do
-
+          
           end if
 
         end do 

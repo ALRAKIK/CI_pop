@@ -64,34 +64,47 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
 
       start_time = omp_get_wtime()
 
+
       num_int = 0
       num_total_int = number_of_functions_per_unitcell * (number_of_functions) * (number_of_functions) * (number_of_functions+1) / 2 
+
+      !$omp parallel do collapse(3) private(j, k, l, value) shared(two_electron, ERI,num_int) schedule(dynamic,16)
 
             do i = 1, number_of_functions_per_unitcell
               do j = 1, number_of_functions
                   do k = 1, number_of_functions
                       do l = k, number_of_functions
                           call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
+                          
+                          !$omp atomic
                           num_int = num_int + 1
                           two_electron(i,j,k,l) = value
                           two_electron(i,j,l,k) = value
+
+                          !$omp critical
                           call progress_bar(num_int,num_total_int)
+                          !$omp end critical
+
                       end do
                   end do
               end do
             end do
+
+      !$omp end parallel do
+
           
 
       end_time = omp_get_wtime()
 
       write(outfile,"(a)") "Translation symmetry applied to integrals"
       write(outfile,"(a)") "" 
-      ! write(outfile,'(A65,1X,F9.3,A8)') '2 el-integrals calculation time = ',end_time - start_time,' seconds'
+
       t = int(end_time - start_time)
       days= (t/86400)
       hours=mod(t,86400)/3600
       minutes=mod(mod(t,86400),3600)/60
       seconds=mod(mod(mod(t,86400),3600),60)
+
       write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') '2 el-integrals calculation time = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec     "
       write(outfile,"(a)") "" 
 
@@ -106,8 +119,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
           do j = 1 , number_of_functions
             do k = 1 , number_of_functions
               do l = 1 , number_of_functions
-                !if (abs(two_eri(i,j,k,l)) > 1e-10 ) 
-                write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_eri(i,j,k,l)
+                if (abs(two_eri(i,j,k,l)) > 1e-10 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_eri(i,j,k,l)  
               end do 
             end do 
           end do 
@@ -120,17 +132,33 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
 
 end subroutine ERI_integral_toroidal
 
-subroutine progress_bar(num_int,num_total_int)
+!subroutine progress_bar(num_int,num_total_int)
+!
+!      implicit none 
+!
+!      integer,intent(in) :: num_int , num_total_int
+!      integer            :: i
+!
+!      do i = 1 , 10 
+!        if (num_int == i*num_total_int/10) then
+!          write(*,"(I3,a)") i*10 , " % done"
+!        end if
+!      end do 
+!
+!end subroutine progress_bar
 
-      implicit none 
-
-      integer,intent(in) :: num_int , num_total_int
-      integer            :: i
-
-      do i = 1 , 10 
-        if (num_int == i*num_total_int/10) then
-          write(*,"(I3,a)") i*10 , " % done"
-        end if
-      end do 
-
+subroutine progress_bar(num_int, num_total_int)
+      
+      implicit none
+      integer, intent(in) :: num_int, num_total_int
+      integer, save       :: last_percentage = -1
+      integer             :: current_percentage
+  
+      current_percentage = (num_int * 100) / num_total_int
+  
+      ! Only print when percentage changes and is a multiple of 10
+      if (current_percentage /= last_percentage .and. mod(current_percentage, 10) == 0) then
+         write(*, "(I3,a)") current_percentage, " % done"
+         last_percentage = current_percentage
+      end if
 end subroutine progress_bar

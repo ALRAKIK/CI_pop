@@ -125,8 +125,12 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               !                     &nu_x,nu_y,nu_z,xq,yq,zq,&
               !                     &value_s)
 
-              const   = (c1*c2*c3*c4) * 2.d0 * pi**(3.0d0/2.0d0) * Lx**2
-              call grid_integrate_ERI_mod(mu,nu,mu_x,nu_x,value_s)
+              const   = (c1*c2*c3*c4) * 2.d0 * dsqrt(pi)*pi * Lx*Lx 
+              
+              !call grid_integrate_ERI_mod(mu,nu,mu_x,nu_x,value_s)
+              ! call integrate_ERI_mod(mu,nu,mu_x,nu_x,value_s)
+
+              call integrate_ERI_mod_mod(mu,nu,mu_x,nu_x,xp-xq,value_s)
 
               value = value + const * value_s
               
@@ -253,8 +257,8 @@ subroutine grid_integrate_ERI(gamma_x_1, gamma_y_1, gamma_z_1, xp, yp, zp, &
       double precision, intent(in) :: xq, yq, zq
 
       ! Grid parameters - use fewer points per dimension for 6D grid to manage memory
-      integer, parameter :: nx1 = 15, ny1 = 15, nz1 = 15  ! First set grid dimensions
-      integer, parameter :: nx2 = 15, ny2 = 15, nz2 = 15  ! Second set grid dimensions
+      integer, parameter :: nx1 = 20, ny1 = 20, nz1 = 20  ! First set grid dimensions
+      integer, parameter :: nx2 = 20, ny2 = 20, nz2 = 20  ! Second set grid dimensions
 
       ! Output parameters
       double precision, intent(out) :: result
@@ -393,7 +397,7 @@ subroutine grid_integrate_ERI_mod(sigma,nu,sigma_x,nu_x,result)
 
       sum_f = 0.0d0
 
-      t_range = 20.d0 
+      t_range = 10.d0 
       dt = t_range/dble(nt)
 
 
@@ -424,6 +428,185 @@ subroutine grid_integrate_ERI_mod(sigma,nu,sigma_x,nu_x,result)
       result =  dt *  sum_f
     
 end subroutine grid_integrate_ERI_mod
+
+
+
+subroutine integrate_ERI_mod(sigma,nu,sigma_x,nu_x,result)
+      
+      use quadpack, only : dqagi
+      use omp_lib
+      use torus_init
+      use, intrinsic :: ieee_arithmetic
+
+      implicit none
+
+      
+    
+      ! Input parameters
+      double precision, intent(in)  :: sigma_x , sigma
+      double precision, intent(in)  :: nu_x , nu
+      
+      ! Output parameters
+
+      double precision, intent(out) :: result
+    
+      ! Local variables
+
+      double precision              :: epsabs, epsrel
+      integer,parameter             :: inf = 1 
+      double precision,parameter    :: bound = 0.0d0
+      integer, parameter            :: limit = 100
+      integer, parameter            :: lenw = limit*4
+      integer                       :: ier, iwork(limit), last, neval
+      double precision              :: abserr, work(lenw)
+
+      epsabs = 1.0e-8    ! Absolute error tolerance
+      epsrel = 1.0e-6    ! Relative error tolerance
+
+      
+      call dqagi(f_decay, bound, inf, epsabs, epsrel, result,abserr, neval, ier,Limit,Lenw,Last,Iwork,Work)
+
+      if (ier /= 0) then
+        write(*,'(A,I8,A)') 'Error code = ', ier
+      end if
+
+      contains
+
+      function f_decay(x) result(fx)
+        double precision, intent(in) :: x
+        double precision     :: fx
+
+        double precision :: I_0_x , I_0_sigma_x , I_0_nu_x
+
+        INTERFACE
+
+        FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
+          USE iso_c_binding
+          REAL(C_DOUBLE), VALUE :: x_val
+          REAL(C_DOUBLE) :: gsl_sf_bessel_I0
+        END FUNCTION gsl_sf_bessel_I0
+      
+        FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
+          USE iso_c_binding
+          REAL(C_DOUBLE), VALUE :: x_val
+          REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
+        END FUNCTION gsl_sf_bessel_I0_scaled
+      
+        END INTERFACE
+
+        I_0_x        = gsl_sf_bessel_I0_scaled(2.d0*x**2/ax**2)
+        I_0_sigma_x  = gsl_sf_bessel_I0_scaled(2.d0*sigma_x/ax**2)
+        I_0_nu_x     = gsl_sf_bessel_I0_scaled(2.d0*nu_x/ax**2)
+
+        fx  = 1.d0/((sigma*nu)+(sigma+nu)*x**2) * I_0_x * I_0_sigma_x * I_0_nu_x * dexp(2.d0*(nu_x+sigma_x-nu-sigma)/ax**2)
+
+      end function f_decay
+
+end subroutine integrate_ERI_mod
+
+
+subroutine integrate_ERI_mod_mod(sigma,nu,sigma_x,nu_x,xpq,result)
+      
+      use quadpack , only : dqagi
+      use iso_c_binding
+      use torus_init
+      use gsl_bessel_mod
+      use, intrinsic :: ieee_arithmetic
+
+      implicit none
+
+      ! Input parameters
+      double precision, intent(in)  :: sigma_x , sigma
+      double precision, intent(in)  :: nu_x , nu
+      double precision, intent(in)  :: xpq
+
+      
+      ! Output parameters
+
+      double precision, intent(out) :: result
+    
+      ! Local variables
+
+      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      integer,parameter                  :: inf = 1 
+      double precision,parameter         :: bound = 0.0d0
+      integer, parameter                 :: limit = 100
+      integer, parameter                 :: lenw = limit*4
+      integer                            :: ier, iwork(limit), last, neval
+      double precision                   :: abserr, work(lenw)
+      integer                            :: n 
+      integer,parameter                  :: Nmax = 40
+      double precision,dimension(0:Nmax) :: IAB
+      double precision                   :: A , B 
+
+      INTERFACE
+      FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
+        USE iso_c_binding
+        REAL(C_DOUBLE), VALUE :: x_val
+        REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
+      END FUNCTION gsl_sf_bessel_I0_scaled
+    
+      END INTERFACE
+      
+      call dqagi(f_decay, bound, inf, epsabs, epsrel, result,abserr, neval, ier,Limit,Lenw,Last,Iwork,Work)
+
+      if (ier /= 0) then
+        write(*,'(A,I8,A)') 'Error code = ', ier
+      end if
+
+      contains
+
+      function f_decay(t) result(ft)
+        double precision, intent(in) :: t
+        double precision             :: ft
+
+        ft  = 1.d0/((sigma*nu)+(sigma+nu)*t**2) * S(t)
+
+      end function f_decay
+
+      double precision function S(t) result(sum)
+
+      use gsl_bessel_mod
+      implicit none
+      double precision, intent(in) :: t
+      double precision             :: A, B, C, term
+      double precision             :: tol     = 1.0d-12
+      integer                      :: n, Nmax = 40 
+
+      INTERFACE
+
+        FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
+          USE iso_c_binding
+          REAL(C_DOUBLE), VALUE :: x_val
+          REAL(C_DOUBLE) :: gsl_sf_bessel_I0
+        END FUNCTION gsl_sf_bessel_I0
+      
+        FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
+          USE iso_c_binding
+          REAL(C_DOUBLE), VALUE :: x_val
+          REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
+        END FUNCTION gsl_sf_bessel_I0_scaled
+      
+      END INTERFACE
+      
+      A = 2.d0*sigma_x/(ax*ax)
+      B = 2.d0*nu_x/(ax*ax)
+      C = 2.d0*t*t/(ax*ax)
+
+      sum = gsl_sf_bessel_I0_scaled(A)*gsl_sf_bessel_I0_scaled(B)*gsl_sf_bessel_I0_scaled(C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
+
+      do n = 1, Nmax
+         term = bessi_scaled(n, A)*bessi_scaled(n, B)*bessi_scaled(n, C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
+         if (term < tol) exit
+         sum = sum + term * 2.d0 * cos(dble(n)*ax*xpq) 
+      end do
+
+end function S
+
+end subroutine integrate_ERI_mod_mod
+
+
+
 
 
 

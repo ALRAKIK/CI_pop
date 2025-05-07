@@ -11,7 +11,7 @@ $(shell mkdir -p $(BDIR) $(ODIR)/module)
 FC = gfortran
 FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -march=native  -g -fbacktrace  -fcheck=all -fimplicit-none -fopenmp
 MODDIR = -J$(ODIR) -I$(ODIR)  # Put and find modules in obj directory
-LIBS = -lblas -llapack -L/opt/homebrew/Cellar/gsl/2.8/lib -lgsl -lgslcblas -lm -fopenmp
+LIBS   = src/lib/libquadpack.a   -lblas -llapack -L/opt/homebrew/Cellar/gsl/2.8/lib -lgsl -lgslcblas -lm -fopenmp
 
 # Find all module files
 MODULE_SRC = $(wildcard $(MODULE_DIR)/*.f90)

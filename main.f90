@@ -113,7 +113,7 @@ program CI
 !                            Plot the gussians                                !
 !     -------------------------------------------------------------------     !
 
-!      call plot(n_atoms,geometry)
+!      call plot(n_atoms,geometry,calculation_type)
 
 !     -------------------------------------------------------------------     !
 !                         calculate the integrals 
@@ -130,7 +130,7 @@ program CI
         call overlap_matrix(n_atoms,geometry,atoms)
         call kinetic_matrix(n_atoms,geometry,atoms)
         call nuclear_attraction_matrix(n_atoms,geometry,atoms)  
-        call ERI_integral(n_atoms,geometry,atoms)
+!        call ERI_integral(n_atoms,geometry,atoms)
         call cpu_time(end_HF)
         t_HF = end_HF - start_HF
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
@@ -201,7 +201,7 @@ program CI
         call cpu_time(end_HF)
         t_HF = end_HF - start_HF
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',t_HF,' seconds'
-        call ERI_integral_toroidal(n_atoms,geometry,atoms)
+!        call ERI_integral_toroidal(n_atoms,geometry,atoms)
 !        call overlap_matrix_toroidal_num(n_atoms,number_of_functions,atoms,AO)
 !        write(outfile,*) ""
         call system("rm torus_parameters.inp")

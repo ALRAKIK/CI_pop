@@ -103,6 +103,7 @@ subroutine norm_orb(n_gaussian,n_contraction,exponent,contraction,n_type,contrac
         do j = 1, n_gaussian
           contractionN(j,n)= contraction(j,n)*sum*(D4*exponent(j))**(DP5*n_type+DP25)*PIPPI
         end do 
+        
       end do 
 
       RETURN
@@ -332,6 +333,142 @@ end subroutine normalize_basis_tor
 !
 !end subroutine  norm_orb_tor
 
+!subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
+!
+!      implicit none 
+!
+!      integer,intent(in)             :: n_contraction
+!      integer,intent(in)             :: n_gaussian
+!      integer,intent(in)             :: n_type 
+!
+!      double precision,intent(in)    :: exponent(n_gaussian)
+!      double precision,intent(in)    :: Lx, Ly, Lz
+!
+!      double precision,intent(in)    :: contraction(n_gaussian,n_contraction)
+!      double precision ,intent(out)  :: contractionN(n_gaussian,n_contraction)
+!
+!      integer                        :: n, i, j 
+!      double precision               :: sum  , alpha , beta , gamma , c1 , c2 , const 
+!      double precision               :: ax , ay , az 
+!      double precision               :: THRMIN = 1.D-17
+!      double precision , parameter   :: pi = 3.14159265358979323846D00
+!      double precision               :: I_0_gamma_x, I_0_gamma_y, I_0_gamma_z
+!
+!
+!      INTERFACE
+!        
+!        FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
+!          USE iso_c_binding
+!          REAL(C_DOUBLE), VALUE :: x_val
+!          REAL(C_DOUBLE) :: gsl_sf_bessel_I0
+!        END FUNCTION gsl_sf_bessel_I0
+!
+!        FUNCTION gsl_sf_bessel_I1(x_val) BIND(C, NAME="gsl_sf_bessel_I1")
+!          USE iso_c_binding
+!          REAL(C_DOUBLE), VALUE :: x_val
+!          REAL(C_DOUBLE) :: gsl_sf_bessel_I1
+!        END FUNCTION gsl_sf_bessel_I1
+!
+!        FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
+!          USE iso_c_binding
+!          REAL(C_DOUBLE), VALUE :: x_val
+!          REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
+!        END FUNCTION gsl_sf_bessel_I0_scaled
+!
+!        FUNCTION gsl_sf_bessel_I1_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I1_scaled")
+!          USE iso_c_binding
+!          REAL(C_DOUBLE), VALUE :: x_val
+!          REAL(C_DOUBLE) :: gsl_sf_bessel_I1_scaled
+!        END FUNCTION gsl_sf_bessel_I1_scaled
+!
+!      END INTERFACE
+!
+!
+!      ax = 2.d0*pi/Lx
+!      !ay = 2.d0*pi/Ly
+!      !az = 2.d0*pi/Lz
+!      
+!      ! norm s orbital !
+!
+!      if (n_type == 1) then 
+!
+!        do n = 1 , n_contraction
+!          sum = 0.d0
+!          do i = 1 , n_gaussian
+!            do j = 1 , n_gaussian
+!
+!              alpha = exponent(i)
+!              beta  = exponent(j)
+!              gamma = alpha + beta
+!
+!              I_0_gamma_x = gsl_sf_bessel_I0_scaled(2.d0*gamma/ax**2)
+!              !I_0_gamma_y = gsl_sf_bessel_I0_scaled(2.d0*gamma/ay**2)
+!              !I_0_gamma_z = gsl_sf_bessel_I0_scaled(2.d0*gamma/az**2)
+!
+!              c1 = contraction(i,n)
+!              c2 = contraction(j,n)
+!
+!              const = c1*c2*Lx!*Ly*Lz
+!
+!              sum  = sum + const*I_0_gamma_x*(pi/gamma)!*I_0_gamma_y*I_0_gamma_z
+!              print*, const*I_0_gamma_x*(pi/gamma)
+!            end do 
+!          end do 
+!
+!          IF (SQRT(sum) .LT. THRMIN) GOTO 20
+!          sum=1.d0/SQRT(sum)
+!          do j = 1, n_gaussian
+!            contractionN(j,n)= contraction(j,n)*sum
+!          end do 
+!
+!        end do 
+!
+!      end if 
+!      
+!20    continue 
+!
+!      ! norm p orbital ! 
+!
+!      if (n_type == 2) then
+!        do n = 1 , n_contraction
+!          sum = 0.d0
+!          do i = 1 , n_gaussian
+!            do j = 1 , n_gaussian
+!              alpha = exponent(i)
+!              beta  = exponent(j)
+!              gamma = alpha + beta
+!              if ( gamma == 0.d0 ) cycle
+!  
+!              I_0_gamma_x = gsl_sf_bessel_I1_scaled(2.d0*gamma/ax**2)
+!              !I_0_gamma_y = gsl_sf_bessel_I0_scaled(2.d0*gamma/ay**2)
+!              !I_0_gamma_z = gsl_sf_bessel_I0_scaled(2.d0*gamma/az**2)
+!  
+!              c1 = contraction(i,n)
+!              c2 = contraction(j,n)
+!  
+!              !const = c1*c2*Lx*Ly*Lz*(1/(2.d0*gamma))
+!              const = c1*c2*Lx*(1/(2.d0*gamma)) !Ly*Lz*(1/(2.d0*gamma))
+!              !sum  = sum + const*I_0_gamma_x*I_0_gamma_y*I_0_gamma_z
+!              sum  = sum + const*I_0_gamma_x * (pi/gamma)!*I_0_gamma_y*I_0_gamma_z
+!            end do 
+!          end do 
+!
+!
+!        IF (SQRT(sum) .LT. THRMIN) GOTO 30
+!          sum=1.d0/SQRT(sum)
+!
+!          do j = 1, n_gaussian
+!            contractionN(j,n)= contraction(j,n)*sum
+!          end do 
+!
+!        end do
+!
+!      end if 
+!      
+!30    continue 
+!
+!end subroutine  norm_orb_tor
+
 subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
       implicit none 
@@ -348,26 +485,14 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
 
       integer                        :: n, i, j 
       double precision               :: sum  , alpha , beta , gamma , c1 , c2 , const 
-      double precision               :: ax , ay , az 
+      double precision               :: ax 
+      double precision               :: norm(n_gaussian)
       double precision               :: THRMIN = 1.D-17
       double precision , parameter   :: pi = 3.14159265358979323846D00
-      double precision               :: I_0_gamma_x, I_0_gamma_y, I_0_gamma_z
+      double precision               :: I_0_gamma_x
 
 
       INTERFACE
-        
-        FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0
-        END FUNCTION gsl_sf_bessel_I0
-
-        FUNCTION gsl_sf_bessel_I1(x_val) BIND(C, NAME="gsl_sf_bessel_I1")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I1
-        END FUNCTION gsl_sf_bessel_I1
-
         FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
           USE iso_c_binding
           REAL(C_DOUBLE), VALUE :: x_val
@@ -384,15 +509,25 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
 
 
       ax = 2.d0*pi/Lx
-      !ay = 2.d0*pi/Ly
-      !az = 2.d0*pi/Lz
-      
+
       ! norm s orbital !
 
       if (n_type == 1) then 
 
+      do n = 1 , n_contraction
+        do i = 1 , n_gaussian
+
+        Norm(i) = 1.d0 / dsqrt( (pi/(2.d0*exponent(i))) * Lx * gsl_sf_bessel_I0_scaled(4.d0*exponent(i)/(ax*ax)) ) 
+
+        contractionN(i,n) =  contraction(i,n) * Norm(i) 
+
+        end do 
+      end do 
+        
         do n = 1 , n_contraction
+          
           sum = 0.d0
+
           do i = 1 , n_gaussian
             do j = 1 , n_gaussian
 
@@ -401,22 +536,20 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
               gamma = alpha + beta
 
               I_0_gamma_x = gsl_sf_bessel_I0_scaled(2.d0*gamma/ax**2)
-              !I_0_gamma_y = gsl_sf_bessel_I0_scaled(2.d0*gamma/ay**2)
-              !I_0_gamma_z = gsl_sf_bessel_I0_scaled(2.d0*gamma/az**2)
 
-              c1 = contraction(i,n)
-              c2 = contraction(j,n)
+              c1 = contractionN(i,n)
+              c2 = contractionN(j,n)
 
-              const = c1*c2*Lx!*Ly*Lz
+              const = c1*c2*Lx
 
-              sum  = sum + const*I_0_gamma_x*(pi/gamma)!*I_0_gamma_y*I_0_gamma_z
+              sum  = sum + const*I_0_gamma_x*(pi/gamma)
             end do 
           end do 
 
           IF (SQRT(sum) .LT. THRMIN) GOTO 20
           sum=1.d0/SQRT(sum)
           do j = 1, n_gaussian
-            contractionN(j,n)= contraction(j,n)*sum
+            contractionN(j,n)= contractionN(j,n)*sum
           end do 
 
         end do 
@@ -428,6 +561,7 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
       ! norm p orbital ! 
 
       if (n_type == 2) then
+
         do n = 1 , n_contraction
           sum = 0.d0
           do i = 1 , n_gaussian
@@ -435,19 +569,17 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
               alpha = exponent(i)
               beta  = exponent(j)
               gamma = alpha + beta
+
               if ( gamma == 0.d0 ) cycle
   
               I_0_gamma_x = gsl_sf_bessel_I1_scaled(2.d0*gamma/ax**2)
-              !I_0_gamma_y = gsl_sf_bessel_I0_scaled(2.d0*gamma/ay**2)
-              !I_0_gamma_z = gsl_sf_bessel_I0_scaled(2.d0*gamma/az**2)
   
               c1 = contraction(i,n)
               c2 = contraction(j,n)
-  
-              !const = c1*c2*Lx*Ly*Lz*(1/(2.d0*gamma))
-              const = c1*c2*Lx*(1/(2.d0*gamma)) !Ly*Lz*(1/(2.d0*gamma))
-              !sum  = sum + const*I_0_gamma_x*I_0_gamma_y*I_0_gamma_z
-              sum  = sum + const*I_0_gamma_x * (pi/gamma)!*I_0_gamma_y*I_0_gamma_z
+                
+              const = c1*c2*Lx*(1/(2.d0*gamma))
+              sum  = sum + const*I_0_gamma_x * (pi/gamma)
+
             end do 
           end do 
 

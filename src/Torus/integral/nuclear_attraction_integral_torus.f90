@@ -180,7 +180,7 @@ subroutine nuclear_attraction_integral_sp_torus(number_of_atoms,geometry,atoms,r
 !            else 
 
               do k = 1 , number_of_atoms
-              
+
                 x_PC = xp - geometry(k,1) 
                 y_PC = yp - geometry(k,2)
                 z_PC = zp - geometry(k,3)

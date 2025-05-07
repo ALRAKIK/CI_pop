@@ -230,7 +230,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       EHF = ET + EV + EJ + EK
 
-      if (abs(EHF - EHF_old) < thresh .and. nSCF > maxSCF/4 ) exit
+      if (abs(EHF - EHF_old) < thresh ) exit  !.and. nSCF > maxSCF/4 ) exit
 
       if (nSCF > 2) then 
         EHF_old = EHF 
