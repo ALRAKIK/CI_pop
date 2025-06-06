@@ -34,6 +34,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,allocatable  :: F(:,:),Fp(:,:)
       double precision,allocatable  :: error(:,:)
       double precision,external     :: trace_matrix
+!      double precision              :: a = 1.75d0 
 
       integer                       :: max_diis = 5
       integer                       :: n_diis
@@ -50,6 +51,8 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,intent(out)  :: EHF 
       double precision,intent(out)  :: e(nBas)
       double precision,intent(out)  :: c(nBas,nBas)
+
+      open(HFfile,file="./tmp/RHF.out")
     
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
@@ -59,62 +62,33 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       ! Memory allocation
   
-      allocate(cp(nBas,nBas),P(nBas,nBas),                         &
-             J(nBas,nBas),K(nBas,nBas),F(nBas,nBas),Fp(nBas,nBas), &
-             error(nBas,nBas))
+      allocate(cp(nBas,nBas), P(nBas,nBas) ,error(nBas,nBas))
+      allocate(J(nBas,nBas) , K(nBas,nBas))
+      allocate(F(nBas,nBas) ,Fp(nBas,nBas))
 
       allocate(err_diis(nBas*nBas,max_diis))
       allocate(F_diis(nBas*nBas,max_diis))
   
       ! Guess coefficients and eigenvalues
-  
-      F(:,:) = Hc(:,:)
 
-      open(1,file="./tmp/FOCK_matrix.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(F,1))
-      do i = 1 , size(F,1)
-        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (F(i,o),o=1,size(F,1))
-      end do 
-      close(1)
+      !     Huckel guess          !
+      !-----------------------------------------------------------------!
 
-      open(1,file="./tmp/X.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(X,1))
-      do i = 1 , size(X,1)
-        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (X(i,o),o=1,size(X,1))
-      end do 
-      close(1)
+!      do mu = 1, nBas
+!        F(mu,mu) = Hc(mu,mu)
+!        do nu = mu+1, nBas
+!    
+!          F(mu,nu) = 0.5d0*a*S(mu,nu)*(Hc(mu,mu) + Hc(nu,nu))
+!          F(nu,mu) = F(mu,nu)
+!    
+!        end do
+!      end do
 
-      cp(:,:) = matmul(transpose(X(:,:)), matmul(F(:,:), X(:,:)))
-
-      open(1,file="./tmp/C_prime.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(cp,1))
-      do i = 1 , size(cp,1)
-        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (cp(i,o),o=1,size(cp,1))
-      end do 
-      close(1)
-
-      call diagonalize_matrix(nBAS, cp, e)
+      !-----------------------------------------------------------------!   
       
-      c(:,:) = matmul(X(:,:), cp(:,:))
-
-      open(1,file="./tmp/C.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(c,1))
-      do i = 1 , size(c,1)
-        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (c(i,o),o=1,size(c,1))
-      end do 
-      close(1)
+      call    guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
       
-      P(:,:) = 2d0 * matmul(c(:,1:nO), transpose(c(:,1:nO)))
-
-      open(1,file="./tmp/density_matrix.dat")
-        write(1,'(15x,1000(i3,15x))') (i,i=1,size(P,1))
-        do i = 1 , size(P,1)
-          write(1,'(i3,6x,1000(f16.10,2x))') i ,  (P(i,o),o=1,size(P,1))
-        end do 
-      close(1)
-
-
-
+      
       ! --------------------------------------------------------------- !
       !              check that P_{mu nu} S_{mu nu} = N 
       ! --------------------------------------------------------------- !
@@ -194,18 +168,50 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       !   Compute the exchange potential K
       call exchange_potential(nBas,P,ERI,K)
+      
       ! ****************** !
 
       !   Build Fock operator
     
       F(:,:) = Hc(:,:) + J(:,:) + K(:,:)
-  
+       
       !   Compute the error vector and extract the convergence criterion
       error = matmul(F,matmul(P,S)) - matmul(matmul(S,P),F)
-      if(nSCF > 1) Conv = maxval(abs(error)) 
+      if(nSCF > 1) Conv = maxval(abs(error))
       if (Conv < thresh) exit 
+
       ! ****************** !
   
+
+      write(HFfile,'(a)') ""
+      write(HFfile,'(a)')    "!--------------------------------------------!"
+      write(HFfile,'(a,I3)') "                 Iter  = ", nSCF
+      write(HFfile,'(a)')    "!--------------------------------------------!"
+      write(HFfile,'(a)') ""
+
+    
+      call header_HF("Hartree potential J = P(la,si)*ERI(mu,nu,la,si)",-1)
+      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(j,1))
+      do i = 1 , size(j,1)
+        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (j(i,o),o=1,size(j,1))
+      end do 
+      write(HFfile,'(a)') ""
+
+      call header_HF("Exchange potential K = -0.5 P(la,si)*ERI(mu,la,si,nu)",-1)
+      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(k,1))
+      do i = 1 , size(k,1)
+        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (k(i,o),o=1,size(k,1))
+      end do 
+      write(HFfile,'(a)') ""
+
+      call header_HF("Fock matrix F = Hc + J + K", -1)
+      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(F,1))
+      do i = 1 , size(F,1)
+        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (F(i,o),o=1,size(F,1))
+      end do 
+      write(HFfile,'(a)') ""
+
+
       !------------------------------------------------------------------------
       !   Compute HF energy
       !------------------------------------------------------------------------
@@ -220,17 +226,19 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       !   Compute the Hartree energy
       EJ = 0.5d0*trace_matrix(nBas,matmul(P,J))
+
       ! ****************** !
 
       !   Compute the exchange energy
       EK = 0.5d0*trace_matrix(nBas,matmul(P,K))
+
       ! ****************** !
 
       !   Total HF energy
   
       EHF = ET + EV + EJ + EK
 
-      if (abs(EHF - EHF_old) < thresh ) exit  !.and. nSCF > maxSCF/4 ) exit
+      if ((abs(EHF - EHF_old) < thresh ) .and. nSCF > maxSCF/4 ) exit
 
       if (nSCF > 2) then 
         EHF_old = EHF 
@@ -253,7 +261,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       !   Transform for the Fock matrix F in the orthogonal basis 
       
-      Fp(:,:) = matmul(transpose(X(:,:)), matmul(F(:,:),X(:,:)))
+      Fp = matmul(transpose(X),matmul(F,X))
             
       !   Diagonalize F' to get MO coefficients (eigenvectors in the orthogonal basis) c' and MO energies (eigenvalues) e
 
@@ -269,13 +277,57 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       P(:,:) = 2d0*matmul(c(:,1:nO),transpose(c(:,1:nO)))
 
+
+      call header_HF("Fock matrix in the orthogonal basis Fp =  X^t   F   X  ", -1)
+      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(Fp,1))
+      do i = 1 , size(Fp,1)
+        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (Fp(i,o),o=1,size(Fp,1))
+      end do
+      write(HFfile,'(a)') ""
+
+      call header_HF("MO coefficients in the non-orthogonal basis c = X cp", -1)
+      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(c,1))
+      do i = 1 , size(c,1)
+        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (c(i,o),o=1,size(c,1))
+      end do 
+      write(HFfile,'(a)') ""
+      
+      call header_HF("Density matrix P = 2 c c^t", -1)
+      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(P,1))
+      do i = 1 , size(P,1)
+        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (P(i,o),o=1,size(P,1))
+      end do 
+      write(HFfile,'(a)') ""
+
+      call header_HF("HF Orbital Energies", -1)
+      do i = 1 , size(e)
+        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  e(i)
+      end do
+
+      write(HFfile,'(a)') ""
+      write(HFfile,'(a,f16.10)')   " The Kinetic   Energy    = ", ET
+      write(HFfile,'(a,f16.10)')   " The Potential Energy    = ", EV
+      write(HFfile,'(a,f16.10)')   " The Hartree   Energy    = ", EJ
+      write(HFfile,'(a,f16.10,a)') " The Exchange  Energy    = ", EK  , "    +"
+      write(HFfile,'(a,f16.10,a)') " The Nuclear   Energy    = ", ENuc 
+      write(HFfile,'(a,f16.10)')   "-----------------------------------"
+      write(HFfile,'(a,f16.10)')   " The HF Energy        = ", EHF+ENuc
+      write(HFfile,'(a)') ""
+      write(HFfile,'(a)') "" 
+      
+      write(HFfile,'(2a)')  repeat('*_',36) , "*"
+      write(HFfile,'(a)')   repeat('_',73)
+
       !   Dump results
    
       write(outfile,"(1x,a1,i2,1x,a1,f16.8,1x,a1,f10.6,1x,a1,f10.6,1x,a1,f16.8,4x,a1,f16.8,4x,a1,f16.8,4x,a1)")      & 
       "|",nSCF,"|",EHF+ENuc,"|",Conv,"|",Gap,"|",ET,"|",EV,"|",Ej+EK,"|"
+      
       enddo
 
       write(outfile,*) repeat('-', 110)
+
+      close(HFfile)
 
       !------------------------------------------------------------------------
       ! End of SCF loop

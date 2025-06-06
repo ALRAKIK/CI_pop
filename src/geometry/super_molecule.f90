@@ -13,7 +13,7 @@ subroutine build_super_molecule()
       character(len=2),allocatable   :: super_atoms(:)
       character(len=100)             :: line
       logical                        :: reading_cell 
-      character(len=5)               :: type_of_calculation
+      character(len=10)              :: type_of_calculation
       double precision               :: rx , theta 
       double precision,parameter     :: pi     = 3.14159265358979323846D00
 
@@ -30,6 +30,8 @@ subroutine build_super_molecule()
         write(*,'(a)') "Type of calculation: OBC"
       else if (type_of_calculation == "Tori") then 
         write(*,'(a)') "Type of calculation: Toroidal"
+      else if (type_of_calculation == "Tori2D") then 
+        write(*,'(a)') "Type of calculation: Toroidal real 2D"
       else 
         write(*,'(a)') "Error: Unknown type of calculation. Please use either 'Torus','Ring','Tori' or 'OBC' ."
         stop
@@ -151,7 +153,7 @@ subroutine build_super_molecule()
       end if 
 
       open(4 , file =  "general_parameters.dat" )
-        write (4,'(a5)') type_of_calculation
+        write (4,'(a10)') type_of_calculation
       close(4)
 
 end subroutine

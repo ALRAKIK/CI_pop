@@ -30,8 +30,10 @@ program CI
       double precision,allocatable    ::          T(:,:)
       double precision,allocatable    ::          V(:,:)
       double precision,allocatable    ::         Hc(:,:)
+      double precision,allocatable    ::      Hc_MO(:,:)
       double precision,allocatable    ::          X(:,:)
       double precision,allocatable    ::    ERI(:,:,:,:)
+      double precision,allocatable    :: ERI_MO(:,:,:,:)
       double precision,allocatable    ::            e(:)
       double precision,allocatable    ::          c(:,:)
       double precision,allocatable    :: S_SAO_diag(:,:)
@@ -40,7 +42,7 @@ program CI
       double precision                :: E_nuc , EHF
       double precision                :: start_HF,end_HF,t_HF
 
-      character(len=5)                :: calculation_type 
+      character(len=10)               :: calculation_type 
 
 
       !-----------------------------------------------------------------!
@@ -51,7 +53,7 @@ program CI
 
       call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type)
 
-      if (calculation_type == "Torus" .or. calculation_type == "Tori") call Torus_def()
+      if (calculation_type == "Torus" .or. calculation_type == "Tori" .or. calculation_type == "Tori2D" ) call Torus_def()
 
       allocate(geometry(n_atoms,3))
       allocate(charge(n_atoms))
@@ -66,8 +68,8 @@ program CI
       allocate(atoms    (n_atoms))
       allocate(norm_helper(n_atoms))
 
-      if (calculation_type == "Tori") then 
-        call basis_tor(n_atoms,charge,atoms,norm_helper)
+      if (calculation_type == "Tori" .or. calculation_type == "Tori2D" ) then 
+        call basis_tor(n_atoms,charge,atoms,norm_helper,calculation_type)
       else
         call basis(n_atoms,charge,atoms)
       end if 
@@ -92,7 +94,7 @@ program CI
 
       allocate(AO(number_of_functions))
 
-      if (calculation_type == "Tori") then 
+      if (calculation_type == "Tori" .or. calculation_type == "Tori2D") then 
         call classification_orbital_tor(n_atoms,number_of_functions,geometry,atoms,norm_helper,AO)
       else
         call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
@@ -130,7 +132,7 @@ program CI
         call overlap_matrix(n_atoms,geometry,atoms)
         call kinetic_matrix(n_atoms,geometry,atoms)
         call nuclear_attraction_matrix(n_atoms,geometry,atoms)  
-!        call ERI_integral(n_atoms,geometry,atoms)
+        call ERI_integral(n_atoms,geometry,atoms)
         call cpu_time(end_HF)
         t_HF = end_HF - start_HF
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
@@ -201,9 +203,34 @@ program CI
         call cpu_time(end_HF)
         t_HF = end_HF - start_HF
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',t_HF,' seconds'
-!        call ERI_integral_toroidal(n_atoms,geometry,atoms)
+        call ERI_integral_toroidal(n_atoms,geometry,atoms)
 !        call overlap_matrix_toroidal_num(n_atoms,number_of_functions,atoms,AO)
 !        write(outfile,*) ""
+        call system("rm torus_parameters.inp")
+      end if 
+      
+      !-----------------------------------------------------------------!
+
+      !-----------------------------------------------------------------!
+      !        calculate the with Toroidal translational symmetry       !
+      !-----------------------------------------------------------------!
+
+      if (calculation_type == "Tori2D") then 
+
+        call header("Toroidal  2D Real Gaussian",-1)
+        call header_under("Calculate the integerals",-1)
+        call Torus_def()
+        write(outfile,*) ""
+        write(outfile,'(a,f12.8,a,f12.8,a)') "The length of the box:  Lx , Ly = (", Lx ," , ", Ly , " )"  
+        write(outfile,*) ""
+        call cpu_time(start_HF)
+        call overlap_matrix_toroidal_2D(n_atoms,number_of_functions,atoms,AO)
+        call kinetic_matrix_toroidal_2D(n_atoms,number_of_functions,atoms,AO)
+        !call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
+        call cpu_time(end_HF)
+        t_HF = end_HF - start_HF
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',t_HF,' seconds'
+        call ERI_integral_toroidal_2D(n_atoms,geometry,atoms)
         call system("rm torus_parameters.inp")
       end if 
       
@@ -262,14 +289,43 @@ program CI
         call RHF_SAO(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
       call cpu_time(end_HF)
       else 
+        if (calculation_type == "Tori2D") E_nuc = 0.d0 
         call cpu_time(start_HF)
         call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
       call cpu_time(end_HF)
       end if 
-
       t_HF = end_HF - start_HF
       write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',t_HF,' seconds'
       write(outfile,*)
+
+      if (calculation_type == "Tori2D") then
+        
+        
+      !-----------------------------------------------------------------!
+      ! AO to MO transformation
+      !-----------------------------------------------------------------!
+
+        allocate(ERI_MO(nBas,nBas,nBas,nBas))
+        allocate(Hc_MO(nBas,nBas))
+
+        call cpu_time(start_HF)
+        call AO_to_MO_HC (nBas,c,HC,HC_MO)
+        call AO_to_MO_ERI(nBas,c,ERI,ERI_MO)
+        call cpu_time(end_HF)
+    
+        t_HF = end_HF - start_HF
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',t_HF,' seconds'
+        write(outfile,*)
+    
+
+      !-----------------------------------------------------------------!
+      ! FCI Energy calculation
+      !-----------------------------------------------------------------!
+
+
+      call FCI(Hc_MO,ERI_MO,nBAS)
+        
+      end if
 
       ! ---------------------------------------------------------------- !
       ! ---------------------------------------------------------------- !

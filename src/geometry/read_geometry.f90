@@ -3,12 +3,12 @@ subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type)
       implicit none 
 
 
-      integer                      :: i 
-      integer                      :: number_of_atoms
-      double precision             :: geometry(100,3)
-      integer                      :: charge(100)
-      character(len=5),intent(out) :: calculation_type
-      character(len=2),allocatable :: type(:)
+      integer                       :: i 
+      integer                       :: number_of_atoms
+      double precision              :: geometry(100,3)
+      integer                       :: charge(100)
+      character(len=10),intent(out) :: calculation_type
+      character(len=2),allocatable  :: type(:)
       
       
       open(1,file="supermolecule.mol")

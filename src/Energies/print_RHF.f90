@@ -38,8 +38,9 @@ subroutine print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,Ex,EHF)
       write(outfile,'(A32,1X,F16.10)') ' Nuclear   repulsion  ',ENuc
       write(outfile,'(A32,1X,F16.10)') ' Hartree-Fock energy  ',EHF + ENuc
       write(outfile,'(A50)')           '---------------------------------------'
-      write(outfile,'(A36,F13.6)')     ' HF HOMO      energy (eV):',e(HOMO)*autoeV
-      write(outfile,'(A36,F13.6)')     ' HF LUMO      energy (eV):',e(LUMO)*autoev
+      write(outfile,'(A36,F13.6)')     ' HF HOMO      energy (au):',e(HOMO)
+      write(outfile,'(A36,F13.6)')     ' HF LUMO      energy (au):',e(LUMO)
+      write(outfile,'(A36,F13.6)')     ' HF HOMO-LUMO gap    (au):',Gap
       write(outfile,'(A36,F13.6)')     ' HF HOMO-LUMO gap    (eV):',Gap*autoev
       write(outfile,'(A50)')           '---------------------------------------'
       write(outfile,'(A36,F13.6)')     ' Potential energy        :',(EV+EJ+Ex+ENuc)

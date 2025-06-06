@@ -173,8 +173,8 @@ subroutine get_X_from_overlap(N,over,X)
 
       ! --------------------------------------------------------------- !
 
-!      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
-!      call matout(N,N,Xt)
+      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
+      call matout(N,N,Xt)
 
       ! --------------------------------------------------------------- !
   
@@ -397,16 +397,3 @@ subroutine split_matrix(nBas, matrix)
       end do 
     
 end subroutine split_matrix
-
-
-subroutine split_matrix_ERI(nBas, matrix)
-
-  implicit none
-
-  integer, intent(in)             :: nBas
-  double precision, intent(inout) :: matrix(nBas,nBas,nBas,nBas)
-  integer                         :: i , j 
-    
-
-
-end subroutine split_matrix_ERI

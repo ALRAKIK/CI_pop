@@ -1,4 +1,4 @@
-subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
+subroutine ERI_integral_toroidal_2D(number_of_atoms,geometry,atoms)
 
       use omp_lib
       use files
@@ -74,7 +74,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
               do j = 1, number_of_functions
                   do k = 1, number_of_functions
                       do l = k, number_of_functions
-                          call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
+                          call ERI_integral_4_function_toroidal_2D(ERI(i),ERI(j),ERI(k),ERI(l), value)
                           
                           !$omp atomic
                           num_int = num_int + 1
@@ -130,35 +130,5 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
       deallocate(two_electron)
       deallocate(two_eri)
 
-end subroutine ERI_integral_toroidal
-
-!subroutine progress_bar(num_int,num_total_int)
-!
-!      implicit none 
-!
-!      integer,intent(in) :: num_int , num_total_int
-!      integer            :: i
-!
-!      do i = 1 , 10 
-!        if (num_int == i*num_total_int/10) then
-!          write(*,"(I3,a)") i*10 , " % done"
-!        end if
-!      end do 
-!
-!end subroutine progress_bar
-
-subroutine progress_bar(num_int, num_total_int)
-      
-      implicit none
-      integer, intent(in) :: num_int, num_total_int
-      integer, save       :: last_percentage = -1
-      integer             :: current_percentage
-  
-      current_percentage = (num_int * 100) / num_total_int
-  
-      ! Only print when percentage changes and is a multiple of 10
-      if (current_percentage /= last_percentage .and. mod(current_percentage, 10) == 0) then
-         write(*, "(I3,a)") current_percentage, " % done"
-         last_percentage = current_percentage
-      end if
-end subroutine progress_bar
+end subroutine ERI_integral_toroidal_2D
+!-----------------------------------------------------------------!
