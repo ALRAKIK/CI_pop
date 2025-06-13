@@ -30,7 +30,6 @@ subroutine ERI_integral_4_function_toroidal_2D(one,two,three,four,value)
       double precision                :: const  
       double precision                :: value_s 
       double precision                :: eta = 1e-9
-      double precision                :: kc1 , kc2 
       double precision                :: mu_x, mu_y
       double precision                :: nu_x, nu_y 
       double precision                :: mu  , nu 
@@ -109,6 +108,7 @@ end subroutine ERI_integral_4_function_toroidal_2D
 
 subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
       
+      use gsl_bessel_mod
       use quadpack , only : dqagi
       use iso_c_binding
       use torus_init
@@ -137,15 +137,6 @@ subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
       integer,parameter                  :: Nmax = 40
-
-      INTERFACE
-      FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
-        USE iso_c_binding
-        REAL(C_DOUBLE), VALUE :: x_val
-        REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
-      END FUNCTION gsl_sf_bessel_I0_scaled
-    
-      END INTERFACE
       
       call dqagi(f_decay, bound, inf, epsabs, epsrel, result,abserr, neval, ier,Limit,Lenw,Last,Iwork,Work)
 
@@ -172,28 +163,12 @@ subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
       double precision             :: sum1, sum2
       double precision             :: tol = 1.0d-12
       integer                      :: n
-
-      INTERFACE
-
-        FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0
-        END FUNCTION gsl_sf_bessel_I0
-      
-        FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
-        END FUNCTION gsl_sf_bessel_I0_scaled
-      
-      END INTERFACE
       
       A = 2.d0*sigma_x/(ax*ax)
       B = 2.d0*nu_x/(ax*ax)
       C = 2.d0*t*t/(ax*ax)
 
-      sum1 = gsl_sf_bessel_I0_scaled(A)*gsl_sf_bessel_I0_scaled(B)*gsl_sf_bessel_I0_scaled(C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
+      sum1 = bessi_scaled(0,A)*bessi_scaled(0,B)*bessi_scaled(0,C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
 
       do n = 1, Nmax
          term = bessi_scaled(n, A)*bessi_scaled(n, B)*bessi_scaled(n, C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
@@ -205,10 +180,10 @@ subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
       B = 2.d0*nu_y/(ay*ay)
       C = 2.d0*t*t/(ay*ay)
 
-      sum2 = gsl_sf_bessel_I0_scaled(A)*gsl_sf_bessel_I0_scaled(B)*gsl_sf_bessel_I0_scaled(C) * exp(A+B-2.d0*(sigma+nu)/(ay*ay))
+      sum2 = bessi_scaled(0,A)*bessi_scaled(0,B)*bessi_scaled(0,C) * exp(A+B-2.d0*(sigma+nu)/(ay*ay))
 
       do n = 1, Nmax
-         term = bessi_scaled(n, A)*bessi_scaled(n, B)*bessi_scaled(n, C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
+         term = bessi_scaled(n, A)*bessi_scaled(n, B)*bessi_scaled(n, C) * exp(A+B-2.d0*(sigma+nu)/(ay*ay))
          if (term < tol) exit
          sum2 = sum2 + term * 2.d0 * cos(dble(n)*ay*ypq) 
       end do

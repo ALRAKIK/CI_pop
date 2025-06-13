@@ -161,7 +161,6 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
             yp       = 0.d0
             zp       = 0.d0
 
-            !kc       = dexp(-(alpha+beta)*Lx**2/(2.d0*pi**2)) * c1 * c2  * 2.d0 * dsqrt(pi) / ax * Lx 
             kc       = c1 * c2  * 2.d0 * dsqrt(pi) / ax * Lx 
 
             if (AO2%orbital=="px") then 
@@ -490,10 +489,9 @@ subroutine integrate_NA_pp_px_Toroidal(gamma_x,xP,p,xc,xa,xb,result)
     
 end subroutine integrate_NA_pp_px_Toroidal
 
-
-
 subroutine integrate_NA_pp_py_Toroidal(gamma_x,xpc,p, result)
     
+      use gsl_bessel_mod
       use quadpack, only : dqagi
       use omp_lib
       use torus_init
@@ -531,24 +529,8 @@ subroutine integrate_NA_pp_py_Toroidal(gamma_x,xpc,p, result)
 
         double precision :: I_0_x ,dx 
 
-        INTERFACE
-
-        FUNCTION gsl_sf_bessel_I0(x_val) BIND(C, NAME="gsl_sf_bessel_I0")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0
-        END FUNCTION gsl_sf_bessel_I0
-      
-        FUNCTION gsl_sf_bessel_I0_scaled(x_val) BIND(C, NAME="gsl_sf_bessel_I0_scaled")
-          USE iso_c_binding
-          REAL(C_DOUBLE), VALUE :: x_val
-          REAL(C_DOUBLE) :: gsl_sf_bessel_I0_scaled
-        END FUNCTION gsl_sf_bessel_I0_scaled
-      
-        END INTERFACE
-
         dx = 2.d0*dsqrt( gamma_x**2 + x**4 + 2.d0 * gamma_x * x**2 * dcos(ax*(XPC))) / ax**2
-        I_0_x = gsl_sf_bessel_I0_scaled(dx)
+        I_0_x = bessi_scaled(0, dx)
 
         fx  = (1.d0/(p+x**2))**2  * dexp(-2.d0*(x**2+p)/ax**2 + dx)  * I_0_x
 
