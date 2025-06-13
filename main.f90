@@ -8,22 +8,22 @@ program CI
       implicit none 
 
       !-----------------------------------------------------------------!
-      !                         START variables                         !
+      !                         The  variables                          !
       !-----------------------------------------------------------------!
 
 
       integer                         :: i , j
       integer                         :: n_atoms , nBAS
-      integer                         :: nO      , n_electron 
+      integer                         :: nO      , nV   , n_electron 
 
       double precision                :: geometry_tmp(100,3)
       integer                         :: charge_tmp(100)
       integer                         :: number_of_functions
 
-      double precision,allocatable    :: geometry(:,:)
-      integer         ,allocatable    :: charge(:)
-      type(atom)      ,allocatable    :: atoms(:)
-      type(atom)      ,allocatable    :: norm_helper(:)
+      double precision  ,allocatable  :: geometry(:,:)
+      integer           ,allocatable  :: charge(:)
+      type(atom)        ,allocatable  :: atoms(:)
+      type(atom)        ,allocatable  :: norm_helper(:)
       type(ERI_function),allocatable  :: AO (:)
 
       double precision,allocatable    ::          S(:,:)
@@ -36,11 +36,9 @@ program CI
       double precision,allocatable    :: ERI_MO(:,:,:,:)
       double precision,allocatable    ::            e(:)
       double precision,allocatable    ::          c(:,:)
-      double precision,allocatable    :: S_SAO_diag(:,:)
-
 
       double precision                :: E_nuc , EHF
-      double precision                :: start_HF,end_HF,t_HF
+      double precision                :: start,end,time
 
       character(len=10)               :: calculation_type 
 
@@ -100,64 +98,55 @@ program CI
         call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
       end if
 
-!      call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
       call print_orbital_table(AO,number_of_functions)
 
-!      call check_openmp_enabled()
-
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !               ---------------------------------                 !
       !                       Allocate the memory                       !
       !               ---------------------------------                 !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas),X(nBas,nBas),ERI(nBas,nBas,nBas,nBas),e(nBas),c(nBas,nBas))
+      ! one electron integrals !
+      allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas)) 
+      ! two electron integrals !
+      allocate(ERI(nBas,nBas,nBas,nBas))
+      ! HF variables ! 
+      allocate(X(nBas,nBas),e(nBas),c(nBas,nBas))
 
-!     -------------------------------------------------------------------     !
-!                            Plot the gussians                                !
-!     -------------------------------------------------------------------     !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !               ---------------------------------                 !
+      !                       Plot the gussians                         !
+      !               ---------------------------------                 !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!      call plot(n_atoms,geometry,calculation_type)
+      !  call plot(n_atoms,geometry,calculation_type)
 
-!     -------------------------------------------------------------------     !
-!                         calculate the integrals 
-!     -------------------------------------------------------------------     !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !               ---------------------------------                 !
+      !                   calculate the integrals                       !
+      !               ---------------------------------                 !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       !-----------------------------------------------------------------!
       !                    calculate molecule                           !
       !-----------------------------------------------------------------!
 
       if (calculation_type == "OBC" .or. calculation_type == "Ring" ) then 
-        call header("calculation with OBC",-1)
-        call header_under("Calculate the integerals",-1)
-        call cpu_time(start_HF)
-        call overlap_matrix(n_atoms,geometry,atoms)
-        call kinetic_matrix(n_atoms,geometry,atoms)
-        call nuclear_attraction_matrix(n_atoms,geometry,atoms)  
-        call ERI_integral(n_atoms,geometry,atoms)
-        call cpu_time(end_HF)
-        t_HF = end_HF - start_HF
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
-        write(outfile,*)
-      end if 
+        call header(" OBC Calculation ",-1)
+        call header_under(" Calculate the integerals ",-1)
+        
+        call cpu_time(start)
 
-      !-----------------------------------------------------------------!
-      !                        calculate SAO                            !
-      !-----------------------------------------------------------------!
+        call overlap_matrix             (n_atoms,geometry,atoms)
+        call kinetic_matrix             (n_atoms,geometry,atoms)
+        call nuclear_attraction_matrix  (n_atoms,geometry,atoms)  
+        call ERI_integral               (n_atoms,geometry,atoms)
 
-      if (calculation_type == "SAO") then 
-        call header("Torus with SAO",-1)
-        call header_under("Calculate the integerals",-1)
-        call Torus_def()
-        allocate(S_SAO_diag(number_of_functions,number_of_functions))
-        call cpu_time(start_HF)
-        call overlap_matrix_SAO(n_atoms,number_of_functions,atoms,AO,S_SAO_diag)
-        call kinetic_matrix_SAO(n_atoms,number_of_functions,atoms,AO,S_SAO_diag)
-        call nuclear_attraction_matrix_SAO(n_atoms,number_of_functions,geometry,atoms,AO,S_SAO_diag)
-        call ERI_integral_SAO(n_atoms,number_of_functions,geometry,atoms,S_SAO_diag)
-        call cpu_time(end_HF)
-        t_HF = end_HF - start_HF
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',t_HF,' seconds'
+        call cpu_time(end)
+        
+        time = end - start
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',time,' seconds'
         write(outfile,*)
-        deallocate(S_SAO_diag)
       end if 
 
       !-----------------------------------------------------------------!
@@ -196,16 +185,14 @@ program CI
         write(outfile,*) ""
         write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx 
         write(outfile,*) ""
-        call cpu_time(start_HF)
+        call cpu_time(start)
         call overlap_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
         call kinetic_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
         call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
-        call cpu_time(end_HF)
-        t_HF = end_HF - start_HF
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',t_HF,' seconds'
+        call cpu_time(end)
+        time = end - start
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',time,' seconds'
         call ERI_integral_toroidal(n_atoms,geometry,atoms)
-!        call overlap_matrix_toroidal_num(n_atoms,number_of_functions,atoms,AO)
-!        write(outfile,*) ""
         call system("rm torus_parameters.inp")
       end if 
       
@@ -223,13 +210,13 @@ program CI
         write(outfile,*) ""
         write(outfile,'(a,f12.8,a,f12.8,a)') "The length of the box:  Lx , Ly = (", Lx ," , ", Ly , " )"  
         write(outfile,*) ""
-        call cpu_time(start_HF)
+        call cpu_time(start)
         call overlap_matrix_toroidal_2D(n_atoms,number_of_functions,atoms,AO)
         call kinetic_matrix_toroidal_2D(n_atoms,number_of_functions,atoms,AO)
         !call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
-        call cpu_time(end_HF)
-        t_HF = end_HF - start_HF
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',t_HF,' seconds'
+        call cpu_time(end)
+        time = end - start
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',time,' seconds'
         call ERI_integral_toroidal_2D(n_atoms,geometry,atoms)
         call system("rm torus_parameters.inp")
       end if 
@@ -256,25 +243,15 @@ program CI
 
       call read_integrals(nBas,S,T,V,Hc,ERI)
 
-!      call split_matrix(nBas,S)
-!      call split_matrix(nBas,T)
-!      call split_matrix(nBas,V)
-!      call split_matrix(nBas,HC)
-!      call split_matrix_ERI(nBas,ERI)
-
-!      call read_overlap_T(nBas,S_T)
-
-!      call check_symmetric_matrix(nBas,S,T,V,HC)
-
       !------------------------------------------------------!
       !                                  (-1/2)         t    !
       !  orthogonalization and get  X = S       =  U s U     !
       !                                                      !
       !------------------------------------------------------!
 
-      CALL HEADER ('The Overlap Matrix',-1)
+!      CALL HEADER ('The Overlap Matrix',-1)
 
-      call matout(nBas,nBas,S)
+!      call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
        
@@ -283,23 +260,73 @@ program CI
       !                           HF code start                          !
       !                                                                  !
       ! ---------------------------------------------------------------- ! 
+ 
+      if (calculation_type == "Tori2D") E_nuc = 0.d0 
+      call cpu_time(start)
+      call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+      call cpu_time(end)
 
-      if (calculation_type == "SAO") then 
-      call cpu_time(start_HF)
-        call RHF_SAO(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
-      call cpu_time(end_HF)
-      else 
-        if (calculation_type == "Tori2D") E_nuc = 0.d0 
-        call cpu_time(start_HF)
-        call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
-      call cpu_time(end_HF)
-      end if 
-      t_HF = end_HF - start_HF
-      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',t_HF,' seconds'
+      time = end - start
+      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',time,' seconds'
       write(outfile,*)
 
+      ! ---------------------------------------------------------------- !
+      !                                                                  !
+      !                          MP2 code start                          !
+      !                                                                  !
+      ! ---------------------------------------------------------------- ! 
+
+      ! ---------------------------------------------------------------- !
+      !                                                                  !
+      !                     ERI transfer from AO to MO                   !
+      !                                                                  !
+      ! ---------------------------------------------------------------- !
+
+      if (calculation_type /= "Tori2D") then 
+!        allocate(ERI_MO(nBas,nBas,nBas,nBas))
+!        call cpu_time(start_HF)
+!        call AO_to_MO_ERI_corelated(nBas,c,ERI,ERI_MO)
+!        call cpu_time(end_HF)
+!        t_HF = end_HF - start_HF
+!        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',t_HF,' seconds'
+!        write(outfile,*)
+      
+
+      ! ---------------------------------------------------------------- !
+      !                                                                  !
+      !                       Compute MP2 Energy                         !
+      !                                                                  !
+      ! ---------------------------------------------------------------- !
+
+
+!        nV = nBas - nO
+!
+!        call cpu_time(start_HF)
+!        call MP2(nBas,nO,nV,e,ERI_MO,E_Nuc,EHF)
+!        call cpu_time(end_HF)
+!        t_HF = end_HF - start_HF
+!        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for MP2 = ',t_HF,' seconds'
+!        write(outfile,*)
+
+
+      ! ---------------------------------------------------------------- !
+      !                                                                  !
+      !                       Compute CCD Energy                         !
+      !                                                                  !
+      ! ---------------------------------------------------------------- !
+
+
+!        call cpu_time(start_HF)
+!        call CCD(nBas,nO,nV,E_Nuc,EHF,e,ERI_MO)
+!        call cpu_time(end_HF)
+!        t_HF = end_HF - start_HF
+!        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for CCD = ',t_HF,' seconds'
+!        write(outfile,*)
+
+      end if 
+
+
       if (calculation_type == "Tori2D") then
-        
         
       !-----------------------------------------------------------------!
       ! AO to MO transformation
@@ -308,20 +335,18 @@ program CI
         allocate(ERI_MO(nBas,nBas,nBas,nBas))
         allocate(Hc_MO(nBas,nBas))
 
-        call cpu_time(start_HF)
+        call cpu_time(start)
         call AO_to_MO_HC (nBas,c,HC,HC_MO)
         call AO_to_MO_ERI(nBas,c,ERI,ERI_MO)
-        call cpu_time(end_HF)
+        call cpu_time(end)
     
-        t_HF = end_HF - start_HF
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',t_HF,' seconds'
+        time = end - start
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',time,' seconds'
         write(outfile,*)
     
-
       !-----------------------------------------------------------------!
       ! FCI Energy calculation
       !-----------------------------------------------------------------!
-
 
       call FCI(Hc_MO,ERI_MO,nBAS)
         

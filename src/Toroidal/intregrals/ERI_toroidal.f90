@@ -10,8 +10,8 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
 
       !-----------------------------------------------------------------!
 
-      integer                        :: i , j , k , l , num_int , num_total_int , p ,q 
-      integer                        :: actual_total_int
+      integer                        :: i , j , k , l , num_int , num_total_int !, p ,q 
+      !integer                        :: actual_total_int
       integer                        :: number_of_atoms
       type(atom)                     :: atoms(number_of_atoms)
       type(ERI_function),allocatable :: ERI  (:)
@@ -55,7 +55,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
         index_sym = index_sym + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
       end do 
 
-      ! 4-fold symmetry implementation (k,l permutation only)
+      ! 2-fold symmetry implementation (k,l permutation only)
 
       !$omp parallel
       if (omp_get_thread_num() == 0) then
@@ -68,86 +68,84 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
       num_int = 0
       num_total_int = number_of_functions_per_unitcell * (number_of_functions) * (number_of_functions) * (number_of_functions+1) / 2 
 
-!      !$omp parallel do collapse(2) private(j,l, value) shared(two_electron, ERI,num_int) !schedule(dynamic,16)
-!
-!             do i = 1, number_of_functions
-!               do j = i, number_of_functions
-!                   do k = 1, number_of_functions
-!                       do l = k, number_of_functions
-!                        
-!                        call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
-!                          
-!                          !$omp atomic
-!                          num_int = num_int + 1
-!                          two_electron(i,j,k,l) = value
-!                          two_electron(i,j,l,k) = value
-!                          two_electron(j,i,l,k) = value
-!                          two_electron(j,i,k,l) = value
-!
-!                          !$omp critical
-!                          call progress_bar(num_int,num_total_int)
-!                          !$omp end critical
-!
-!                      end do
-!                  end do
-!              end do
-!            end do
-!
-!      !$omp end parallel do
+      !$omp parallel do collapse(3) private(j,l, value) shared(two_electron, ERI,num_int) schedule(dynamic,16)
+
+             do i = 1, number_of_functions_per_unitcell
+               do j = 1, number_of_functions
+                   do k = 1, number_of_functions
+                       do l = k, number_of_functions
+                        
+                        call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
+                          
+                          !$omp atomic
+                          num_int = num_int + 1
+                          two_electron(i,j,k,l) = value
+                          two_electron(i,j,l,k) = value
+
+                          !$omp critical
+                          call progress_bar(num_int,num_total_int)
+                          !$omp end critical
+
+                      end do
+                  end do
+              end do
+            end do
+
+      !$omp end parallel do
 
 
       ! 8-fold symmetry implementation ((i,j),(k,l) permutation only)
 
-      actual_total_int = 0 
-
-      do i = 1, number_of_functions
-        do j = 1, i
-            do k = 1, number_of_functions
-                do l = 1, k
-                    p = i*(i-1)/2 + j
-                    q = k*(k-1)/2 + l
-                    if (p >= q) actual_total_int = actual_total_int + 1
-                end do
-            end do
-        end do
-      end do
-
-      write(*,*) 'Will compute ', actual_total_int, ' unique integrals'
-
-!$omp parallel do private(j,k,l,value,p,q) shared(two_electron,ERI)
-      do i = 1, number_of_functions
-        do j = 1, i
-            do k = 1, number_of_functions
-                do l = 1, k
-                    p = i*(i-1)/2 + j
-                    q = k*(k-1)/2 + l
-
-                    if (p >= q) then
-                        call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
-
-                        ! Store only in the canonical position
-                        !$omp atomic
-                        num_int = num_int + 1
-                        two_electron(i,j,k,l) = value
-                        two_electron(j,i,k,l) = value
-                        two_electron(i,j,l,k) = value     
-                        two_electron(j,i,l,k) = value
-                        two_electron(k,l,i,j) = value     
-                        two_electron(l,k,i,j) = value
-                        two_electron(k,l,j,i) = value
-                        two_electron(l,k,j,i) = value
-
-                        !$omp critical
-                          call progress_bar(num_int,actual_total_int)
-                        !$omp end critical
-
-                    end if
-                end do
-            end do
-        end do
-      end do
-!$omp end parallel do
-
+!      actual_total_int = 0 
+!
+!      do i = 1, number_of_functions
+!        do j = 1, i
+!            do k = 1, number_of_functions
+!                do l = 1, k
+!                    p = i*(i-1)/2 + j
+!                    q = k*(k-1)/2 + l
+!                    if (p >= q) actual_total_int = actual_total_int + 1
+!                end do
+!            end do
+!        end do
+!      end do
+!
+!      write(*,*) 'Will compute ', actual_total_int, ' unique integrals'
+!
+!!$omp parallel do private(j,k,l,value,p,q) shared(two_electron,ERI)
+!      do i = 1, number_of_functions
+!        do j = 1, i
+!            do k = 1, number_of_functions
+!                do l = 1, k
+!                    p = i*(i-1)/2 + j
+!                    q = k*(k-1)/2 + l
+!
+!                    if (p >= q) then
+!                        call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
+!
+!                        ! Store only in the canonical position
+!                        !$omp atomic
+!                        num_int = num_int + 1
+!                        two_electron(i,j,k,l) = value
+!                        two_electron(j,i,k,l) = value
+!                        two_electron(i,j,l,k) = value     
+!                        two_electron(j,i,l,k) = value
+!                        two_electron(k,l,i,j) = value     
+!                        two_electron(l,k,i,j) = value
+!                        two_electron(k,l,j,i) = value
+!                        two_electron(l,k,j,i) = value
+!
+!                        !$omp critical
+!                          call progress_bar(num_int,actual_total_int)
+!                        !$omp end critical
+!
+!                    end if
+!                end do
+!            end do
+!        end do
+!      end do
+!!$omp end parallel do
+!
 
       end_time = omp_get_wtime()
 
@@ -168,15 +166,15 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      !call shift_integrals(two_electron,two_eri,number_of_functions,number_of_functions_per_unitcell)
+      call shift_integrals(two_electron,two_eri,number_of_functions,number_of_functions_per_unitcell)
 
       open(1,file="./tmp/ERI.dat")
         do i = 1, number_of_functions
           do j = 1 , number_of_functions
             do k = 1 , number_of_functions
               do l = 1 , number_of_functions
-                !if (abs(two_eri(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_eri(i,j,k,l)                   
-                if (abs(two_electron(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_electron(i,j,k,l)
+                if (abs(two_eri(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_eri(i,j,k,l)                   
+                !if (abs(two_electron(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_electron(i,j,k,l)
               end do 
             end do 
           end do 

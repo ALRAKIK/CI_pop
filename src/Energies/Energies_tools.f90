@@ -173,8 +173,8 @@ subroutine get_X_from_overlap(N,over,X)
 
       ! --------------------------------------------------------------- !
 
-      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
-      call matout(N,N,Xt)
+!      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
+!      call matout(N,N,Xt)
 
       ! --------------------------------------------------------------- !
   

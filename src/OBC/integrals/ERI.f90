@@ -46,23 +46,6 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
 
       start_time = omp_get_wtime()
 
-
-      
-
-      !open(1,file="./tmp/ERI.dat")
-
-      
-!      do i = 1, number_of_functions
-!        do j = 1 , number_of_functions
-!          do k = 1 , number_of_functions
-!            do l = 1 , number_of_functions
-!              call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l),value)
-!              if (abs(value) > 1e-10 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , value 
-!            end do 
-!          end do 
-!        end do 
-!      end do 
-
       ! 8-fold symmetry implementation ((i,j),(k,l) permutation only)
 
       actual_total_int = 0 
@@ -118,7 +101,7 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
       end_time = omp_get_wtime()
 
       write(outfile,"(a)") ""
-      write(outfile,"(a)") "Translation symmetry applied to integrals"
+      write(outfile,"(a)") " (8-fold) symmetry applied to integrals"
       write(outfile,"(a)") "" 
 
       t = int(end_time - start_time)
@@ -141,8 +124,6 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
           end do 
         end do 
       close(1)
-
-      !close(1)
 
       deallocate(ERI)
 

@@ -126,7 +126,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
       open(1,file="./tmp/OV.dat")
         do i = 1 , size(overlap,1)
           do j = i , size(overlap,1)
-            write(1,'(I5,I5,f16.8)') i , j , overlap(i,j)
+            if (abs(overlap(i,j)) > 1e-8 ) write(1,'(I5,I5,f16.8)') i , j , overlap(i,j)
           end do 
         end do 
       close(1)
