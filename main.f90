@@ -41,13 +41,16 @@ program CI
       double precision                :: start,end,time
 
       character(len=10)               :: calculation_type 
+      character(len=100)              :: output_file_name
+
+      logical                         :: check_read
 
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
       !-----------------------------------------------------------------!    
 
-      call build_super_molecule()
+      call build_super_molecule(check_read)
 
       call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type)
 
@@ -72,7 +75,9 @@ program CI
         call basis(n_atoms,charge,atoms)
       end if 
 
-      open (outfile,file="results.out")
+      write(output_file_name,'(A,A,A,I0,A)') "results_",trim(calculation_type),"_",n_atoms,".out"
+
+      open (outfile,file=trim(output_file_name))
 
       CALL HEADER ('The Geometry',-1)
 
@@ -127,19 +132,26 @@ program CI
       !               ---------------------------------                 !
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      select case (trim(calculation_type))
-        case ("OBC", "Ring", "OBC2D")
-          call molecule(n_atoms,number_of_functions,atoms,AO,geometry)   ! Molecule 
-        case ("Torus")
-          call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)  ! Torus with PBC 
-        case ("Tori")
-          call Tori(n_atoms,number_of_functions,atoms,AO,geometry)       ! Toroidal 1D Gaussian TRR
-        case ("Tori2D")
-          call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 2D Gaussian
-        case default
-          write(outfile,'(A)') 'Unknown calculation type: ', trim(calculation_type)
-          stop
-      end select
+      if (.not. check_read) then
+        write(outfile,'(A)') 'The integrals will be calculated'
+        select case (trim(calculation_type))
+          case ("OBC", "Ring", "OBC2D")
+            call molecule(n_atoms,geometry,atoms)                          ! Molecule 
+          case ("Torus")
+            call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)  ! Torus with PBC 
+          case ("Tori")
+            call Tori(n_atoms,number_of_functions,atoms,AO,geometry)       ! Toroidal 1D Gaussian TRR
+          case ("Tori2D")
+            call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 2D Gaussian
+          case default
+            write(outfile,'(A)') 'Unknown calculation type: ', trim(calculation_type)
+            stop
+        end select
+      else
+        write(outfile,'(A)') 'The integrals will be read from file'
+      end if
+
+      
       
 !     -------------------------------------------------------------------     !
 !                        Nuclear repulsion energy  
@@ -158,7 +170,11 @@ program CI
 
       nO = n_electron/2 
 
-      call read_integrals(nBas,S,T,V,Hc,ERI)
+      if (check_read) then 
+        call read_integrals_from_file(nBas,S,T,V,Hc,ERI)
+      else 
+        call read_integrals(nBas,S,T,V,Hc,ERI)
+      end if 
 
       !------------------------------------------------------!
       !                                  (-1/2)         t    !
@@ -179,12 +195,14 @@ program CI
       ! ---------------------------------------------------------------- ! 
  
       if (calculation_type == "Tori2D") E_nuc = 0.d0 
-      call cpu_time(start)
-      call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
-      call cpu_time(end)
+      
+        call cpu_time(start)
+        call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+        call cpu_time(end)
 
-      time = end - start
-      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',time,' seconds'
+        time = end - start
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',time,' seconds'
+
       write(outfile,*)
 
       !-----------------------------------------------------------------!
@@ -220,6 +238,8 @@ program CI
       ! ---------------------------------------------------------------- !
 
       close(outfile)
+
+      call system("rm torus_parameters.inp")
 
 
 end program CI 

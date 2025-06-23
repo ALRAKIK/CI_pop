@@ -21,7 +21,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       ! Local variables
   
       integer,parameter             :: maxSCF = 100
-      double precision,parameter    :: thresh = 1d-5
+      double precision,parameter    :: thresh = 1d-10
       integer                       :: nSCF
       double precision              :: Conv
       double precision              :: Gap
@@ -36,7 +36,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,external     :: trace_matrix
 !      double precision              :: a = 1.75d0 
 
-      integer                       :: max_diis = 5
+      integer                       :: max_diis = 0
       integer                       :: n_diis
       integer                       :: i  , o
       integer                       :: mu , nu 

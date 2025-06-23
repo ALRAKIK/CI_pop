@@ -67,10 +67,9 @@ subroutine read_integrals(nBas,S,T,V,Hc,G)
       11 close(unit=11)
 
 
-end subroutine
+end subroutine read_integrals
 
-
-subroutine read_overlap_T(nBas,S)
+subroutine read_integrals_from_file(nBas,S,T,V,Hc,G)
 
       ! Read one- and two-electron integrals from files
 
@@ -82,12 +81,19 @@ subroutine read_overlap_T(nBas,S)
 
       ! Local variables
 
-      integer                       :: mu,nu
-      double precision              :: Ov
+      integer                       :: mu,nu,la,si
+      double precision              :: Ov,Kin,Nuc,ERI
 
       double precision,intent(out)  :: S(nBas,nBas)
-      
-      open( 8,file='./tmp/OV_tor.dat' )
+      double precision,intent(out)  :: T(nBas,nBas)
+      double precision,intent(out)  :: V(nBas,nBas)
+      double precision,intent(out)  :: Hc(nBas,nBas)
+      double precision,intent(out)  :: G(nBas,nBas,nBas,nBas)
+
+      open( 8,file='./Read/OV.dat' )
+      open( 9,file='./Read/KI.dat' )
+      open(10,file='./Read/NA.dat' )
+      open(11,file='./Read/ERI.dat')
 
       S(:,:) = 0d0
       do 
@@ -97,7 +103,42 @@ subroutine read_overlap_T(nBas,S)
       enddo
       8 close(8)
 
-end subroutine
+      ! Read kinetic integrals
+
+      T(:,:) = 0d0
+      do 
+        read(9,*,end=9) mu,nu,Kin
+        T(mu,nu) = Kin
+        T(nu,mu) = Kin
+      enddo
+      9 close(9)
+
+      ! Read nuclear integrals
+
+      V(:,:) = 0d0
+      do 
+        read(10,*,end=10) mu,nu,Nuc
+        V(mu,nu) = Nuc
+        V(nu,mu) = Nuc
+      enddo
+      10 close(unit=10)
+
+      ! Define core Hamiltonian
+
+      Hc(:,:) = T(:,:) + V(:,:)
+
+      ! Read ERI integrals
+
+      G(:,:,:,:) = 0.d0
+
+      do 
+      read(11,*,end=11) mu,nu,la,si,ERI
+        G(mu, nu, la, si) = ERI
+      enddo
+      11 close(unit=11)
+
+
+end subroutine read_integrals_from_file
 
 !------------------------------------------------------------------------!
 subroutine get_X_from_overlap(N,over,X)
@@ -341,59 +382,4 @@ function trace_matrix(n,A) result(Tr)
   
 end function trace_matrix
 !------------------------------------------------------------------------
-subroutine sort_matrix_diagonal(n,matrix)
 
-      implicit none 
-
-      integer, intent(in) :: n
-      double precision,intent(inout)  :: matrix(n,n)
-      integer :: i, j
-      double precision       :: diag_elements(n)
-      
-
-      double precision :: temp
-  
-
-      do i = 1, n
-        diag_elements(i) = matrix(i,i)
-      end do
- 
-
-      do i = 1, n-1
-          do j = 1, n-i
-              if (diag_elements(j) > diag_elements(j+1)) then
-                  temp = diag_elements(j)
-                  diag_elements(j) = diag_elements(j+1)
-                  diag_elements(j+1) = temp
-              end if
-          end do
-      end do
-
-      matrix (:,:) = 0.d0 
-      
-      do i = 1, n
-        matrix(i,i) = diag_elements(i)
-      end do
-
-end subroutine sort_matrix_diagonal
-
-
-
-subroutine split_matrix(nBas, matrix)
-
-      implicit none
-
-      integer, intent(in)             :: nBas
-      double precision, intent(inout) :: matrix(nBas,nBas)
-      integer                         :: i , j 
-        
-      do i = 1 , nbas 
-        do j = 4,nbas,5
-          if (.not. (i == 4 .or. i == 9 .or. i ==14 .or. i ==19 .or. i ==24 .or. i ==29 .or. i ==34 .or. i ==39 .or. i == 44 .or. i == 49 )) then 
-            matrix(i,j) = 0.d0 
-            matrix(j,i) = 0.d0 
-          end if 
-        end do 
-      end do 
-    
-end subroutine split_matrix

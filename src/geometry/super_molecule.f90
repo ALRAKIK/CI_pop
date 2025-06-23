@@ -1,4 +1,4 @@
-subroutine build_super_molecule()
+subroutine build_super_molecule(check_read)
 
       implicit none 
       
@@ -12,7 +12,7 @@ subroutine build_super_molecule()
       double precision,allocatable   :: super_geometry(:,:)
       character(len=2),allocatable   :: super_atoms(:)
       character(len=100)             :: line
-      logical                        :: reading_cell 
+      logical                        :: reading_cell  , check_read
       character(len=10)              :: type_of_calculation
       double precision               :: rx , theta 
       double precision,parameter     :: pi     = 3.14159265358979323846D00
@@ -53,6 +53,11 @@ subroutine build_super_molecule()
           reading_cell = .true.
           exit
         end if
+
+        if (trim(line) == 'Read') then
+          check_read = .true.
+        end if
+
       end do
 
       max_atoms = 100
@@ -79,6 +84,7 @@ subroutine build_super_molecule()
         print *, 'Error parsing atom data:', trim(line)
         num_atoms = num_atoms - 1
         end if
+
       end do
 
       close(1)
@@ -112,10 +118,10 @@ subroutine build_super_molecule()
       end do
 
       open(2,file="supermolecule.mol")
-      do i = 1, num_atoms * number_of_unitcell
-        write(2, '(A2,4x,3(F0.8,4x))') super_atoms(i), super_geometry(i, 1), &
-                                 super_geometry(i, 2), super_geometry(i, 3)
-      end do
+        do i = 1, num_atoms * number_of_unitcell
+          write(2, '(A2,4x,3(F0.16,4x))') super_atoms(i), super_geometry(i, 1), &
+                                   super_geometry(i, 2), super_geometry(i, 3)
+        end do
       close(2)
 
       open(3,file="torus_parameters.inp")
@@ -126,31 +132,31 @@ subroutine build_super_molecule()
 
       if (type_of_calculation == "Ring") then 
 
-      atom_index = 0
-      rx         = L / (2.d0*pi) 
+        atom_index = 0
+        rx         = L / (2.d0*pi) 
 
-      do i = 0, number_of_unitcell-1
-        do j = 1, num_atoms
-            atom_index = atom_index + 1
-            super_atoms(atom_index) = a_names(j)
-            theta = (i * distance_between_unitcells + unitcell(j, 1) )* 2.d0*pi / (number_of_unitcell * distance_between_unitcells)
-            super_geometry(atom_index, 1) = rx * cos(theta)
-            super_geometry(atom_index, 2) = rx * sin(theta)
-            super_geometry(atom_index, 3) = 0.d0
+        do i = 0, number_of_unitcell-1
+          do j = 1, num_atoms
+              atom_index = atom_index + 1
+              super_atoms(atom_index) = a_names(j)
+              theta = (i * distance_between_unitcells + unitcell(j, 1) )* 2.d0*pi / (number_of_unitcell * distance_between_unitcells)
+              super_geometry(atom_index, 1) = rx * cos(theta)
+              super_geometry(atom_index, 2) = rx * sin(theta)
+              super_geometry(atom_index, 3) = 0.d0
+          end do
         end do
-      end do
 
-      open(2,file="supermolecule.mol")
-      do i = 1, num_atoms * number_of_unitcell
-        write(2, '(A2,4x,3(F16.8,4x))') super_atoms(i), super_geometry(i, 1), &
-                                 super_geometry(i, 2), super_geometry(i, 3)
-      end do
-      close(2)
+        open(2,file="supermolecule.mol")
+          do i = 1, num_atoms * number_of_unitcell
+            write(2, '(A2,4x,3(F16.8,4x))') super_atoms(i), super_geometry(i, 1), &
+                                     super_geometry(i, 2), super_geometry(i, 3)
+          end do
+        close(2)
 
-      open(3,file="torus_parameters.inp")
-        write(3,"(f12.8)") L
-        write(3,"(I2)")    num_atoms
-      close(3)
+        open(3,file="torus_parameters.inp")
+          write(3,"(f24.16)") L
+          write(3,"(I2)")    num_atoms
+        close(3)
 
       end if 
 

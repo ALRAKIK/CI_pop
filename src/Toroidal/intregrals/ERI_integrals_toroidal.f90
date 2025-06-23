@@ -110,9 +110,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               call integrate_ERI_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s,der)
 
               value  = value    + const * value_s
-              !value1 = value1   + const * der
 
-              !print*, value , value1 
               
             end do
           end do 
