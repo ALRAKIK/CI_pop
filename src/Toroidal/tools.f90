@@ -38,10 +38,4 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
         rp = 0.5d0 * abs((r1 + r2))
       end if
 
-
-
-
-
-
-
 end subroutine bary_center_toroidal

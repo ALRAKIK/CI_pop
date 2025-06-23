@@ -14,7 +14,7 @@ program CI
 
       integer                         :: i , j
       integer                         :: n_atoms , nBAS
-      integer                         :: nO      , nV   , n_electron 
+      integer                         :: nO      , n_electron 
 
       double precision                :: geometry_tmp(100,3)
       integer                         :: charge_tmp(100)
@@ -127,102 +127,19 @@ program CI
       !               ---------------------------------                 !
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      !-----------------------------------------------------------------!
-      !                    calculate molecule                           !
-      !-----------------------------------------------------------------!
-
-      if (calculation_type == "OBC" .or. calculation_type == "Ring" ) then 
-        call header(" OBC Calculation ",-1)
-        call header_under(" Calculate the integerals ",-1)
-        
-        call cpu_time(start)
-
-        call overlap_matrix             (n_atoms,geometry,atoms)
-        call kinetic_matrix             (n_atoms,geometry,atoms)
-        call nuclear_attraction_matrix  (n_atoms,geometry,atoms)  
-        call ERI_integral               (n_atoms,geometry,atoms)
-
-        call cpu_time(end)
-        
-        time = end - start
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',time,' seconds'
-        write(outfile,*)
-      end if 
-
-      !-----------------------------------------------------------------!
-      !           calculate the with Torus translational symmetry       !
-      !-----------------------------------------------------------------!
-
-
-      if (calculation_type == "Torus") then 
-
-        call header("Torus with PBC",-1)
-        call header_under("Calculate the integerals",-1)
-        call Torus_def()
-        write(outfile,*) ""
-        write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx 
-        write(outfile,*) ""
-        call overlap_matrix_torus(n_atoms,number_of_functions,atoms,AO)
-        call kinetic_matrix_torus(n_atoms,number_of_functions,atoms,AO)
-        call nuclear_attraction_matrix_torus(n_atoms,number_of_functions,geometry,atoms,AO)
-        call ERI_integral_torus(n_atoms,geometry,atoms)
-        write(outfile,*) ""
-        call system("rm torus_parameters.inp")
-      end if 
-
-      !-----------------------------------------------------------------!
-
-      !-----------------------------------------------------------------!
-      !        calculate the with Toroidal translational symmetry       !
-      !-----------------------------------------------------------------!
-
-
-      if (calculation_type == "Tori") then 
-
-        call header("Toroidal Gaussian",-1)
-        call header_under("Calculate the integerals",-1)
-        call Torus_def()
-        write(outfile,*) ""
-        write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx 
-        write(outfile,*) ""
-        call cpu_time(start)
-        call overlap_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
-        call kinetic_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
-        call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
-        call cpu_time(end)
-        time = end - start
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',time,' seconds'
-        call ERI_integral_toroidal(n_atoms,geometry,atoms)
-        call system("rm torus_parameters.inp")
-      end if 
-      
-      !-----------------------------------------------------------------!
-
-      !-----------------------------------------------------------------!
-      !        calculate the with Toroidal translational symmetry       !
-      !-----------------------------------------------------------------!
-
-      if (calculation_type == "Tori2D") then 
-
-        call header("Toroidal  2D Real Gaussian",-1)
-        call header_under("Calculate the integerals",-1)
-        call Torus_def()
-        write(outfile,*) ""
-        write(outfile,'(a,f12.8,a,f12.8,a)') "The length of the box:  Lx , Ly = (", Lx ," , ", Ly , " )"  
-        write(outfile,*) ""
-        call cpu_time(start)
-        call overlap_matrix_toroidal_2D(n_atoms,number_of_functions,atoms,AO)
-        call kinetic_matrix_toroidal_2D(n_atoms,number_of_functions,atoms,AO)
-        !call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
-        call cpu_time(end)
-        time = end - start
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for NA  integrals = ',time,' seconds'
-        call ERI_integral_toroidal_2D(n_atoms,geometry,atoms)
-        call system("rm torus_parameters.inp")
-      end if 
-      
-      !-----------------------------------------------------------------!
-
+      select case (trim(calculation_type))
+        case ("OBC", "Ring", "OBC2D")
+          call molecule(n_atoms,number_of_functions,atoms,AO,geometry)   ! Molecule 
+        case ("Torus")
+          call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)  ! Torus with PBC 
+        case ("Tori")
+          call Tori(n_atoms,number_of_functions,atoms,AO,geometry)       ! Toroidal 1D Gaussian TRR
+        case ("Tori2D")
+          call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 2D Gaussian
+        case default
+          write(outfile,'(A)') 'Unknown calculation type: ', trim(calculation_type)
+          stop
+      end select
       
 !     -------------------------------------------------------------------     !
 !                        Nuclear repulsion energy  
@@ -249,9 +166,9 @@ program CI
       !                                                      !
       !------------------------------------------------------!
 
-!      CALL HEADER ('The Overlap Matrix',-1)
+      !CALL HEADER ('The Overlap Matrix',-1)
 
-!      call matout(nBas,nBas,S)
+      !call matout(nBas,nBas,S)
 
       call get_X_from_overlap(nBAS,S,X)
        
@@ -270,71 +187,18 @@ program CI
       write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',time,' seconds'
       write(outfile,*)
 
-      ! ---------------------------------------------------------------- !
-      !                                                                  !
-      !                          MP2 code start                          !
-      !                                                                  !
-      ! ---------------------------------------------------------------- ! 
-
-      ! ---------------------------------------------------------------- !
-      !                                                                  !
-      !                     ERI transfer from AO to MO                   !
-      !                                                                  !
-      ! ---------------------------------------------------------------- !
-
-      if (calculation_type /= "Tori2D") then 
-!        allocate(ERI_MO(nBas,nBas,nBas,nBas))
-!        call cpu_time(start_HF)
-!        call AO_to_MO_ERI_corelated(nBas,c,ERI,ERI_MO)
-!        call cpu_time(end_HF)
-!        t_HF = end_HF - start_HF
-!        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',t_HF,' seconds'
-!        write(outfile,*)
-      
-
-      ! ---------------------------------------------------------------- !
-      !                                                                  !
-      !                       Compute MP2 Energy                         !
-      !                                                                  !
-      ! ---------------------------------------------------------------- !
+      !-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
 
 
-!        nV = nBas - nO
-!
-!        call cpu_time(start_HF)
-!        call MP2(nBas,nO,nV,e,ERI_MO,E_Nuc,EHF)
-!        call cpu_time(end_HF)
-!        t_HF = end_HF - start_HF
-!        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for MP2 = ',t_HF,' seconds'
-!        write(outfile,*)
+      if (calculation_type == "Tori2D" .or. calculation_type == "OBC2D") then
 
-
-      ! ---------------------------------------------------------------- !
-      !                                                                  !
-      !                       Compute CCD Energy                         !
-      !                                                                  !
-      ! ---------------------------------------------------------------- !
-
-
-!        call cpu_time(start_HF)
-!        call CCD(nBas,nO,nV,E_Nuc,EHF,e,ERI_MO)
-!        call cpu_time(end_HF)
-!        t_HF = end_HF - start_HF
-!        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for CCD = ',t_HF,' seconds'
-!        write(outfile,*)
-
-      end if 
-
-
-      if (calculation_type == "Tori2D") then
-        
       !-----------------------------------------------------------------!
       ! AO to MO transformation
       !-----------------------------------------------------------------!
 
         allocate(ERI_MO(nBas,nBas,nBas,nBas))
         allocate(Hc_MO(nBas,nBas))
-
         call cpu_time(start)
         call AO_to_MO_HC (nBas,c,HC,HC_MO)
         call AO_to_MO_ERI(nBas,c,ERI,ERI_MO)
@@ -348,7 +212,7 @@ program CI
       ! FCI Energy calculation
       !-----------------------------------------------------------------!
 
-      call FCI(Hc_MO,ERI_MO,nBAS)
+      call FCI(Hc_MO,ERI_MO,nBAS,E_nuc)
         
       end if
 

@@ -32,6 +32,8 @@ subroutine build_super_molecule()
         write(*,'(a)') "Type of calculation: Toroidal"
       else if (type_of_calculation == "Tori2D") then 
         write(*,'(a)') "Type of calculation: Toroidal real 2D"
+      else if (type_of_calculation == "OBC2D") then 
+        write(*,'(a)') "Type of calculation: OBC with FCI"
       else 
         write(*,'(a)') "Error: Unknown type of calculation. Please use either 'Torus','Ring','Tori' or 'OBC' ."
         stop
@@ -111,7 +113,7 @@ subroutine build_super_molecule()
 
       open(2,file="supermolecule.mol")
       do i = 1, num_atoms * number_of_unitcell
-        write(2, '(A2,4x,3(F12.8,4x))') super_atoms(i), super_geometry(i, 1), &
+        write(2, '(A2,4x,3(F0.8,4x))') super_atoms(i), super_geometry(i, 1), &
                                  super_geometry(i, 2), super_geometry(i, 3)
       end do
       close(2)
@@ -140,7 +142,7 @@ subroutine build_super_molecule()
 
       open(2,file="supermolecule.mol")
       do i = 1, num_atoms * number_of_unitcell
-        write(2, '(A2,4x,3(F12.8,4x))') super_atoms(i), super_geometry(i, 1), &
+        write(2, '(A2,4x,3(F16.8,4x))') super_atoms(i), super_geometry(i, 1), &
                                  super_geometry(i, 2), super_geometry(i, 3)
       end do
       close(2)

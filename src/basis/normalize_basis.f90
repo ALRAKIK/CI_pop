@@ -241,7 +241,7 @@ subroutine normalize_basis_tor_2D()
           call norm_orb_tor_2D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
           write(2,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            write(2,'(1000f24.16)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           deallocate(exponent,contraction,contractionN)
         end if

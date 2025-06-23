@@ -1,30 +1,30 @@
 subroutine AO_to_MO_ERI(nBas,c,ERI_AO,ERI_MO)
 
-! Expression of bi-electronic integrals in the MO basis set
+      ! Expression of bi-electronic integrals in the MO basis set
 
-  implicit none
-!  include 'parameters.h'
+      implicit none
 
-! Input variables
+      ! Input variables
+      
+      integer,intent(in)            :: nBas
+      double precision,intent(in)   :: c(nBas,nBas)
+      double precision,intent(in)   :: ERI_AO(nBas,nBas,nBas,nBas)
+      
+      ! Local variables
+      
+      integer                       :: mu,nu,la,si
+      integer                       :: p,q,r,s
+      integer                       :: i,j,k,l
+      double precision,allocatable  :: scr(:,:,:,:)
 
-  integer,intent(in)            :: nBas
-  double precision,intent(in)   :: c(nBas,nBas)
-  double precision,intent(in)   :: ERI_AO(nBas,nBas,nBas,nBas)
+      ! Output variables
 
-! Local variables
+      double precision,intent(out)  :: ERI_MO(nBas,nBas,nBas,nBas)
 
-  integer                       :: mu,nu,la,si
-  integer                       :: p,q,r,s
-  integer                       :: i,j,k,l
-  double precision,allocatable  :: scr(:,:,:,:)
+      ! Memory allocation
 
-! Output variables
+      allocate(scr(nBas,nBas,nBas,nBas))
 
-  double precision,intent(out)  :: ERI_MO(nBas,nBas,nBas,nBas)
-
-! Memory allocation
-
-  allocate(scr(nBas,nBas,nBas,nBas))
   
 !--------------------------------------
 ! AO to MO transformation starts here !
@@ -126,30 +126,25 @@ end subroutine AO_to_MO_ERI
 
 subroutine AO_to_MO_HC(nBas,c,HC_AO,HC_MO)
 
-! Expression of bi-electronic integrals in the MO basis set
+      ! Expression of bi-electronic integrals in the MO basis set
 
-  implicit none
-!  include 'parameters.h'
+      implicit none
 
-! Input variables
+      ! Input variables
 
-  integer,intent(in)            :: nBas
-  double precision,intent(in)   :: c(nBas,nBas)
-  double precision,intent(in)   :: HC_AO(nBas,nBas)
+      integer,intent(in)            :: nBas
+      double precision,intent(in)   :: c(nBas,nBas)
+      double precision,intent(in)   :: HC_AO(nBas,nBas)
 
-! Local variables
+      ! Local variables
 
-  integer                       :: mu,nu,la,si
-  integer                       :: p,q,r,s
-  integer                       :: i,j,k,l
+      integer                       :: i,j,k,l
 
-! Output variables
+      ! Output variables
 
-  double precision,intent(out)  :: HC_MO(nBas,nBas)
+      double precision,intent(out)  :: HC_MO(nBas,nBas)
 
-! Memory allocation
-
-  
+      
       !--------------------------------------
       ! AO to MO transformation starts here !
       !--------------------------------------
@@ -166,8 +161,6 @@ subroutine AO_to_MO_HC(nBas,c,HC_AO,HC_MO)
             enddo
          enddo
       enddo
-
-
 
       open(1,file="./tmp/HC_MO.dat")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(HC_MO,1))

@@ -136,12 +136,17 @@ subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 40
+      integer,parameter                  :: Nmax = 50
       
       call dqagi(f_decay, bound, inf, epsabs, epsrel, result,abserr, neval, ier,Limit,Lenw,Last,Iwork,Work)
 
       if (ier /= 0) then
         write(*,'(A,I8,A)') 'Error code = ', ier
+      end if
+
+      if (ier == 1) then
+        write(*,'(A,I8,A)') 'Error code = ', ier
+        stop 'Integration failed'
       end if
 
       contains

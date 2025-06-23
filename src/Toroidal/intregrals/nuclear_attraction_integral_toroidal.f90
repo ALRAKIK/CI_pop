@@ -259,7 +259,7 @@ subroutine nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atom
             yp       = 0.d0
             zp       = 0.d0
 
-            kc       = c1 * c2 * dsqrt(pi) * Lx * dexp(-(alpha+beta)*Lx**2/(2.d0*pi**2)) / (ax**2) 
+            kc       = c1 * c2 * dsqrt(pi) * Lx / (ax*ax) 
 
             if (AO1%orbital == "px" .and. AO2%orbital == "px") then 
             
@@ -483,7 +483,7 @@ subroutine integrate_NA_pp_px_Toroidal(gamma_x,xP,p,xc,xa,xb,result)
         I_0_x = bessi_scaled(0, 2.d0*nu_x/ax**2)
         I_2_x = bessi_scaled(2, 2.d0*nu_x/ax**2)
 
-        fx  = 1.d0/(p+x**2) * dexp(-2.d0*(x**2-nu_x)/ax**2) * ( cos(ax*(xb-xa)) * I_0_x - cos(ax*(2.d0*xD-xa-xb)) *  I_2_x  )
+        fx  = 1.d0/(p+x**2) * dexp(-2.d0*(x**2+p-nu_x)/ax**2) * ( cos(ax*(xb-xa)) * I_0_x - cos(ax*(2.d0*xD-xa-xb)) *  I_2_x  )
 
       end function f_decay
     

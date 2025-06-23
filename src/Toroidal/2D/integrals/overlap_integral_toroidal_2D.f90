@@ -18,7 +18,6 @@ subroutine overlap_integral_ss_toroidal_2D(r1,r2,AO1,AO2,S_ss_normal)
       double precision             :: c1    , c2 
       double precision             :: x1 , x2 , y1 , y2 
       double precision             :: X , Y
-      double precision             :: eta = 1e-9
       double precision             :: const 
       double precision             :: overlap_x , overlap_y
       double precision             :: gamma_x , gamma_y     
@@ -42,15 +41,11 @@ subroutine overlap_integral_ss_toroidal_2D(r1,r2,AO1,AO2,S_ss_normal)
           beta = AO2%exponent(j)
           c2   = AO2%coefficient(j)
 
-              !const       = c1*c2
+              gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
+              gamma_y     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(Y)))
 
-              !const       = sign(dabs(const)**(1.0D0/2.0D0),const)
-
-              gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))+eta
-              gamma_y     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(Y)))+eta 
-
-              I_0_gamma_x = bessi_scaled(0,2.d0*gamma_x/(ax**2))
-              I_0_gamma_y = bessi_scaled(0,2.d0*gamma_y/(ay**2))
+              I_0_gamma_x = bessi_scaled(0,2.d0*gamma_x/(ax*ax))
+              I_0_gamma_y = bessi_scaled(0,2.d0*gamma_y/(ay*ay))
 
               overlap_x   =  Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x
               overlap_y   =  Ly * exp(-2.d0*(alpha+beta-gamma_y)/ay**2) * I_0_gamma_y
