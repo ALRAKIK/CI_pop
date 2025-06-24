@@ -119,7 +119,7 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
       open(1,file="./tmp/NA.dat")
         do i = 1 , size(NA,1)
           do j = i , size(NA,1)
-            if (abs(NA(i,j)) > 1e-8 ) write(1,'(I5,I5,f16.8)') i , j ,  NA(i,j)
+            if (abs(NA(i,j)) > 1e-8 ) write(1,'(I5,I5,f24.16)') i , j ,  NA(i,j)
           end do 
         end do 
       close(1)

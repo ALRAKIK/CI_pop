@@ -118,7 +118,7 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
       open(1,file="./tmp/KI.dat")
       do i = 1 , size(kinetic,1)
         do j = i , size(kinetic,1)
-          if (abs(kinetic(i,j)) > 1e-8 ) write(1,'(I5,I5,f16.8)') i, j , kinetic(i,j)
+          if (abs(kinetic(i,j)) > 1e-8 ) write(1,'(I5,I5,f24.16)') i, j , kinetic(i,j)
         end do 
       end do 
       close(1)

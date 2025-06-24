@@ -21,7 +21,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       ! Local variables
   
       integer,parameter             :: maxSCF = 100
-      double precision,parameter    :: thresh = 1d-10
+      double precision,parameter    :: thresh = 1d-5
       integer                       :: nSCF
       double precision              :: Conv
       double precision              :: Gap

@@ -18,7 +18,6 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       double precision             :: c1    , c2 
       double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
       double precision             :: X , Y , Z
-      double precision             :: eta = 1e-9
       double precision             :: const 
       double precision             :: overlap_x , overlap_y , overlap_z 
       double precision             :: gamma_x    
@@ -47,7 +46,7 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
               const       = c1*c2
               const       = sign(dabs(const)**(1.0D0/3.0D0),const)
 
-              gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))+eta
+              gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
 
 
               I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))

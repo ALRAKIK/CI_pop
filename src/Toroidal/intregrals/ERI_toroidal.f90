@@ -173,7 +173,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
           do j = 1 , number_of_functions
             do k = 1 , number_of_functions
               do l = 1 , number_of_functions
-                if (abs(two_eri(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_eri(i,j,k,l)                   
+                if (abs(two_eri(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f24.16)") i , j , k , l , two_eri(i,j,k,l)                   
                 !if (abs(two_electron(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_electron(i,j,k,l)
               end do 
             end do 
