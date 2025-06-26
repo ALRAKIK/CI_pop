@@ -89,7 +89,8 @@ subroutine overlap_matrix_toroidal_2D(number_of_atoms,number_of_functions,atoms,
       open(1,file="./tmp/OV.dat")
         do i = 1 , size(overlap,1)
           do j = i , size(overlap,1)
-            write(1,'(I5,I5,f16.8)') i , j , overlap(i,j)
+            !write(1,'(I5,I5,f24.16)') i , j , overlap(i,j)
+            write(1,*) i , j , overlap(i,j)
           end do 
         end do 
       close(1)

@@ -26,15 +26,15 @@ subroutine FCI(Hc,ERI,nbas,E_nuc)
 
       call header("FCI Calculation",-1)
 
-      write(outfile,'(a,f16.10,f16.10)') "EPS             :" , e1 , e2
+      write(outfile,'(a,E16.10,4x,E16.10)') "EPS              " , e1 , e2
       write(outfile,*) "" 
-      write(outfile,'(a,f16.10)')        "EHF             :" , ehf + E_nuc
+      write(outfile,'(a,E16.10)')        "EHF              " , ehf + E_nuc
       write(outfile,*) ""
-      write(outfile,'(a,f16.10)')        "EFCI(Ground)    :" , efci + E_nuc
+      write(outfile,'(a,E16.10)')        "EFCI(Ground)     " , efci + E_nuc
       write(outfile,*) ""
-      write(outfile,'(a,f16.10)')        "E_corr          :" , delta - dsqrt(delta*delta+ERI(1,2,1,2)*ERI(1,2,1,2))
+      write(outfile,'(a,E16.10)')        "E_corr           " , delta - dsqrt(delta*delta+ERI(1,2,1,2)*ERI(1,2,1,2))
       write(outfile,*) ""
-      write(outfile,'(a,f16.10)')        "EFCI(Triplet)   :" , etrip + E_nuc
+      write(outfile,'(a,E16.10)')        "EFCI(Triplet)    " , etrip + E_nuc
       write(outfile,*) ""
 
 
