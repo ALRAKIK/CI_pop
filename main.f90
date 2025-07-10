@@ -13,7 +13,7 @@ program CI
       !-----------------------------------------------------------------!
 
 
-      integer                         :: i , j , k , l 
+      integer                         :: i , j
       integer                         :: n_atoms , nBAS
       integer                         :: nO      , n_electron 
 
@@ -244,6 +244,10 @@ program CI
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',time,' seconds'
 
       write(outfile,*)
+      
+      call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
+      call system("rm -r " // trim(tmp_file_name))
+      
 
       !-----------------------------------------------------------------!
       !-----------------------------------------------------------------!

@@ -8,6 +8,7 @@ module files
       integer            :: tmpfile     = 1103
       integer(trexio_t)  :: trexio_file
       character(len=100) :: tmp_file_name
+      character(len=100) :: output_file_name
 
 
 end module files 

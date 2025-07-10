@@ -14,7 +14,6 @@ subroutine initialize_ff(calculation_type,n_atoms)
       ! local ! 
 
       character(len=100)                :: command
-      character(len=100)                :: output_file_name
 
       ! --------------------------------------------------------------- !
 

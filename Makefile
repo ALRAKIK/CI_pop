@@ -16,6 +16,10 @@ LIBS   = src/lib/libquadpack.a -lblas -llapack \
         -L/usr/local/lib -ltrexio	\
 				-lm -fopenmp
 
+LIBS_CLUSTER   = -fopenmp src/lib/libquadpack.a   /nfs/home/aalrakik/gsl/lib64/libgsl.a  src/lib/liblapack.a src/lib/librefblas.a -ltrexio
+
+FFLAGS_CLUSTER = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -march=native  -lblas -g -fbacktrace  -fcheck=all -fimplicit-none  -lgsl -lgslcblas -lm -ffree-line-length-none  -fopenmp
+
 # Find all module files
 MODULE_SRC = $(wildcard $(MODULE_DIR)/*.f90)
 MODULE_OBJ = $(patsubst $(SDIR)/%.f90,$(ODIR)/%.o,$(MODULE_SRC))
