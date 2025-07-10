@@ -16,11 +16,10 @@ module torus_init
         double precision,parameter   :: pi = 3.14159265358979323846D00
 
         open(50,file="torus_parameters.inp")
-          read(50,"(f24.16)") Lx 
-          read(50,"(I2)")    number_of_atom_in_unitcell
+          read(50,*) Lx 
+          read(50,*)    number_of_atom_in_unitcell
         close(50)
-
-
+        
         Torus = .TRUE. 
 
         Ly = Lx ; Lz = Lx 

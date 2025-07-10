@@ -1,5 +1,6 @@
 subroutine normalize_basis()
 
+      use files 
       implicit none 
 
       ! input ! 
@@ -14,8 +15,10 @@ subroutine normalize_basis()
 
       double precision,allocatable  :: exponent(:) , contraction(:,:) , contractionN(:,:) 
 
-      open(1,file="./tmp/Basis_scratch")
-      open(2,file="./tmp/Basis_normalized")
+      !open(1,file="./tmp/Basis_scratch")
+      !open(2,file="./tmp/Basis_normalized")
+      open(1,file=trim(tmp_file_name)//"/Basis_scratch")
+      open(2,file=trim(tmp_file_name)//"/Basis_normalized")
 
       do
       
@@ -116,6 +119,7 @@ end subroutine
 
 subroutine normalize_basis_tor()
 
+      use files 
       implicit none 
 
       ! input ! 
@@ -136,9 +140,13 @@ subroutine normalize_basis_tor()
 
       Ly = Lx ; Lz = Lx 
 
-      open(1,file="./tmp/Basis_scratch")
-      open(2,file="./tmp/Basis_normalized")
-      open(3,file="./tmp/Basis_normalized_p")
+      !open(1,file="./tmp/Basis_scratch")
+      !open(2,file="./tmp/Basis_normalized")
+      !open(3,file="./tmp/Basis_normalized_p")
+      
+      open(1,file=trim(tmp_file_name)//"/Basis_scratch")
+      open(2,file=trim(tmp_file_name)//"/Basis_normalized")
+      open(3,file=trim(tmp_file_name)//"/Basis_normalized_p")
 
 
 

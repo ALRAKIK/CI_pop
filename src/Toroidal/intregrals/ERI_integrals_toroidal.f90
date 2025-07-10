@@ -37,6 +37,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
       double precision                :: nu_x, nu_y , nu_z
       double precision                :: mu  , nu 
       double precision                :: xpA , xpB , xqC , xqD , phi 
+      double precision                :: test 
       integer                         :: pattern_id, encode_orbital_pattern
 
 
@@ -99,6 +100,10 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx 
 
+              test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
+
+              if (test < 1e-12) cycle
+
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
               xqC     = ax*(xq - xc)
@@ -106,7 +111,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               phi     = ax*(xp - xq)
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
-              
+
               call integrate_ERI_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s,der)
 
               value  = value    + const * value_s
@@ -154,7 +159,8 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 150 
+      integer,parameter                  :: Nmax = 150
+      integer                            :: current_max
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi
       
@@ -195,10 +201,10 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       double precision                     :: const 
       double precision                     :: tol  = 1D-12
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
-      integer                              :: n 
-      COMPLEX(KIND=KIND(1.0D0))            :: termAn ,termBn
-      double precision                     :: termC
-      COMPLEX(KIND=KIND(1.0D0))            :: term1 , term2 
+      integer                              :: n  
+      COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
+      double precision                     :: termC 
+      COMPLEX(KIND=KIND(1.0D0))            :: term1  , term2 
 
 
 
@@ -227,6 +233,9 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
           if (abs(term2) < tol) exit
           sum = sum + real(term1+term2) * const
         end do
+
+
+
         
         case (0001) ! | s   s   s   px   ( 2 ) 
         n         = 0

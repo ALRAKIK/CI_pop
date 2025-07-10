@@ -2,6 +2,7 @@ subroutine read_integrals(nBas,S,T,V,Hc,G)
 
       ! Read one- and two-electron integrals from files
 
+      use files
       implicit none
 
       ! Input variables
@@ -19,10 +20,16 @@ subroutine read_integrals(nBas,S,T,V,Hc,G)
       double precision,intent(out)  :: Hc(nBas,nBas)
       double precision,intent(out)  :: G(nBas,nBas,nBas,nBas)
 
-      open( 8,file='./tmp/OV.dat' )
-      open( 9,file='./tmp/KI.dat' )
-      open(10,file='./tmp/NA.dat' )
-      open(11,file='./tmp/ERI.dat')
+      !open( 8,file='./tmp/OV.dat' )
+      !open( 9,file='./tmp/KI.dat' )
+      !open(10,file='./tmp/NA.dat' )
+      !open(11,file='./tmp/ERI.dat')
+
+      open( 8,file=trim(tmp_file_name)// "/OV.dat" )
+      open( 9,file=trim(tmp_file_name)// "/KI.dat" )
+      open(10,file=trim(tmp_file_name)// "/NA.dat" )
+      open(11,file=trim(tmp_file_name)// "/ERI.dat")
+
 
       S(:,:) = 0d0
       do 
@@ -163,6 +170,7 @@ subroutine get_X_from_overlap(N,over,X)
       ! output !
 
       double precision, intent(out) :: X(N,N)
+      
 
       Evec(:,:) = over(:,:)
 
@@ -191,7 +199,126 @@ subroutine get_X_from_overlap(N,over,X)
           if (Eval(i) > thresh) then
             Eval(i) = dsqrt(1.d0 / Eval(i))
           else
-            write(outfile,"(a,I3,a)") 'Eigenvalue ',i,' is too small for Lowdin orthogonalization'
+            write(outfile,"(a,I3,a,4x,E16.10)") 'Eigenvalue ',i,' is too small for Lowdin orthogonalization',Eval(i)
+          end if
+      end do
+    
+      call ADAt(N,Evec,Eval,X)
+
+      !open(1,file="./tmp/X.dat")
+      open(1,file=trim(tmp_file_name)//"/X.dat")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(X,1))
+      do i = 1 , size(X,1)
+        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (X(i,o),o=1,size(X,1))
+      end do 
+      close(1)
+
+      !open(2,file="./tmp/eigen_values.dat")
+      !open(2,file=trim(tmp_file_name)//"/eigen_values.dat")
+      !do i = 1 , N
+      !write(2,*) Eval(i)
+      !end do 
+      !close(2)
+
+      Xt = matmul(transpose(X),(matmul(over,X)))
+
+      ! --------------------------------------------------------------- !
+
+!      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
+!      call matout(N,N,Xt)
+
+      ! --------------------------------------------------------------- !
+  
+end subroutine get_X_from_overlap
+
+!------------------------------------------------------------------------!
+subroutine get_X_from_overlap_2D(N,over,X)
+
+      use files 
+      implicit none 
+
+      ! input !
+
+      integer,intent(in)            :: N
+      double precision, intent(in)  :: over(N,N)
+
+      ! local !
+
+      integer                       :: i , o
+      double precision              :: Evec(N,N)
+      double precision              :: Eval(N)
+      double precision,parameter    :: thresh = 1d-6
+
+      double precision              :: Xt(N,N)
+      double precision              :: a, b , c , d 
+      double precision              :: trace_val , det_val , discriminant
+      double precision              :: lambda1 , lambda2 
+      double precision              :: eigenvector1(2) , eigenvector2(2)
+
+      ! output !
+
+      double precision, intent(out) :: X(N,N)
+
+      Evec(:,:) = over(:,:)
+
+
+      a = Evec(1,1)
+      b = Evec(1,2)
+      c = Evec(2,1)
+      d = Evec(2,2)
+
+      trace_val = a + d
+      det_val   = a*d - b*c
+
+      discriminant = trace_val**2 - 4.0d0 * det_val
+
+      lambda1 = (trace_val + SQRT(discriminant)) / 2.0d0
+      lambda2 = (trace_val - SQRT(discriminant)) / 2.0d0
+
+      Eval(1) = lambda1 
+      Eval(2) = lambda2 
+
+      Evec(1,1) =  b  
+      Evec(2,1) = -(a - lambda1)
+
+      eigenvector1 = (/ b, -(a - lambda1) /)
+      eigenvector1 = eigenvector1 / NORM2(eigenvector1)
+
+      eigenvector2 = (/ b, -(a - lambda2) /)
+      eigenvector2 = eigenvector2 / NORM2(eigenvector2)
+
+      Evec(1,1) = eigenvector1(1)
+      Evec(2,1) = eigenvector1(2)
+      Evec(1,2) = eigenvector2(1)
+      Evec(2,2) = eigenvector2(2)
+
+      !call diagonalize_matrix(N,Evec,Eval)
+
+      ! //////////////////////////////////////////////////////////////// !
+      call header_under("The Overlap Eigenvalues",-1)
+
+      write(outfile, "(5f16.8)") (Eval(i), i=1,n)
+
+      write(outfile,*) ""
+      write(outfile,*) ""
+      write(outfile,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
+      write(outfile,*) ""
+
+      if (Minval(Eval) < 0.d0) then 
+        call header("Error",-1)
+          write(outfile,'(a80)')'*******************************************************************************************'
+          write(outfile,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
+          write(outfile,'(a80)')'*******************************************************************************************'
+          stop            
+      end if
+      ! //////////////////////////////////////////////////////////////// !
+
+      do i = 1 , N
+          if (Eval(i) > thresh) then
+            Eval(i) = dsqrt(1.d0 / Eval(i))
+          else
+            write(outfile,"(a,I3,a,4x,E16.10)") 'Eigenvalue ',i,' is too small for Lowdin orthogonalization',Eval(i)
+            Eval(i) = dsqrt(1.d0 / Eval(i))
           end if
       end do
     
@@ -219,7 +346,7 @@ subroutine get_X_from_overlap(N,over,X)
 
       ! --------------------------------------------------------------- !
   
-end subroutine get_X_from_overlap
+end subroutine get_X_from_overlap_2D
 
 !------------------------------------------------------------------------
 subroutine AtDA(N,A,D,B)

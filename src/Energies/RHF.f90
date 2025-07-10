@@ -34,7 +34,6 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,allocatable  :: F(:,:),Fp(:,:)
       double precision,allocatable  :: error(:,:)
       double precision,external     :: trace_matrix
-!      double precision              :: a = 1.75d0 
 
       integer                       :: max_diis = 0
       integer                       :: n_diis
@@ -52,8 +51,10 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,intent(out)  :: e(nBas)
       double precision,intent(out)  :: c(nBas,nBas)
 
-      open(HFfile,file="./tmp/RHF.out")
-    
+      
+      !open(HFfile,file="./tmp/RHF.out")
+      open(HFfile,file=trim(tmp_file_name)//"/RHF.out")
+
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
       write(outfile,*)'|                          Restricted Hartree-Fock calculation                           |'
@@ -68,27 +69,9 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       allocate(err_diis(nBas*nBas,max_diis))
       allocate(F_diis(nBas*nBas,max_diis))
-  
-      ! Guess coefficients and eigenvalues
-
-      !     Huckel guess          !
-      !-----------------------------------------------------------------!
-
-!      do mu = 1, nBas
-!        F(mu,mu) = Hc(mu,mu)
-!        do nu = mu+1, nBas
-!    
-!          F(mu,nu) = 0.5d0*a*S(mu,nu)*(Hc(mu,mu) + Hc(nu,nu))
-!          F(nu,mu) = F(mu,nu)
-!    
-!        end do
-!      end do
-
-      !-----------------------------------------------------------------!   
-      
+       
       call    guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
-      
-      
+         
       ! --------------------------------------------------------------- !
       !              check that P_{mu nu} S_{mu nu} = N 
       ! --------------------------------------------------------------- !

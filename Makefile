@@ -9,9 +9,12 @@ $(shell mkdir -p $(BDIR) $(ODIR)/module)
 
 # Compiler and flags
 FC = gfortran
-FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -march=native  -g -fbacktrace  -fcheck=all -fimplicit-none -fopenmp
-MODDIR = -J$(ODIR) -I$(ODIR)  # Put and find modules in obj directory
-LIBS   = src/lib/libquadpack.a   -lblas -llapack -L/opt/homebrew/Cellar/gsl/2.8/lib -lgsl -lgslcblas -lm -fopenmp
+FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -march=native  -g -fbacktrace  -fcheck=all -fimplicit-none -fopenmp  
+MODDIR = -J$(ODIR) -I$(ODIR)  -I/usr/local/include  # Put and find modules in obj directory
+LIBS   = src/lib/libquadpack.a -lblas -llapack \
+        -L/opt/homebrew/Cellar/gsl/2.8/lib -lgsl -lgslcblas \
+        -L/usr/local/lib -ltrexio	\
+				-lm -fopenmp
 
 # Find all module files
 MODULE_SRC = $(wildcard $(MODULE_DIR)/*.f90)

@@ -1,6 +1,8 @@
 subroutine extract_basis(number_of_atoms,charge)
 
+      use files
       implicit none 
+
 
       integer              :: number_of_atoms
       integer              :: charge(number_of_atoms)
@@ -22,7 +24,8 @@ subroutine extract_basis(number_of_atoms,charge)
       end do 
       
       open(1,file="Basis")
-      open(2,file="./tmp/Basis_scratch")
+      !open(2,file="./tmp/Basis_scratch")
+      open(2,file=trim(tmp_file_name)//"/Basis_scratch")
 
       do 
 
@@ -49,6 +52,7 @@ end subroutine
 
 subroutine extract_basis_tor(number_of_atoms,charge)
 
+      use files
       implicit none 
 
       integer              :: number_of_atoms
@@ -71,7 +75,8 @@ subroutine extract_basis_tor(number_of_atoms,charge)
       end do 
       
       open(1,file="Basis")
-      open(2,file="./tmp/Basis_scratch")
+      !open(2,file="./tmp/Basis_scratch")
+      open(2,file=trim(tmp_file_name)//"/Basis_scratch")
 
       do 
 

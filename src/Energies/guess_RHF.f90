@@ -11,7 +11,7 @@ subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
       double precision, intent(in)  :: ENuc
       double precision,external     :: trace_matrix
       ! --------------------------------------------------------------- !
-      double precision,allocatable  :: cp(:,:), c(:,:) , e(:) 
+      double precision,allocatable  :: cp(:,:), c(:,:) , e(:) , ct(:,:)
       integer                       :: i      , o 
       double precision              :: ET     , EV
       ! --------------------------------------------------------------- !
@@ -19,18 +19,18 @@ subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
       ! --------------------------------------------------------------- !
 
 
-      allocate(cp(nbas,nbas),c(nbas,nbas), e(nbas))
-      
+      allocate(cp(nbas,nbas),c(nbas,nbas),ct(nbas,nbas), e(nbas))
 
       cp(:,:) = matmul(transpose(X(:,:)), matmul(HC(:,:), X(:,:)))
 
       call diagonalize_matrix(nbas, cp, e)
 
-      c(:,:) = matmul(X(:,:), cp(:,:))
+      c(:,:)  = matmul(X(:,:), cp(:,:))
+
+      ct(:,:) = transpose(c)
 
       P(:,:) = 2d0 * matmul(c(:,1:nO), transpose(c(:,1:nO)))
 
-      
 
       ! --------------------------------------------------------------- !
       !                          Print                                  !
@@ -69,6 +69,14 @@ subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
         write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (c(i,o),o=1,size(c,1))
       end do 
       write(HFfile,'(a)') ""
+
+      call header_HF(" C^t Matrix, C^t = transpose(C)", -1)
+      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(c,1))
+      do i = 1 , size(c,1)
+        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  ((ct(i,o)),o=1,size(transpose(c),1))
+      end do 
+      write(HFfile,'(a)') ""
+
 
       call header_HF("Guess Density Matrix, P = 2 C C^t", -1)
       write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(P,1))

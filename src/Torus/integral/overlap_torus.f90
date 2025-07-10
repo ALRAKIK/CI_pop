@@ -1,5 +1,6 @@
 subroutine overlap_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
 
+      use files
       use torus_init
       use atom_basis
       use classification_ERI
@@ -41,41 +42,6 @@ subroutine overlap_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
       do i = 1 , number_of_atoms/2 + 1 
         index_sym = index_sym + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
       end do 
-
-      ! --------------------------------------------------------------- !
-      !                        test the overlap                         ! 
-      ! --------------------------------------------------------------- !
-      
-      
-
-
-!      AO1 = AO(1)
-!      AO2 = AO(number_of_atoms/2+1)
-!
-!      r1(1) = AO1%x ; r2(1) = AO2%x
-!      r1(2) = AO1%y ; r2(2) = AO2%y
-!      r1(3) = AO1%z ; r2(3) = AO2%z
-!
-!      call overlap_integral_ss_torus(r1,r2,AO1,AO2,overlap(1,1))
-!
-!      open(1,file="exponent_overlap.dat")
-!
-!      do while (overlap(1,1) > 1e-6)
-!        write(1,'(a,f16.8,3x,a,f16.8)') "The exponent  = "  , AO1%exponent , "The overlap  =  " , overlap(1,1)
-!
-!      
-!      call overlap_integral_ss_torus(r1,r2,AO1,AO2,overlap(1,1))
-!        AO1%exponent = AO1%exponent+0.01
-!        AO2%exponent = AO2%exponent+0.01
-!      end do 
-!
-!      close(1)
-
-
-!      stop 
-
-
-
 
       do i = 1 , index_unitcell
         do j = 1 , number_of_functions
@@ -150,15 +116,17 @@ subroutine overlap_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
 
       
 
-      open(1,file="./tmp/OV.dat")
+      !open(1,file="./tmp/OV.dat")
+      open(1,file=trim(tmp_file_name)//"/OV.dat")
         do i = 1 , size(overlap,1)
           do j = i , size(overlap,1)
-            write(1,'(I5,I5,f16.8)') i , j , overlap(i,j)
+            if (overlap(i,j) > 1e-8) write(1,*) i , j , overlap(i,j)
           end do 
         end do 
       close(1)
 
-      open(1,file="./tmp/OV_matrix.dat")
+      !open(1,file="./tmp/OV_matrix.dat")
+      open(1,file=trim(tmp_file_name)//"/OV_matrix.dat")
         write(1,'(15x,1000(i3,15x))') (i,i=1,size(overlap,1))
         do i = 1 , size(overlap,1)
           write(1,'(i3,6x,1000(f16.12,2x))') i ,  (overlap(i,j),j=1,size(overlap,1))

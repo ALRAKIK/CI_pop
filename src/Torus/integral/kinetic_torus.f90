@@ -1,5 +1,6 @@
 subroutine kinetic_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
 
+      use files
       use torus_init
       use atom_basis
       use classification_ERI
@@ -115,15 +116,17 @@ subroutine kinetic_matrix_torus(number_of_atoms,number_of_functions,atoms,AO)
         end do 
       end do 
 
-      open(1,file="./tmp/KI.dat")
+      !open(1,file="./tmp/KI.dat")
+      open(1,file=trim(tmp_file_name)//"/KI.dat")
       do i = 1 , size(kinetic,1)
         do j = i , size(kinetic,1)
-          write(1,'(I5,I5,f16.8)') i, j , kinetic(i,j)
+          if (kinetic(i,j) > 1e-8) write(1,*) i, j , kinetic(i,j)
         end do 
       end do 
       close(1)
 
-      open(1,file="./tmp/KI_matrix.dat")
+      !open(1,file="./tmp/KI_matrix.dat")
+      open(1,file=trim(tmp_file_name)//"/KI_matrix.dat")
         write(1,'(15x,1000(i3,15x))') (i,i=1,size(kinetic,1))
         do i = 1 , size(kinetic,1)
           write(1,'(i3,6x,1000(f16.12,2x))') i ,   (kinetic(i,j),j=1,size(kinetic,1))

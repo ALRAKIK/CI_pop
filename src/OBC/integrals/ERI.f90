@@ -113,12 +113,13 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
       write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') '2 el-integrals calculation time = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec     "
       write(outfile,"(a)") "" 
 
-      open(1,file="./tmp/ERI.dat")
+      !open(1,file="./tmp/ERI.dat")
+      open(1,file=trim(tmp_file_name)//"/ERI.dat")
         do i = 1, number_of_functions
           do j = 1 , number_of_functions
             do k = 1 , number_of_functions
               do l = 1 , number_of_functions
-                if (abs(two_electron(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l , two_electron(i,j,k,l)
+                if (abs(two_electron(i,j,k,l)) > 1e-8 ) write(1,*) i , j , k , l , two_electron(i,j,k,l)
               end do 
             end do 
           end do 

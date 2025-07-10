@@ -1,4 +1,4 @@
-subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type)
+subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type,type)
 
       implicit none 
 
@@ -8,7 +8,7 @@ subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type)
       double precision              :: geometry(100,3)
       integer                       :: charge(100)
       character(len=10),intent(out) :: calculation_type
-      character(len=2),allocatable  :: type(:)
+      character(len=2)              :: type(100)
       
       
       open(1,file="supermolecule.mol")
@@ -22,9 +22,6 @@ subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type)
 
 
 3     close(1)
-
-
-      allocate(type(number_of_atoms))      
 
       open(1,file="supermolecule.mol")
       do i = 1 , number_of_atoms
@@ -41,7 +38,5 @@ subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type)
       call system("rm general_parameters.dat")
 
       call get_charge(number_of_atoms,type,charge)
-
-
 
 end subroutine

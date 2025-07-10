@@ -1,5 +1,6 @@
 subroutine nuclear_attraction_matrix_torus(number_of_atoms,number_of_functions,geometry,atoms,AO)
 
+      use files
       use torus_init
       use atom_basis
       use classification_ERI
@@ -123,15 +124,17 @@ subroutine nuclear_attraction_matrix_torus(number_of_atoms,number_of_functions,g
         end do 
       end do 
 
-      open(1,file="./tmp/NA.dat")
+      !open(1,file="./tmp/NA.dat")
+      open(1,file=trim(tmp_file_name)//"/NA.dat")
         do i = 1 , size(NA,1)
           do j = i , size(NA,1)
-            write(1,'(I5,I5,f16.8)') i , j ,  NA(i,j)
+            if (abs(NA(i,j)) > 1e-8) write(1,*) i , j ,  NA(i,j)
           end do 
         end do 
       close(1)
 
-      open(1,file="./tmp/NA_matrix.dat")
+      !open(1,file="./tmp/NA_matrix.dat")
+      open(1,file=trim(tmp_file_name)//"/NA_matrix.dat")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(NA,1))
       do i = 1 , size(NA,1)
         write(1,'(i3,6x,1000(f16.12,2x))') i , (NA(i,j),j=1,size(NA,1))

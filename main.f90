@@ -4,6 +4,7 @@ program CI
       use torus_init
       use atom_basis
       use classification_ERI
+      use trexio
 
       implicit none 
 
@@ -12,13 +13,15 @@ program CI
       !-----------------------------------------------------------------!
 
 
-      integer                         :: i , j
+      integer                         :: i , j , k , l 
       integer                         :: n_atoms , nBAS
       integer                         :: nO      , n_electron 
 
       double precision                :: geometry_tmp(100,3)
       integer                         :: charge_tmp(100)
+      character*(2)                   :: label_tmp(100)
       integer                         :: number_of_functions
+      character*(10)                  :: keyword(10)
 
       double precision  ,allocatable  :: geometry(:,:)
       integer           ,allocatable  :: charge(:)
@@ -33,6 +36,7 @@ program CI
       double precision,allocatable    ::      Hc_MO(:,:)
       double precision,allocatable    ::          X(:,:)
       double precision,allocatable    ::    ERI(:,:,:,:)
+      double precision,allocatable    ::  ERI_p(:,:,:,:)
       double precision,allocatable    :: ERI_MO(:,:,:,:)
       double precision,allocatable    ::            e(:)
       double precision,allocatable    ::          c(:,:)
@@ -41,25 +45,32 @@ program CI
       double precision                :: start,end,time
 
       character(len=10)               :: calculation_type 
-      character(len=100)              :: output_file_name
+      character(len=2),allocatable    :: label(:)
 
-      logical                         :: check_read
-
+      logical                         :: c_read, c_Integral, c_trexio
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
       !-----------------------------------------------------------------!    
 
-      call build_super_molecule(check_read)
+      call build_super_molecule(keyword)
 
-      call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type)
+      c_integral = any(keyword == 'Integral')
+      c_read     = any(keyword == 'Read'    )
+      c_trexio   = any(keyword == 'Trexio'  )
+
+      call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type,label_tmp)
+
+      call initialize_ff(calculation_type,n_atoms)
 
       if (calculation_type == "Torus" .or. calculation_type == "Tori" .or. calculation_type == "Tori2D" ) call Torus_def()
 
       allocate(geometry(n_atoms,3))
       allocate(charge(n_atoms))
+      allocate(label(n_atoms))
 
       do i = 1 , n_atoms
+        label(i)      =      label_tmp(i)
         charge    (i) =     charge_tmp(i)
         geometry(i,1) = geometry_tmp(i,1)
         geometry(i,2) = geometry_tmp(i,2)
@@ -69,15 +80,19 @@ program CI
       allocate(atoms    (n_atoms))
       allocate(norm_helper(n_atoms))
 
+
       if (calculation_type == "Tori" .or. calculation_type == "Tori2D" ) then 
         call basis_tor(n_atoms,charge,atoms,norm_helper,calculation_type)
       else
         call basis(n_atoms,charge,atoms)
       end if 
 
-      write(output_file_name,'(A,A,A,I0,A)') "results_",trim(calculation_type),"_",n_atoms,".out"
+      n_electron = 0 
+      do i = 1 , n_atoms
+        n_electron = n_electron + atoms(i)%charge
+      end do 
 
-      open (outfile,file=trim(output_file_name))
+      nO = n_electron/2
 
       CALL HEADER ('The Geometry',-1)
 
@@ -105,17 +120,37 @@ program CI
 
       call print_orbital_table(AO,number_of_functions)
 
+
+!     -------------------------------------------------------------------     !
+!                        Nuclear repulsion energy  
+!     -------------------------------------------------------------------     !
+
+      call NRE(n_atoms,geometry,atoms,E_nuc)
+
+      ! --------------------------------------------------------------- !
+      !             Write the geometry to a TREXIO file                 !
+      ! --------------------------------------------------------------- !
+
+
+      if (c_trexio) then
+        call trexio_conv_init(calculation_type, n_atoms)
+        call trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
+                                  number_of_functions)
+      end if
+
+      ! --------------------------------------------------------------- !
+
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !               ---------------------------------                 !
       !                       Allocate the memory                       !
       !               ---------------------------------                 !
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      ! one electron integrals !
       allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas)) 
-      ! two electron integrals !
-      allocate(ERI(nBas,nBas,nBas,nBas))
-      ! HF variables ! 
+      
+      allocate(ERI  (nBas,nBas,nBas,nBas))
+      allocate(ERI_p(nBas,nBas,nBas,nBas))
+
       allocate(X(nBas,nBas),e(nBas),c(nBas,nBas))
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -132,7 +167,9 @@ program CI
       !               ---------------------------------                 !
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      if (.not. check_read) then
+      if (c_read) then
+        write(outfile,'(A)') 'The integrals will be read from file'
+      else 
         write(outfile,'(A)') 'The integrals will be calculated'
         select case (trim(calculation_type))
           case ("OBC", "Ring", "OBC2D")
@@ -146,35 +183,33 @@ program CI
           case default
             write(outfile,'(A)') 'Unknown calculation type: ', trim(calculation_type)
             stop
-        end select
-      else
-        write(outfile,'(A)') 'The integrals will be read from file'
+        end select          
+      end if
+        
+      ! --------------------------------------------------------------- !
+      !            Read the one and the two electron integrals     
+      ! --------------------------------------------------------------- !      
+
+      if (c_Integral) then
+        write(outfile,'(A)') 'All of The integrals calculated'
+        stop 
       end if
 
-      
-      
-!     -------------------------------------------------------------------     !
-!                        Nuclear repulsion energy  
-!     -------------------------------------------------------------------     !
-
-      call NRE(n_atoms,geometry,atoms,E_nuc)
-
-!     -------------------------------------------------------------------     !
-!                Read the one and the two electron integrals     
-!     -------------------------------------------------------------------     !
-
-      n_electron = 0 
-      do i = 1 , n_atoms
-        n_electron = n_electron + atoms(i)%charge
-      end do 
-
-      nO = n_electron/2 
-
-      if (check_read) then 
-        call read_integrals_from_file(nBas,S,T,V,Hc,ERI)
+      if (c_read) then
+        call read_integrals_from_file(nBas,S,T,V,Hc,ERI,calculation_type)
       else 
-        call read_integrals(nBas,S,T,V,Hc,ERI)
-      end if 
+        call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
+      end if
+      
+
+
+      ! --------------------------------------------------------------- !
+
+      if (c_trexio) then
+        call trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
+      end if
+
+      ! --------------------------------------------------------------- !
 
       !------------------------------------------------------!
       !                                  (-1/2)         t    !
@@ -186,7 +221,12 @@ program CI
 
       !call matout(nBas,nBas,S)
 
-      call get_X_from_overlap(nBAS,S,X)
+
+      if (calculation_type == "Tori2D") then 
+        call get_X_from_overlap_2D(nBAS,S,X)
+      else 
+        call get_X_from_overlap(nBAS,S,X)
+      end if 
        
       ! ---------------------------------------------------------------- !
       !                                                                  !
@@ -241,5 +281,15 @@ program CI
 
       call system("rm torus_parameters.inp")
 
+      
+      ! --------------------------------------------------------------- !
+      !            close the TREXIO file and exit                       !
+      ! --------------------------------------------------------------- !
 
-end program CI 
+      if (c_trexio) then
+        call trexio_conv_close()
+      end if
+
+      ! --------------------------------------------------------------- !
+
+end program CI

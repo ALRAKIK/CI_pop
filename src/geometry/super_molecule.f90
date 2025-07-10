@@ -1,22 +1,42 @@
-subroutine build_super_molecule(check_read)
+subroutine build_super_molecule(keyword)
 
       implicit none 
       
+      !-----------------------------------------------------------------!
+
+      ! input ! 
+
+
+      ! local ! 
+
       integer                        :: number_of_unitcell , max_atoms , num_atoms
       integer                        :: io_stat , i , j , atom_index
-      double precision               :: distance_between_unitcells , L 
-      double precision,allocatable   :: geometry_unitcell(:,:)
-      character(len=2),allocatable   :: atom_names(:)
-      double precision,allocatable   :: unitcell(:,:)
-      character(len=2),allocatable   :: a_names(:)
-      double precision,allocatable   :: super_geometry(:,:)
-      character(len=2),allocatable   :: super_atoms(:)
-      character(len=100)             :: line
-      logical                        :: reading_cell  , check_read
-      character(len=10)              :: type_of_calculation
-      double precision               :: rx , theta 
-      double precision,parameter     :: pi     = 3.14159265358979323846D00
 
+
+      double precision,parameter     :: pi  = 3.14159265358979323846D00
+      double precision               :: distance_between_unitcells , L
+      double precision               :: rx , theta 
+      
+
+      double precision,allocatable   :: geometry_unitcell(:,:)
+      double precision,allocatable   :: unitcell(:,:)
+      double precision,allocatable   :: super_geometry(:,:)
+
+
+      logical                        :: reading_cell
+      character(len=10)              :: type_of_calculation
+      character(len=100)             :: line
+
+      character(len=2),allocatable   :: atom_names(:)
+      character(len=2),allocatable   :: a_names(:)
+      character(len=2),allocatable   :: super_atoms(:)
+
+
+      ! output !
+
+      character(len=10),intent(out)  :: keyword(10)
+
+      !-----------------------------------------------------------------!
 
       open(1,file="unitcell.mol")
 
@@ -54,9 +74,11 @@ subroutine build_super_molecule(check_read)
           exit
         end if
 
-        if (trim(line) == 'Read') then
-          check_read = .true.
-        end if
+        if (trim(line) == 'Read'     )   keyword(1) = 'Read'
+
+        if (trim(line) == 'Integrals')   keyword(2) = 'Integrals'
+
+        if (trim(line) == 'Trexio'   )   keyword(3) = 'Trexio'
 
       end do
 
@@ -119,14 +141,14 @@ subroutine build_super_molecule(check_read)
 
       open(2,file="supermolecule.mol")
         do i = 1, num_atoms * number_of_unitcell
-          write(2, '(A2,4x,3(F0.16,4x))') super_atoms(i), super_geometry(i, 1), &
+          write(2, *) super_atoms(i), super_geometry(i, 1), &
                                    super_geometry(i, 2), super_geometry(i, 3)
         end do
       close(2)
 
       open(3,file="torus_parameters.inp")
-        write(3,"(f24.16)") L
-        write(3,"(I2)")    num_atoms
+        write(3,*) L
+        write(3,*) num_atoms
       close(3)
 
 
@@ -148,14 +170,14 @@ subroutine build_super_molecule(check_read)
 
         open(2,file="supermolecule.mol")
           do i = 1, num_atoms * number_of_unitcell
-            write(2, '(A2,4x,3(F16.8,4x))') super_atoms(i), super_geometry(i, 1), &
-                                     super_geometry(i, 2), super_geometry(i, 3)
+            write(2,*) super_atoms(i), super_geometry(i, 1), &
+                       super_geometry(i, 2), super_geometry(i, 3)
           end do
         close(2)
 
         open(3,file="torus_parameters.inp")
-          write(3,"(f24.16)") L
-          write(3,"(I2)")    num_atoms
+          write(3,*) L
+          write(3,*) num_atoms
         close(3)
 
       end if 
