@@ -201,6 +201,7 @@ program CI
         call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
       end if
       
+      
 
 
       ! --------------------------------------------------------------- !

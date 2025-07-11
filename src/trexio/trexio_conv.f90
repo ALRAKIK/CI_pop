@@ -176,17 +176,16 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
 
       ! local ! 
 
-      integer                         :: i , j , k , l 
+      integer                         :: i , j , k , l  , p , q 
 
       double precision                :: Eri_p(nBas,nBas,nBas,nBas)
 
       integer(trexio_exit_code)       :: rc       
       character*(128)                 :: err_msg  
       integer(8)                      :: offset, icount
-      integer(8), parameter           :: BUFSIZE = 10000_8
-      integer                         :: buffer_index(4,BUFSIZE)
-      double precision                :: buffer_values(BUFSIZE)
-
+      integer(8)                      :: BUFSIZE
+      integer,allocatable             :: buffer_index(:,:)
+      double precision,allocatable    :: buffer_values(:)
 
       ! writing into the trexio file ! 
 
@@ -219,6 +218,11 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
       end if
 
 
+      BUFSIZE = nbas*nbas*nbas*nbas
+
+      allocate(buffer_index(4, BUFSIZE))
+      allocate(buffer_values(BUFSIZE))
+
       do i = 1 , nBas
         do j = 1 , nBas
           do k = 1 , nBas
@@ -245,6 +249,32 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
           end do
         end do 
       end do
+
+
+!      icount = 1
+!      offset = 0_8
+!      do i = 1, nBas
+!        do j = 1, i
+!            do k = 1, nBas
+!                do l = 1, k
+!                    p = i*(i-1)/2 + j
+!                    q = k*(k-1)/2 + l
+!
+!                    if (p >= q) then
+!
+!                      buffer_index(1,icount) = i
+!                      buffer_index(2,icount) = j
+!                      buffer_index(3,icount) = k
+!                      buffer_index(4,icount) = l
+!                      buffer_values(icount) = ERI_p(i,j,k,l)
+!                      icount = icount + 1
+!                    
+!                    end if
+!
+!                end do
+!            end do
+!        end do
+!      end do
 
       rc = trexio_write_ao_2e_int_eri(trexio_file,offset,BUFSIZE,buffer_index,buffer_values)
       if (rc /= TREXIO_SUCCESS) then
