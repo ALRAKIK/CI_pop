@@ -183,9 +183,10 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
       integer(trexio_exit_code)       :: rc       
       character*(128)                 :: err_msg  
       integer(8)                      :: offset, icount
-      integer(8)                      :: BUFSIZE
-      integer,allocatable             :: buffer_index(:,:)
-      double precision,allocatable    :: buffer_values(:)
+      integer(8), parameter           :: BUFSIZE=10000_8
+      integer                         :: buffer_index(4,BUFSIZE)
+      double precision                :: buffer_values(BUFSIZE)
+      double precision                :: integral
 
       ! writing into the trexio file ! 
 
@@ -218,10 +219,10 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
       end if
 
 
-      BUFSIZE = nbas*nbas*nbas*nbas
+      !BUFSIZE = nbas*nbas*nbas*nbas
 
-      allocate(buffer_index(4, BUFSIZE))
-      allocate(buffer_values(BUFSIZE))
+      !allocate(buffer_index(4, BUFSIZE))
+      !allocate(buffer_values(BUFSIZE))
 
       do i = 1 , nBas
         do j = 1 , nBas
@@ -233,18 +234,28 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
         end do 
       end do
 
-      icount = 1
+      icount = 0_8
       offset = 0_8
-      do i = 1 , nBas
-        do j = 1 , nBas
-          do k = 1 , nBas
-            do l = 1 , nBas
+      do l = 1 , nBas
+        do k = 1 , nBas
+          do j = 1 , nBas
+            do i = 1 , nBas
+              if (i==j .and. k<l) cycle
+              if (i<j) cycle
+              integral = ERI_p(i,j,k,l)
+              if (integral == 0.d0) cycle
+              icount = icount + 1_8
               buffer_index(1,icount) = i
               buffer_index(2,icount) = j
               buffer_index(3,icount) = k
               buffer_index(4,icount) = l
-              buffer_values(icount) = ERI_p(i,j,k,l)
-              icount = icount + 1
+              buffer_values(icount)  = integral
+              if (icount == BUFSIZE) then
+                rc = trexio_write_ao_2e_int_eri(trexio_file,offset,BUFSIZE,buffer_index,buffer_values)
+                call trexio_assert(rc, TREXIO_SUCCESS)
+                offset = offset + icount
+                icount = 0_8
+              end if
             end do 
           end do
         end do 
@@ -276,12 +287,12 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
 !        end do
 !      end do
 
-      rc = trexio_write_ao_2e_int_eri(trexio_file,offset,BUFSIZE,buffer_index,buffer_values)
-      if (rc /= TREXIO_SUCCESS) then
-        call trexio_string_of_error(rc, err_msg)
-          print *, 'Error: '//trim(err_msg)
-        call exit(-1)
-      end if
+      !rc = trexio_write_ao_2e_int_eri(trexio_file,offset,BUFSIZE,buffer_index,buffer_values)
+      !if (rc /= TREXIO_SUCCESS) then
+      !  call trexio_string_of_error(rc, err_msg)
+      !    print *, 'Error: '//trim(err_msg)
+      !  call exit(-1)
+      !end if
 
 
 
