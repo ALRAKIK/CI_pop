@@ -324,14 +324,14 @@ subroutine get_X_from_overlap_2D(N,over,X)
     
       call ADAt(N,Evec,Eval,X)
 
-      open(1,file="./tmp/X.dat")
+      open(1,file=trim(tmp_file_name)//"/X.dat ")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(X,1))
       do i = 1 , size(X,1)
         write(1,'(i3,6x,1000(f16.10,2x))') i ,  (X(i,o),o=1,size(X,1))
       end do 
       close(1)
 
-      open(2,file="./tmp/eigen_values.dat")
+      open(2,file=trim(tmp_file_name)//"/eigen_values.dat ")
       do i = 1 , N
       write(2,*) Eval(i)
       end do 

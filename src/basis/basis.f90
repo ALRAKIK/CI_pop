@@ -45,11 +45,10 @@ subroutine basis_tor(number_of_atoms,charge,atoms,norm_helper,calculation_type)
 
       if (calculation_type == 'torus' .or. calculation_type == 'Tori' ) then
         call normalize_basis_tor()
-        !call system("python src/basis/clean_lines_tor.py")
-        !call system("python src/basis/clean_lines_tor_help.py")
       else if (calculation_type == 'Tori2D') then
         call normalize_basis_tor_2D()
-        call system("python src/basis/clean_lines_tor.py")
+      else if (calculation_type == 'Tori3D') then
+        call normalize_basis_tor_3D()
       else
         print *, "Unknown calculation type"
         stop

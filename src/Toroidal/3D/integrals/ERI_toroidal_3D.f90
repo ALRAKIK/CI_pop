@@ -1,4 +1,4 @@
-subroutine ERI_integral_toroidal_2D(number_of_atoms,geometry,atoms)
+subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,atoms)
 
       use files
       use omp_lib
@@ -11,14 +11,15 @@ subroutine ERI_integral_toroidal_2D(number_of_atoms,geometry,atoms)
 
       !-----------------------------------------------------------------!
 
-      integer                        :: i , j , k , l , num_int , num_total_int
+      integer                        :: i , j , k , l , num_int , num_total_int !, p ,q 
+      !integer                        :: actual_total_int
       integer                        :: number_of_atoms
       type(atom)                     :: atoms(number_of_atoms)
       type(ERI_function),allocatable :: ERI  (:)
 
       double precision               :: geometry(number_of_atoms,3)
-      double precision,allocatable   ::       two_electron(:,:,:,:)
-      double precision,allocatable   ::            two_eri(:,:,:,:)
+      double precision,allocatable   :: two_electron(:,:,:,:)
+      double precision,allocatable   :: two_eri(:,:,:,:)
       double precision               :: value
       double precision               :: start_time, end_time
       integer                        :: number_of_functions
@@ -65,17 +66,17 @@ subroutine ERI_integral_toroidal_2D(number_of_atoms,geometry,atoms)
 
       start_time = omp_get_wtime()
 
-
       num_int = 0
       num_total_int = number_of_functions_per_unitcell * (number_of_functions) * (number_of_functions) * (number_of_functions+1) / 2 
 
-      !$omp parallel do collapse(3) private(j, k, l, value) shared(two_electron, ERI,num_int) schedule(dynamic,16)
+      !$omp parallel do collapse(3) private(j,l, value) shared(two_electron, ERI,num_int) schedule(dynamic,16)
 
-            do i = 1, number_of_functions_per_unitcell
-              do j = 1, number_of_functions
-                  do k = 1, number_of_functions
-                      do l = k, number_of_functions
-                          call ERI_integral_4_function_toroidal_2D(ERI(i),ERI(j),ERI(k),ERI(l), value)
+             do i = 1, number_of_functions_per_unitcell
+               do j = 1, number_of_functions
+                   do k = 1, number_of_functions
+                       do l = k, number_of_functions
+                        
+                        call ERI_integral_4_function_toroidal_3D(ERI(i),ERI(j),ERI(k),ERI(l), value)
                           
                           !$omp atomic
                           num_int = num_int + 1
@@ -93,10 +94,9 @@ subroutine ERI_integral_toroidal_2D(number_of_atoms,geometry,atoms)
 
       !$omp end parallel do
 
-          
-
       end_time = omp_get_wtime()
 
+      write(outfile,"(a)") ""
       write(outfile,"(a)") "Translation symmetry applied to integrals"
       write(outfile,"(a)") "" 
 
@@ -121,7 +121,7 @@ subroutine ERI_integral_toroidal_2D(number_of_atoms,geometry,atoms)
           do j = 1 , number_of_functions
             do k = 1 , number_of_functions
               do l = 1 , number_of_functions
-                if (abs(two_eri(i,j,k,l)) > 1e-8 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)  
+                if (abs(two_eri(i,j,k,l)) > 1e-8 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)                   
               end do 
             end do 
           end do 
@@ -132,5 +132,4 @@ subroutine ERI_integral_toroidal_2D(number_of_atoms,geometry,atoms)
       deallocate(two_electron)
       deallocate(two_eri)
 
-end subroutine ERI_integral_toroidal_2D
-!-----------------------------------------------------------------!
+end subroutine ERI_integral_toroidal_3D

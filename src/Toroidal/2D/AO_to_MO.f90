@@ -2,6 +2,8 @@ subroutine AO_to_MO_ERI(nBas,c,ERI_AO,ERI_MO)
 
       ! Expression of bi-electronic integrals in the MO basis set
 
+      use files 
+
       implicit none
 
       ! Input variables
@@ -110,17 +112,6 @@ subroutine AO_to_MO_ERI(nBas,c,ERI_AO,ERI_MO)
       
       enddo
 
-      open(1,file="./tmp/ERI_MO.dat")
-        do i = 1, nbas
-          do j = 1 , nbas
-            do k = 1 , nbas
-              do l = 1 , nbas
-                if (abs(ERI_MO(i,j,k,l)) > 1e-8 ) write(1,"(I5,I5,I5,I5,f16.10)") i , j , k , l ,  ERI_MO(i,j,k,l)
-              end do 
-            end do 
-          end do 
-        end do 
-      close(1)
 
 end subroutine AO_to_MO_ERI
 
@@ -128,8 +119,10 @@ subroutine AO_to_MO_HC(nBas,c,HC_AO,HC_MO)
 
       ! Expression of bi-electronic integrals in the MO basis set
 
-      implicit none
+      use files
 
+      implicit none
+      
       ! Input variables
 
       integer,intent(in)            :: nBas
@@ -161,12 +154,5 @@ subroutine AO_to_MO_HC(nBas,c,HC_AO,HC_MO)
             enddo
          enddo
       enddo
-
-      open(1,file="./tmp/HC_MO.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(HC_MO,1))
-      do i = 1 , size(HC_MO,1)
-        write(1,'(i3,6x,1000(f16.12,2x))') i ,  (HC_MO(i,j),j=1,size(HC_MO,1))
-      end do 
-      close(1)
 
 end subroutine AO_to_MO_HC

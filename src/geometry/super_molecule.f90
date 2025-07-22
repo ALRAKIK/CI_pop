@@ -18,23 +18,23 @@ subroutine build_super_molecule(keyword)
       double precision               :: rx , theta 
       
 
-      double precision,allocatable   :: geometry_unitcell(:,:)
-      double precision,allocatable   :: unitcell(:,:)
-      double precision,allocatable   :: super_geometry(:,:)
+      double precision,allocatable   ::  geometry_unitcell(:,:)
+      double precision,allocatable   ::           unitcell(:,:)
+      double precision,allocatable   ::     super_geometry(:,:)
 
 
-      logical                        :: reading_cell
-      character(len=10)              :: type_of_calculation
-      character(len=100)             :: line
+      logical                        ::           reading_cell
+      character(len=10)              ::    type_of_calculation
+      character(len=100)             ::                   line
 
-      character(len=2),allocatable   :: atom_names(:)
-      character(len=2),allocatable   :: a_names(:)
-      character(len=2),allocatable   :: super_atoms(:)
+      character(len=2),allocatable   ::          atom_names(:)
+      character(len=2),allocatable   ::             a_names(:)
+      character(len=2),allocatable   ::         super_atoms(:)
 
 
       ! output !
 
-      character(len=10),intent(out)  :: keyword(10)
+      character(len=10),intent(out)  ::         keyword(10)
 
       !-----------------------------------------------------------------!
 
@@ -52,6 +52,8 @@ subroutine build_super_molecule(keyword)
         write(*,'(a)') "Type of calculation: Toroidal"
       else if (type_of_calculation == "Tori2D") then 
         write(*,'(a)') "Type of calculation: Toroidal real 2D"
+      else if (type_of_calculation == "Tori3D") then 
+        write(*,'(a)') "Type of calculation: Toroidal real 3D"
       else if (type_of_calculation == "OBC2D") then 
         write(*,'(a)') "Type of calculation: OBC with FCI"
       else 

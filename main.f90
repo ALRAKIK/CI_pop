@@ -13,39 +13,39 @@ program CI
       !-----------------------------------------------------------------!
 
 
-      integer                         :: i , j
-      integer                         :: n_atoms , nBAS
-      integer                         :: nO      , n_electron 
+      integer                         ::                  i ,    j
+      integer                         ::            n_atoms , nBAS
+      integer                         ::           nO , n_electron 
 
-      double precision                :: geometry_tmp(100,3)
-      integer                         :: charge_tmp(100)
-      character*(2)                   :: label_tmp(100)
-      integer                         :: number_of_functions
-      character*(10)                  :: keyword(10)
+      double precision                ::       geometry_tmp(100,3)
+      integer                         ::           charge_tmp(100)
+      character*(2)                   ::            label_tmp(100)
+      integer                         ::       number_of_functions
+      character*(10)                  ::               keyword(10)
 
-      double precision  ,allocatable  :: geometry(:,:)
-      integer           ,allocatable  :: charge(:)
-      type(atom)        ,allocatable  :: atoms(:)
-      type(atom)        ,allocatable  :: norm_helper(:)
-      type(ERI_function),allocatable  :: AO (:)
+      double precision  ,allocatable  ::             geometry(:,:)
+      integer           ,allocatable  ::                 charge(:)
+      type(atom)        ,allocatable  ::                  atoms(:)
+      type(atom)        ,allocatable  ::            norm_helper(:)
+      type(ERI_function),allocatable  ::                    AO (:)
 
-      double precision,allocatable    ::          S(:,:)
-      double precision,allocatable    ::          T(:,:)
-      double precision,allocatable    ::          V(:,:)
-      double precision,allocatable    ::         Hc(:,:)
-      double precision,allocatable    ::      Hc_MO(:,:)
-      double precision,allocatable    ::          X(:,:)
-      double precision,allocatable    ::    ERI(:,:,:,:)
-      double precision,allocatable    ::  ERI_p(:,:,:,:)
-      double precision,allocatable    :: ERI_MO(:,:,:,:)
-      double precision,allocatable    ::            e(:)
-      double precision,allocatable    ::          c(:,:)
+      double precision,allocatable    ::                    S(:,:)
+      double precision,allocatable    ::                    T(:,:)
+      double precision,allocatable    ::                    V(:,:)
+      double precision,allocatable    ::                   Hc(:,:)
+      double precision,allocatable    ::                Hc_MO(:,:)
+      double precision,allocatable    ::                    X(:,:)
+      double precision,allocatable    ::              ERI(:,:,:,:)
+      double precision,allocatable    ::            ERI_p(:,:,:,:)
+      double precision,allocatable    ::           ERI_MO(:,:,:,:)
+      double precision,allocatable    ::                      e(:)
+      double precision,allocatable    ::                    c(:,:)
 
-      double precision                :: E_nuc , EHF
-      double precision                :: start,end,time
+      double precision                ::               E_nuc , EHF
+      double precision                ::            start,end,time
 
-      character(len=10)               :: calculation_type 
-      character(len=2),allocatable    :: label(:)
+      character(len=10)               ::          calculation_type 
+      character(len=2),allocatable    ::                  label(:)
 
       logical                         :: c_read, c_Integral, c_trexio
 
@@ -63,7 +63,8 @@ program CI
 
       call initialize_ff(calculation_type,n_atoms)
 
-      if (calculation_type == "Torus" .or. calculation_type == "Tori" .or. calculation_type == "Tori2D" ) call Torus_def()
+      if (calculation_type == "Torus"  .or. calculation_type == "Tori" .or.&
+          calculation_type == "Tori2D" .or. calculation_type == "Tori3D"  ) call Torus_def()
 
       allocate(geometry(n_atoms,3))
       allocate(charge(n_atoms))
@@ -81,7 +82,8 @@ program CI
       allocate(norm_helper(n_atoms))
 
 
-      if (calculation_type == "Tori" .or. calculation_type == "Tori2D" ) then 
+      if (calculation_type == "Tori" .or. calculation_type == "Tori2D" .or. &
+          calculation_type == "Tori3D" ) then 
         call basis_tor(n_atoms,charge,atoms,norm_helper,calculation_type)
       else
         call basis(n_atoms,charge,atoms)
@@ -125,7 +127,7 @@ program CI
 !                        Nuclear repulsion energy  
 !     -------------------------------------------------------------------     !
 
-      call NRE(n_atoms,geometry,atoms,E_nuc)
+      call NRE(calculation_type,n_atoms,geometry,atoms,E_nuc)
 
       ! --------------------------------------------------------------- !
       !             Write the geometry to a TREXIO file                 !
@@ -180,6 +182,8 @@ program CI
             call Tori(n_atoms,number_of_functions,atoms,AO,geometry)       ! Toroidal 1D Gaussian TRR
           case ("Tori2D")
             call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 2D Gaussian
+          case ("Tori3D")
+            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 3D Gaussian  
           case default
             write(outfile,'(A)') 'Unknown calculation type: ', trim(calculation_type)
             stop
@@ -223,7 +227,7 @@ program CI
       !call matout(nBas,nBas,S)
 
 
-      if (calculation_type == "Tori2D") then 
+      if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) then 
         call get_X_from_overlap_2D(nBAS,S,X)
       else 
         call get_X_from_overlap(nBAS,S,X)
@@ -235,7 +239,7 @@ program CI
       !                                                                  !
       ! ---------------------------------------------------------------- ! 
  
-      if (calculation_type == "Tori2D") E_nuc = 0.d0 
+      if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) E_nuc = 0.d0 
       
         call cpu_time(start)
         call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
@@ -254,7 +258,9 @@ program CI
       !-----------------------------------------------------------------!
 
 
-      if (calculation_type == "Tori2D" .or. calculation_type == "OBC2D") then
+      if (calculation_type == "Tori2D" .or. calculation_type == "OBC2D" .or. calculation_type == "Tori3D" ) then
+
+        Hc(:,:) = T(:,:)
 
       !-----------------------------------------------------------------!
       ! AO to MO transformation
