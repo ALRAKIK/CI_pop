@@ -156,7 +156,6 @@ subroutine build_super_molecule(keyword)
         else
           write(3,*) L
         end if
-        !write(3,*) L
         write(3,*) num_atoms
       close(3)
 
@@ -190,7 +189,6 @@ subroutine build_super_molecule(keyword)
           else
             write(3,*) L
           end if
-!          write(3,*) L
           write(3,*) num_atoms
         close(3)
 

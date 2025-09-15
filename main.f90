@@ -146,7 +146,9 @@ program CI
         call trexio_conv_init(calculation_type, n_atoms)
         call trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
                                   number_of_functions)
+        stop 
       end if
+
 
       ! --------------------------------------------------------------- !
 
@@ -259,7 +261,7 @@ program CI
       write(outfile,*)
       
       call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
-      !call system("rm -r " // trim(tmp_file_name))
+      call system("rm -r " // trim(tmp_file_name))
       
 
       !-----------------------------------------------------------------!

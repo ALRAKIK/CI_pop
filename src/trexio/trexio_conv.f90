@@ -91,12 +91,14 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
-      rc = trexio_write_nucleus_label (trexio_file, label,2)
-      if (rc /= TREXIO_SUCCESS) then
-        call trexio_string_of_error(rc, err_msg)
-          print *, 'Error: '//trim(err_msg)
-        call exit(-1)
-      end if
+
+      !rc = trexio_write_nucleus_label (trexio_file, label,2)
+      !if (rc /= TREXIO_SUCCESS) then
+      !  call trexio_string_of_error(rc, err_msg)
+      !    print *, 'Error: '//trim(err_msg)
+      !  call exit(-1)
+      !end if
+ 
 
       rc = trexio_write_nucleus_coord (trexio_file, geometry)
       if (rc /= TREXIO_SUCCESS) then
@@ -260,40 +262,6 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
           end do
         end do 
       end do
-
-
-!      icount = 1
-!      offset = 0_8
-!      do i = 1, nBas
-!        do j = 1, i
-!            do k = 1, nBas
-!                do l = 1, k
-!                    p = i*(i-1)/2 + j
-!                    q = k*(k-1)/2 + l
-!
-!                    if (p >= q) then
-!
-!                      buffer_index(1,icount) = i
-!                      buffer_index(2,icount) = j
-!                      buffer_index(3,icount) = k
-!                      buffer_index(4,icount) = l
-!                      buffer_values(icount) = ERI_p(i,j,k,l)
-!                      icount = icount + 1
-!                    
-!                    end if
-!
-!                end do
-!            end do
-!        end do
-!      end do
-
-      !rc = trexio_write_ao_2e_int_eri(trexio_file,offset,BUFSIZE,buffer_index,buffer_values)
-      !if (rc /= TREXIO_SUCCESS) then
-      !  call trexio_string_of_error(rc, err_msg)
-      !    print *, 'Error: '//trim(err_msg)
-      !  call exit(-1)
-      !end if
-
 
 
 end subroutine trexio_conv_integrals
