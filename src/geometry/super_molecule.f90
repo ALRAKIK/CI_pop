@@ -82,6 +82,8 @@ subroutine build_super_molecule(keyword)
 
         if (trim(line) == 'Trexio'   )   keyword(3) = 'Trexio'
 
+        if (trim(line) == 'Angstrom' )   keyword(4) = 'Angstrom'
+
       end do
 
       max_atoms = 100
@@ -149,7 +151,12 @@ subroutine build_super_molecule(keyword)
       close(2)
 
       open(3,file="torus_parameters.inp")
-        write(3,*) L
+        if (keyword(4) == 'Angstrom') then 
+          write(3,*) L * 1.8897261249935897D00
+        else
+          write(3,*) L
+        end if
+        !write(3,*) L
         write(3,*) num_atoms
       close(3)
 
@@ -178,7 +185,12 @@ subroutine build_super_molecule(keyword)
         close(2)
 
         open(3,file="torus_parameters.inp")
-          write(3,*) L
+          if (keyword(4) == 'Angstrom') then 
+            write(3,*) L * 1.8897261249935897D00
+          else
+            write(3,*) L
+          end if
+!          write(3,*) L
           write(3,*) num_atoms
         close(3)
 

@@ -48,6 +48,7 @@ program CI
       character(len=2),allocatable    ::                  label(:)
 
       logical                         :: c_read, c_Integral, c_trexio
+      logical                         :: c_Angstrom
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
@@ -55,9 +56,10 @@ program CI
 
       call build_super_molecule(keyword)
 
-      c_integral = any(keyword == 'Integral')
+      c_integral = any(keyword == 'Integrals')
       c_read     = any(keyword == 'Read'    )
       c_trexio   = any(keyword == 'Trexio'  )
+      c_Angstrom = any(keyword == 'Angstrom')
 
       call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type,label_tmp)
 
@@ -73,9 +75,15 @@ program CI
       do i = 1 , n_atoms
         label(i)      =      label_tmp(i)
         charge    (i) =     charge_tmp(i)
-        geometry(i,1) = geometry_tmp(i,1)
-        geometry(i,2) = geometry_tmp(i,2)
-        geometry(i,3) = geometry_tmp(i,3)
+        if (c_Angstrom) then 
+          geometry(i,1) = geometry_tmp(i,1) * 1.8897261249935897D00
+          geometry(i,2) = geometry_tmp(i,2) * 1.8897261249935897D00
+          geometry(i,3) = geometry_tmp(i,3) * 1.8897261249935897D00
+        else
+          geometry(i,1) = geometry_tmp(i,1)
+          geometry(i,2) = geometry_tmp(i,2)
+          geometry(i,3) = geometry_tmp(i,3)
+        end if
       end do 
 
       allocate(atoms    (n_atoms))
@@ -251,7 +259,7 @@ program CI
       write(outfile,*)
       
       call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
-      call system("rm -r " // trim(tmp_file_name))
+      !call system("rm -r " // trim(tmp_file_name))
       
 
       !-----------------------------------------------------------------!

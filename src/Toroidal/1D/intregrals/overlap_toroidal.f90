@@ -48,8 +48,9 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
 
       ! --------------------------------------------------------------- !
 
-      do i = 1 , index_unitcell
-        do j = i , number_of_functions
+      !do i = 1 , index_unitcell
+      do i = 1 , number_of_functions
+        do j = 1 , number_of_functions
 
           AO1 = AO(i)
           AO2 = AO(j)
@@ -105,19 +106,18 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      do i = index_unitcell + 1   , number_of_functions
-        do j = index_unitcell + 1 , number_of_functions
-          overlap(i,j) = overlap(i-index_unitcell,j-index_unitcell)
-        end do 
-      end do 
+      !do i = index_unitcell + 1   , number_of_functions
+      !  do j = index_unitcell + 1 , number_of_functions
+      !    overlap(i,j) = overlap(i-index_unitcell,j-index_unitcell)
+      !  end do 
+      !end do 
  
-      do i = 1 , number_of_functions - 1 
-        do j = i , number_of_functions
-          overlap(j,i) = overlap(i,j)
-        end do 
-      end do 
+      !do i = 1 , number_of_functions - 1 
+      !  do j = i , number_of_functions
+      !    overlap(j,i) = overlap(i,j)
+      !  end do 
+      !end do 
 
-      !open(1,file="./tmp/OV.dat")
       open(1,file=trim(tmp_file_name)//"/OV.dat ")
         do i = 1 , size(overlap,1)
           do j = i , size(overlap,1)
@@ -126,7 +126,6 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
         end do 
       close(1)
 
-      !open(1,file="./tmp/OV_matrix.dat")
       open(1,file=trim(tmp_file_name)//"/OV_matrix.dat")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(overlap,1))
       do i = 1 , size(overlap,1)

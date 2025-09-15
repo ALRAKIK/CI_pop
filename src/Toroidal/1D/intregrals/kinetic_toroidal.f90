@@ -46,7 +46,8 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
       end do 
 
 
-      do i = 1 , index_unitcell
+      !do i = 1 , index_unitcell
+      do i = 1 , number_of_functions
         do j = 1 , number_of_functions
 
           AO1 = AO(i)
@@ -104,17 +105,17 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      do i = index_unitcell + 1   , number_of_functions
-        do j = index_unitcell + 1 , number_of_functions
-          kinetic(i,j) = kinetic(i-index_unitcell,j-index_unitcell)
-        end do 
-      end do 
-
-      do i = 1 , number_of_functions - 1 
-        do j = i , number_of_functions
-          kinetic(j,i) = kinetic(i,j)
-        end do 
-      end do 
+      !do i = index_unitcell + 1   , number_of_functions
+      !  do j = index_unitcell + 1 , number_of_functions
+      !    kinetic(i,j) = kinetic(i-index_unitcell,j-index_unitcell)
+      !  end do 
+      !end do 
+!
+      !do i = 1 , number_of_functions - 1 
+      !  do j = i , number_of_functions
+      !    kinetic(j,i) = kinetic(i,j)
+      !  end do 
+      !end do 
 
       !open(1,file="./tmp/KI.dat")
       open(1,file=trim(tmp_file_name)//"/KI.dat ")

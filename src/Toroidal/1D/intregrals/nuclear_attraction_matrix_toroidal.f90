@@ -41,7 +41,8 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
         index_unitcell = index_unitcell  + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
       end do 
 
-      do i = 1 , index_unitcell 
+      !do i = 1 , index_unitcell 
+      do i = 1 , number_of_functions 
         do j = 1 , number_of_functions
         
           AO1 = AO(i)
@@ -99,23 +100,23 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
       
 
-      do i = 1 , index_unitcell
-        do j = 1 , number_of_functions
-          if (abs(NA(i,j)) < 1e-10) NA(i,j) = 0.d0 
-        end do 
-      end do 
+      !do i = 1 , index_unitcell
+      !  do j = 1 , number_of_functions
+      !    if (abs(NA(i,j)) < 1e-10) NA(i,j) = 0.d0 
+      !  end do 
+      !end do 
 
-      do i = index_unitcell + 1   , number_of_functions
-        do j = index_unitcell + 1 , number_of_functions
-          NA(i,j) = NA(i-index_unitcell,j-index_unitcell)
-        end do 
-      end do 
+      !do i = index_unitcell + 1   , number_of_functions
+      !  do j = index_unitcell + 1 , number_of_functions
+      !    NA(i,j) = NA(i-index_unitcell,j-index_unitcell)
+      !  end do 
+      !end do 
 
-      do i = 1 , number_of_functions - 1 
-        do j = i , number_of_functions
-          NA(j,i) = NA(i,j)
-        end do 
-      end do 
+      !do i = 1 , number_of_functions - 1 
+      !  do j = i , number_of_functions
+      !    NA(j,i) = NA(i,j)
+      !  end do 
+      !end do 
 
       !open(1,file="./tmp/NA.dat")
       open(1,file=trim(tmp_file_name)//"/NA.dat ")
