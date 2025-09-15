@@ -48,7 +48,7 @@ subroutine build_super_molecule(keyword)
         write(*,'(a)') "Type of calculation: Torus"
       else if (type_of_calculation == "OBC") then 
         write(*,'(a)') "Type of calculation: OBC"
-      else if (type_of_calculation == "Tori") then 
+      else if (type_of_calculation == "Tori1D") then 
         write(*,'(a)') "Type of calculation: Toroidal"
       else if (type_of_calculation == "Tori2D") then 
         write(*,'(a)') "Type of calculation: Toroidal real 2D"

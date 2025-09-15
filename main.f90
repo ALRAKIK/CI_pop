@@ -90,7 +90,7 @@ program CI
       allocate(norm_helper(n_atoms))
 
 
-      if (calculation_type == "Tori" .or. calculation_type == "Tori2D" .or. &
+      if (calculation_type == "Tori1D" .or. calculation_type == "Tori2D" .or. &
           calculation_type == "Tori3D" ) then 
         call basis_tor(n_atoms,charge,atoms,norm_helper,calculation_type)
       else
@@ -122,7 +122,7 @@ program CI
 
       allocate(AO(number_of_functions))
 
-      if (calculation_type == "Tori" .or. calculation_type == "Tori2D") then 
+      if (calculation_type == "Tori1D" .or. calculation_type == "Tori2D") then 
         call classification_orbital_tor(n_atoms,number_of_functions,geometry,atoms,norm_helper,AO)
       else
         call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
@@ -186,8 +186,8 @@ program CI
             call molecule(n_atoms,geometry,atoms)                          ! Molecule 
           case ("Torus")
             call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)  ! Torus with PBC 
-          case ("Tori")
-            call Tori(n_atoms,number_of_functions,atoms,AO,geometry)       ! Toroidal 1D Gaussian TRR
+          case ("Tori1D")
+            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry)       ! Toroidal 1D Gaussian TRR
           case ("Tori2D")
             call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 2D Gaussian
           case ("Tori3D")

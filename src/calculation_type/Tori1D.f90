@@ -1,4 +1,4 @@
-subroutine Tori(n_atoms,number_of_functions,atoms,AO,geometry)
+subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry)
 
       use files
       use torus_init
@@ -52,4 +52,4 @@ subroutine Tori(n_atoms,number_of_functions,atoms,AO,geometry)
       ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - !
 
 
-end subroutine Tori
+end subroutine Tori1D

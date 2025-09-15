@@ -159,7 +159,7 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 150
+      integer,parameter                  :: Nmax = 60
       integer                            :: current_max
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi

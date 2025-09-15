@@ -43,7 +43,7 @@ subroutine basis_tor(number_of_atoms,charge,atoms,norm_helper,calculation_type)
 
       call extract_basis_tor   (number_of_atoms,charge)
 
-      if (calculation_type == 'torus' .or. calculation_type == 'Tori' ) then
+      if (calculation_type == 'torus' .or. calculation_type == 'Tori1D' ) then
         call normalize_basis_tor()
       else if (calculation_type == 'Tori2D') then
         call normalize_basis_tor_2D()

@@ -27,7 +27,7 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
 
       allocate(kinetic(number_of_functions,number_of_functions))
 
-      kinetic(:,:) = 0.d0 
+      kinetic(:,:) = 0.d0
 
       index_atom1 = atoms(1)%num_s_function + 3*atoms(1)%num_p_function
 
@@ -44,10 +44,8 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
       do i = 1 , number_of_atom_in_unitcell
         index_unitcell = index_unitcell  + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
       end do 
-
-
-      !do i = 1 , index_unitcell
-      do i = 1 , number_of_functions
+      
+      do i = 1 ,  index_unitcell
         do j = 1 , number_of_functions
 
           AO1 = AO(i)
@@ -105,19 +103,18 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      !do i = index_unitcell + 1   , number_of_functions
-      !  do j = index_unitcell + 1 , number_of_functions
-      !    kinetic(i,j) = kinetic(i-index_unitcell,j-index_unitcell)
-      !  end do 
-      !end do 
-!
-      !do i = 1 , number_of_functions - 1 
-      !  do j = i , number_of_functions
-      !    kinetic(j,i) = kinetic(i,j)
-      !  end do 
-      !end do 
+      do i = index_unitcell + 1   , number_of_functions
+        do j = index_unitcell + 1 , number_of_functions
+          kinetic(i,j) = kinetic(i-index_unitcell,j-index_unitcell)
+        end do 
+      end do 
 
-      !open(1,file="./tmp/KI.dat")
+      do i = 1 , number_of_functions - 1 
+        do j = i , number_of_functions
+          kinetic(j,i) = kinetic(i,j)
+        end do 
+      end do 
+
       open(1,file=trim(tmp_file_name)//"/KI.dat ")
       do i = 1 , size(kinetic,1)
         do j = i , size(kinetic,1)
@@ -126,7 +123,6 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO)
       end do 
       close(1)
 
-      !open(1,file="./tmp/KI_matrix.dat")
       open(1,file=trim(tmp_file_name)//"/KI_matrix.dat")
         write(1,'(15x,1000(i3,15x))') (i,i=1,size(kinetic,1))
         do i = 1 , size(kinetic,1)

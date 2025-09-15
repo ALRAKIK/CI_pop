@@ -16,7 +16,6 @@ subroutine read_basis_class(atom_type)
       atom_type%num_p_function = 0
 
     
-      !open(1, file="./tmp/Basis_normalized")
       open(1,file=trim(tmp_file_name)//"/Basis_normalized")
 
         do 
@@ -71,10 +70,8 @@ subroutine read_basis_class_tor(atom_type,num)
       atom_type%num_p_function = 0
 
       if (num == 1) then 
-        !open(1, file="./tmp/Basis_normalized")
         open(1,file=trim(tmp_file_name)//"/Basis_normalized")
       else 
-        !open(1, file="./tmp/Basis_normalized_p")
         open(1,file=trim(tmp_file_name)//"/Basis_normalized_p")
       end if 
         do 
