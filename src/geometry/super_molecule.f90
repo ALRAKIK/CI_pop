@@ -95,8 +95,8 @@ subroutine build_super_molecule(keyword)
       geometry_unitcell(:,3) = 0.d0 
 
       do
-        read(1, '(A)', iostat=io_stat) line
 
+        read(1, '(A)', iostat=io_stat) line
         if (trim(line) == '$$') then
           reading_cell = .false.
           exit
@@ -105,10 +105,11 @@ subroutine build_super_molecule(keyword)
         num_atoms = num_atoms + 1
 
         read(line, *, iostat=io_stat) atom_names(num_atoms), geometry_unitcell(num_atoms,1), &
-                            geometry_unitcell(num_atoms,2), geometry_unitcell(num_atoms,3)
+                             geometry_unitcell(num_atoms,2), geometry_unitcell(num_atoms,3)
+
         if (io_stat /= 0) then
-        print *, 'Error parsing atom data:', trim(line)
-        num_atoms = num_atoms - 1
+          print *, 'Error parsing atom data:', trim(line)
+          num_atoms = num_atoms - 1
         end if
 
       end do

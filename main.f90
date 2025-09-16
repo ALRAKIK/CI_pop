@@ -65,7 +65,7 @@ program CI
 
       call initialize_ff(calculation_type,n_atoms)
 
-      if (calculation_type == "Torus"  .or. calculation_type == "Tori" .or.&
+      if (calculation_type == "Torus"  .or. calculation_type == "Tori1D" .or.&
           calculation_type == "Tori2D" .or. calculation_type == "Tori3D"  ) call Torus_def()
 
       allocate(geometry(n_atoms,3))
@@ -146,7 +146,6 @@ program CI
         call trexio_conv_init(calculation_type, n_atoms)
         call trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
                                   number_of_functions)
-        stop 
       end if
 
 

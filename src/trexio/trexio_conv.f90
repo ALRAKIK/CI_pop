@@ -78,7 +78,7 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
 
       ! local ! 
 
-      integer(trexio_exit_code)       :: rc       
+      integer(trexio_exit_code)       :: rc       , i 
       character*(128)                 :: err_msg  
 
 
@@ -91,14 +91,16 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
+      do i = 1 , n_atoms
+        print*, label(i)
+      end do
 
-      !rc = trexio_write_nucleus_label (trexio_file, label,2)
-      !if (rc /= TREXIO_SUCCESS) then
-      !  call trexio_string_of_error(rc, err_msg)
-      !    print *, 'Error: '//trim(err_msg)
-      !  call exit(-1)
-      !end if
- 
+      rc = trexio_write_nucleus_label (trexio_file, label,n_atoms)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if 
 
       rc = trexio_write_nucleus_coord (trexio_file, geometry)
       if (rc /= TREXIO_SUCCESS) then
