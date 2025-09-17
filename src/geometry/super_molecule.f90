@@ -4,26 +4,21 @@ subroutine build_super_molecule(keyword)
       
       !-----------------------------------------------------------------!
 
-      ! input ! 
-
-
       ! local ! 
 
-      integer                        :: number_of_unitcell , max_atoms , num_atoms
-      integer                        :: io_stat , i , j , atom_index
+      integer                        :: number_of_unitcell, max_atoms
+      integer                        :: num_atoms
+      integer                        :: io_stat, i, j, atom_index
 
+      double precision,parameter     :: pi  = acos(-1.d0)
 
-      double precision,parameter     :: pi  = 3.14159265358979323846D00
-      double precision               :: distance_between_unitcells , L
-      double precision               :: rx , theta 
-      
+      double precision               :: distance_between_unitcells, L
+      double precision               :: rx, theta
 
       double precision,allocatable   ::  geometry_unitcell(:,:)
       double precision,allocatable   ::           unitcell(:,:)
       double precision,allocatable   ::     super_geometry(:,:)
 
-
-      logical                        ::           reading_cell
       character(len=10)              ::    type_of_calculation
       character(len=100)             ::                   line
 
@@ -31,16 +26,19 @@ subroutine build_super_molecule(keyword)
       character(len=2),allocatable   ::             a_names(:)
       character(len=2),allocatable   ::         super_atoms(:)
 
+      logical                        ::           reading_cell
+
 
       ! output !
 
-      character(len=10),intent(out)  ::         keyword(10)
+      character(len=10),intent(out)  ::            keyword(10)
 
       !-----------------------------------------------------------------!
 
       open(1,file="unitcell.mol")
 
-      read(1,*) type_of_calculation , number_of_unitcell , distance_between_unitcells , L 
+      read(1,*) type_of_calculation, number_of_unitcell,                &
+              & distance_between_unitcells, L
 
       if (type_of_calculation == "Ring") then
         write(*,'(a)') "Type of calculation: Ring"
@@ -57,7 +55,12 @@ subroutine build_super_molecule(keyword)
       else if (type_of_calculation == "OBC2D") then 
         write(*,'(a)') "Type of calculation: OBC with FCI"
       else 
-        write(*,'(a)') "Error: Unknown type of calculation. Please use either 'Torus','Ring','Tori' or 'OBC' ."
+        write(*,'(a)') ""
+        write(*,'(a)') "Error: Unknown type of calculation"
+        write(*,'(a)') ""
+        write(*,'(a)') "Please use either    'OBC',   'Ring',  'Torus'"
+        write(*,'(a)') "                  'Tori1D', 'Tori2D', 'Tori3D'."
+        write(*,'(a)') ""
         stop
       end if
 
@@ -65,7 +68,8 @@ subroutine build_super_molecule(keyword)
         read(1, '(A)',iostat=io_stat) line
         if (io_stat /= 0) then
           write(*,'(a)') ""
-          write(*,'(a)')'Error: Reached end of file without finding opening $$ marker in your unitcell'
+          write(*,'(a)')'Error: Reached end of file without finding'
+          write(*,'(a)')'       opening $$ marker in your unitcell'
           write(*,'(a)') ""
           close(1)
           stop
@@ -83,6 +87,9 @@ subroutine build_super_molecule(keyword)
         if (trim(line) == 'Trexio'   )   keyword(3) = 'Trexio'
 
         if (trim(line) == 'Angstrom' )   keyword(4) = 'Angstrom'
+
+
+        ! here add the keyword for the threshold of the integrals !
 
       end do
 
@@ -104,8 +111,10 @@ subroutine build_super_molecule(keyword)
 
         num_atoms = num_atoms + 1
 
-        read(line, *, iostat=io_stat) atom_names(num_atoms), geometry_unitcell(num_atoms,1), &
-                             geometry_unitcell(num_atoms,2), geometry_unitcell(num_atoms,3)
+        read(line, *, iostat=io_stat) atom_names(num_atoms),            &
+        &                             geometry_unitcell(num_atoms,1),   &
+        &                             geometry_unitcell(num_atoms,2),   &
+        &                             geometry_unitcell(num_atoms,3)
 
         if (io_stat /= 0) then
           print *, 'Error parsing atom data:', trim(line)
@@ -138,7 +147,10 @@ subroutine build_super_molecule(keyword)
         do j = 1, num_atoms
             atom_index = atom_index + 1
             super_atoms(atom_index) = a_names(j)
-            super_geometry(atom_index, 1) = unitcell(j, 1) + i * distance_between_unitcells
+            ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
+            super_geometry(atom_index, 1) = unitcell(j, 1)              &
+          &                           + i * distance_between_unitcells
+            ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
             super_geometry(atom_index, 2) = unitcell(j, 2)
             super_geometry(atom_index, 3) = unitcell(j, 3) 
         end do
@@ -146,8 +158,8 @@ subroutine build_super_molecule(keyword)
 
       open(2,file="supermolecule.mol")
         do i = 1, num_atoms * number_of_unitcell
-          write(2, *) super_atoms(i), super_geometry(i, 1), &
-                                   super_geometry(i, 2), super_geometry(i, 3)
+          write(2, *)       super_atoms(i), super_geometry(i, 1),       &
+          &           super_geometry(i, 2), super_geometry(i, 3)
         end do
       close(2)
 
@@ -170,7 +182,8 @@ subroutine build_super_molecule(keyword)
           do j = 1, num_atoms
               atom_index = atom_index + 1
               super_atoms(atom_index) = a_names(j)
-              theta = (i * distance_between_unitcells + unitcell(j, 1) )* 2.d0*pi / (number_of_unitcell * distance_between_unitcells)
+              theta = (i * distance_between_unitcells + unitcell(j, 1)) &
+            & * 2.d0*pi/(number_of_unitcell * distance_between_unitcells)
               super_geometry(atom_index, 1) = rx * cos(theta)
               super_geometry(atom_index, 2) = rx * sin(theta)
               super_geometry(atom_index, 3) = 0.d0

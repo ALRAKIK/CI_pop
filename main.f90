@@ -52,21 +52,47 @@ program CI
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
-      !-----------------------------------------------------------------!    
+      !-----------------------------------------------------------------!
 
+      ! --------------------------------------------------------------- !
+      !                   build the super molecule                      !
+      ! --------------------------------------------------------------- !
+      
       call build_super_molecule(keyword)
+
+      ! --------------------------------------------------------------- !
+      !                        Read key words                           !
+      ! --------------------------------------------------------------- !
 
       c_integral = any(keyword == 'Integrals')
       c_read     = any(keyword == 'Read'    )
       c_trexio   = any(keyword == 'Trexio'  )
       c_Angstrom = any(keyword == 'Angstrom')
+      
+      ! --------------------------------------------------------------- !
+      !               Read the Geometry, Label and the Charge           !
+      ! --------------------------------------------------------------- !
 
-      call read_geometry(n_atoms,charge_tmp,geometry_tmp,calculation_type,label_tmp)
+      call read_geometry(n_atoms,charge_tmp,geometry_tmp,               &
+      &                  calculation_type,label_tmp)
+
+      ! --------------------------------------------------------------- !
+      !           prepare the folder to write the output files          !
+      ! --------------------------------------------------------------- !
 
       call initialize_ff(calculation_type,n_atoms)
 
-      if (calculation_type == "Torus"  .or. calculation_type == "Tori1D" .or.&
-          calculation_type == "Tori2D" .or. calculation_type == "Tori3D"  ) call Torus_def()
+      ! --------------------------------------------------------------- !
+      !       If the calculation is on a torus read the parameters      !  
+      ! --------------------------------------------------------------- !
+       
+      if (calculation_type ==  "Torus" .or.                             & 
+      &   calculation_type == "Tori1D" .or.                             &                            
+      &   calculation_type == "Tori2D" .or.                             & 
+      &   calculation_type == "Tori3D")                                 &
+      &   call Torus_def()
+
+      ! --------------------------------------------------------------- !
 
       allocate(geometry(n_atoms,3))
       allocate(charge(n_atoms))
@@ -90,7 +116,8 @@ program CI
       allocate(norm_helper(n_atoms))
 
 
-      if (calculation_type == "Tori1D" .or. calculation_type == "Tori2D" .or. &
+      if (calculation_type == "Tori1D" .or. &
+      &   calculation_type == "Tori2D" .or. &
           calculation_type == "Tori3D" ) then 
         call basis_tor(n_atoms,charge,atoms,norm_helper,calculation_type)
       else
@@ -112,28 +139,34 @@ program CI
 
       number_of_functions = 0 
       do i = 1 , n_atoms
-        number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
+        number_of_functions = number_of_functions                       &
+        &  + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
 
       nBAS = 0 
       do i = 1 , n_atoms
-        nBAS = nBAS + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
+        nBAS = nBAS & 
+        &  + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
 
       allocate(AO(number_of_functions))
 
-      if (calculation_type == "Tori1D" .or. calculation_type == "Tori2D") then 
-        call classification_orbital_tor(n_atoms,number_of_functions,geometry,atoms,norm_helper,AO)
+      if (calculation_type == "Tori1D" .or.                             &
+      &   calculation_type == "Tori2D" .or.                             & 
+      &   calculation_type == "Tori3D") then 
+        call classification_orbital_tor(n_atoms,number_of_functions,    &
+        &                               geometry,atoms,norm_helper,AO)
       else
-        call classification_orbital(n_atoms,number_of_functions,geometry,atoms,AO)
+        call classification_orbital(n_atoms,number_of_functions,        &
+        &                               geometry,atoms,AO)
       end if
 
       call print_orbital_table(AO,number_of_functions)
 
 
-!     -------------------------------------------------------------------     !
-!                        Nuclear repulsion energy  
-!     -------------------------------------------------------------------     !
+      ! --------------------------------------------------------------- !
+      !                    Nuclear repulsion energy                     !
+      ! --------------------------------------------------------------- !
 
       call NRE(calculation_type,n_atoms,geometry,atoms,E_nuc)
 
@@ -144,8 +177,8 @@ program CI
 
       if (c_trexio) then
         call trexio_conv_init(calculation_type, n_atoms)
-        call trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
-                                  number_of_functions)
+        call trexio_conv_global(n_atoms,label,geometry,charge,          &
+        &                       E_nuc,n_electron,number_of_functions)
       end if
 
 
@@ -188,13 +221,14 @@ program CI
           case ("Torus")
             call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)  ! Torus with PBC 
           case ("Tori1D")
-            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry)       ! Toroidal 1D Gaussian TRR
+            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Toroidal 1D Gaussian TRR
           case ("Tori2D")
             call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 2D Gaussian
           case ("Tori3D")
             call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 3D Gaussian  
           case default
-            write(outfile,'(A)') 'Unknown calculation type: ', trim(calculation_type)
+            write(outfile,'(A)') 'Unknown calculation type: ',          &
+            &                     trim(calculation_type)
             stop
         end select          
       end if

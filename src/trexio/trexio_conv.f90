@@ -17,7 +17,9 @@ subroutine trexio_conv_init(calculation_type, n_atoms)
       character(len=100)              :: trexio_file_name
 
 
-      ! open the trexio file for writing 
+      ! --------------------------------------------------------------- !
+      !                 initializing the trexio file                    !
+      ! --------------------------------------------------------------- !
 
       write(trexio_file_name,'(A,A,I0,A)') trim(calculation_type),"_",n_atoms,".trexio"
 
@@ -78,11 +80,12 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
 
       ! local ! 
 
-      integer(trexio_exit_code)       :: rc       , i 
+      integer(trexio_exit_code)       :: rc
       character*(128)                 :: err_msg  
 
-
-      ! writing into the trexio file ! 
+      ! --------------------------------------------------------------- !
+      !                 writing into the trexio file                    ! 
+      ! --------------------------------------------------------------- !
 
       rc = trexio_write_nucleus_num (trexio_file, n_atoms)
       if (rc /= TREXIO_SUCCESS) then
@@ -90,10 +93,6 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
-
-      do i = 1 , n_atoms
-        print*, label(i)
-      end do
 
       rc = trexio_write_nucleus_label (trexio_file, label,n_atoms)
       if (rc /= TREXIO_SUCCESS) then
@@ -116,14 +115,12 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
          call exit(-1)
        end if
 
-
       rc = trexio_write_nucleus_repulsion (trexio_file, E_nuc)
       if (rc /= TREXIO_SUCCESS) then
         call trexio_string_of_error(rc, err_msg)
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
-
 
       rc = trexio_write_electron_num (trexio_file, n_electron)
       if (rc /= TREXIO_SUCCESS) then
@@ -180,7 +177,7 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
 
       ! local ! 
 
-      integer                         :: i , j , k , l  , p , q 
+      integer                         :: i , j , k , l
 
       double precision                :: Eri_p(nBas,nBas,nBas,nBas)
 
@@ -221,12 +218,6 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
-
-
-      !BUFSIZE = nbas*nbas*nbas*nbas
-
-      !allocate(buffer_index(4, BUFSIZE))
-      !allocate(buffer_values(BUFSIZE))
 
       do i = 1 , nBas
         do j = 1 , nBas
