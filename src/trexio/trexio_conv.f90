@@ -85,29 +85,57 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
 
       integer(trexio_exit_code)       :: rc
       character*(128)                 :: err_msg  
+      double precision                :: Nshell(number_of_shells)
+      double precision                :: NAO(number_of_functions)
 
       ! --------------------------------------------------------------- !
       !                 writing into the trexio file                    ! 
       ! --------------------------------------------------------------- !
 
-      rc = trexio_write_nucleus_num (trexio_file, n_atoms)
+      !         - Writing the global (metadata) information -           !
+
+      rc = trexio_write_metadata_code_num(trexio_file, 1)
       if (rc /= TREXIO_SUCCESS) then
         call trexio_string_of_error(rc, err_msg)
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
 
-      rc = trexio_write_nucleus_label (trexio_file, label,n_atoms)
+      rc = trexio_write_metadata_code(trexio_file,"Clifford Gaussian",20)
       if (rc /= TREXIO_SUCCESS) then
         call trexio_string_of_error(rc, err_msg)
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
-      end if 
+      end if
 
-      rc = trexio_write_nucleus_coord (trexio_file, geometry)
+      rc = trexio_write_metadata_author_num(trexio_file,1)
       if (rc /= TREXIO_SUCCESS) then
         call trexio_string_of_error(rc, err_msg)
-        print *, 'Error: '//trim(err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+
+      rc = trexio_write_metadata_author(trexio_file,"Amer Alrakik",15)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+ 
+      rc = trexio_write_metadata_description(trexio_file,'Calculate the integrals using Clifford Gaussian',49)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+
+      !        - Writing the system (nucleus group) information -       !
+
+
+      rc = trexio_write_nucleus_num (trexio_file, n_atoms)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
 
@@ -118,12 +146,29 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
          call exit(-1)
        end if
 
+      rc = trexio_write_nucleus_coord (trexio_file, geometry)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+        print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+
+      rc = trexio_write_nucleus_label (trexio_file, label,n_atoms)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if 
+
+    
       rc = trexio_write_nucleus_repulsion (trexio_file, E_nuc)
       if (rc /= TREXIO_SUCCESS) then
         call trexio_string_of_error(rc, err_msg)
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
+
+      !       - Writing the Electron (electron group) information -     !
 
       rc = trexio_write_electron_num (trexio_file, n_electron)
       if (rc /= TREXIO_SUCCESS) then
@@ -146,7 +191,7 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
-
+      !       - Writing the Basis set (basis group) information -       !
 
       rc = trexio_write_basis_type(trexio_file,"Gaussian",8)
       if (rc /= TREXIO_SUCCESS) then
@@ -169,12 +214,19 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
-      rc = trexio_write_ao_num(trexio_file, number_of_functions)
+
+      Nshell(:) = 1.d0
+
+
+      rc = trexio_write_basis_shell_factor(trexio_file, Nshell)
       if (rc /= TREXIO_SUCCESS) then
         call trexio_string_of_error(rc, err_msg)
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
+      
+      !          - Writing the Orbitals (AO group) information -        !
+
 
       rc = trexio_write_ao_cartesian(trexio_file, 1)
       if (rc /= TREXIO_SUCCESS) then
@@ -182,6 +234,27 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
+
+      rc = trexio_write_ao_num(trexio_file, number_of_functions)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+
+
+
+      NAO(:) = 1.d0
+
+
+      rc = trexio_write_ao_normalization(trexio_file, NAO)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+
+      
 
 end subroutine trexio_conv_global 
 
