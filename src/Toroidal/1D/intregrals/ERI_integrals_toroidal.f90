@@ -100,7 +100,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              if (test < 1e-15) cycle
+              if (test < 1e-30) cycle
 
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
@@ -157,7 +157,7 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
       integer,parameter                  :: Nmax = 60
-      integer,parameter                  :: Nmax_t = 500
+      integer,parameter                  :: Nmax_t = 1000
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi
       
@@ -189,12 +189,11 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       double precision                     :: A,  B, C 
       double precision                     :: D, D2
       double precision                     :: const 
-      double precision                     :: tol  = 1D-12
+      double precision                     :: tol  = 1D-15
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
-      integer                              :: n , small_count
+      integer                              :: n 
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
       double precision                     :: termC
-      double precision                     :: sum1 
       COMPLEX(KIND=KIND(1.0D0))            :: term1  , term2 
 
 
@@ -1449,12 +1448,11 @@ end function S
       double precision                     :: A,  B, C 
       double precision                     :: D, D2
       double precision                     :: const 
-      double precision                     :: tol  = 1D-12
+      double precision                     :: tol  = 1D-15
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n , small_count
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
       double precision                     :: termC
-      double precision                     :: sum1 
       COMPLEX(KIND=KIND(1.0D0))            :: term1  , term2 
 
 

@@ -161,15 +161,6 @@ program CI
         &  + atoms(i)%num_s_function + atoms(i)%num_p_function
       end do
 
-
-
-
-
-
-
-
-
-
       ! --------------------------------------------------------------- !
       !          Allocate the memory for the atomic orbitals            !
       ! --------------------------------------------------------------- !
