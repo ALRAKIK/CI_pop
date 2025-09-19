@@ -132,6 +132,22 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
+      rc = trexio_write_electron_up_num (trexio_file, n_electron/2)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+
+      rc = trexio_write_electron_dn_num (trexio_file, n_electron/2)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+
+
+
       rc = trexio_write_basis_type(trexio_file,"Gaussian",8)
       if (rc /= TREXIO_SUCCESS) then
         call trexio_string_of_error(rc, err_msg)
