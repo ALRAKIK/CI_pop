@@ -133,7 +133,8 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
       open(1,file=trim(tmp_file_name)//"/NA.dat")
         do i = 1 , size(NA,1)
           do j = i , size(NA,1)
-            if (abs(NA(i,j)) > 1e-15 ) write(1,*) i , j ,  NA(i,j)
+            !if (abs(NA(i,j)) > 1e-15 ) write(1,*) i , j ,  NA(i,j)
+            write(1,*) i , j ,  NA(i,j)
           end do 
         end do 
       close(1)
