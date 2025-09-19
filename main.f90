@@ -21,6 +21,8 @@ program CI
       integer                         ::           charge_tmp(100)
       character*(2)                   ::            label_tmp(100)
       integer                         ::       number_of_functions
+      integer                         ::      number_of_primitives
+      integer                         ::          number_of_shells
       character*(10)                  ::               keyword(10)
 
       double precision  ,allocatable  ::             geometry(:,:)
@@ -131,25 +133,56 @@ program CI
 
       nO = n_electron/2
 
-      CALL HEADER ('The Geometry',-1)
-
-      do i = 1 , n_atoms
-        write(outfile,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
-      end do 
+      ! --------------------------------------------------------------- !
+      !                 Information from the Basis set                  !
+      ! --------------------------------------------------------------- !
 
       number_of_functions = 0 
       do i = 1 , n_atoms
         number_of_functions = number_of_functions                       &
         &  + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do 
+      end do
 
       nBAS = 0 
       do i = 1 , n_atoms
         nBAS = nBAS & 
         &  + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do 
+      end do
+
+      number_of_primitives = 0
+      do i = 1 , n_atoms
+        number_of_primitives = number_of_primitives                     &
+        &  + atoms(i)%num_exponent_s + atoms(i)%num_exponent_p
+      end do
+
+      number_of_shells = 0
+      do i = 1 , n_atoms
+        number_of_shells = number_of_shells                     &
+        &  + atoms(i)%num_s_function + atoms(i)%num_p_function
+      end do
+
+
+
+
+
+
+
+
+
+
+      ! --------------------------------------------------------------- !
+      !          Allocate the memory for the atomic orbitals            !
+      ! --------------------------------------------------------------- !
 
       allocate(AO(number_of_functions))
+
+      ! --------------------------------------------------------------- !
+
+      CALL HEADER ('The Geometry',-1)
+
+      do i = 1 , n_atoms
+        write(outfile,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
+      end do 
 
       if (calculation_type == "Tori1D" .or.                             &
       &   calculation_type == "Tori2D" .or.                             & 
@@ -178,7 +211,8 @@ program CI
       if (c_trexio) then
         call trexio_conv_init(calculation_type, n_atoms)
         call trexio_conv_global(n_atoms,label,geometry,charge,          &
-        &                       E_nuc,n_electron,number_of_functions)
+        &                       E_nuc,n_electron,number_of_functions,   &
+        &                       number_of_primitives,number_of_shells)
       end if
 
 
@@ -296,7 +330,6 @@ program CI
       call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
       call system("rm -r " // trim(tmp_file_name))
       
-
       !-----------------------------------------------------------------!
       !-----------------------------------------------------------------!
 

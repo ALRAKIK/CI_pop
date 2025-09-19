@@ -60,7 +60,8 @@ end subroutine trexio_conv_close
 
 
 subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
-                              number_of_functions)
+                              number_of_functions,number_of_primitives,&
+                              number_of_shells)
    
       use files 
       use trexio
@@ -73,6 +74,8 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
       integer          ,intent(in)    :: charge(n_atoms)
       integer          ,intent(in)    :: n_electron
       integer          ,intent(in)    :: number_of_functions
+      integer          ,intent(in)    :: number_of_primitives
+      integer          ,intent(in)    :: number_of_shells
       character(len=2) ,intent(in)    :: label(n_atoms)
       double precision ,intent(in)    :: geometry(n_atoms,3)
       double precision ,intent(in)    :: E_nuc
@@ -136,7 +139,14 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
-      rc = trexio_write_basis_prim_num(trexio_file, number_of_functions)
+      rc = trexio_write_basis_prim_num(trexio_file, number_of_primitives)
+      if (rc /= TREXIO_SUCCESS) then
+        call trexio_string_of_error(rc, err_msg)
+          print *, 'Error: '//trim(err_msg)
+        call exit(-1)
+      end if
+
+      rc = trexio_write_basis_shell_num(trexio_file, number_of_shells)
       if (rc /= TREXIO_SUCCESS) then
         call trexio_string_of_error(rc, err_msg)
           print *, 'Error: '//trim(err_msg)

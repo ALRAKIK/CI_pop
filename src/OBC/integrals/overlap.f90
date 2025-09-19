@@ -124,7 +124,6 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
         end do 
       end do 
 
-      !open(1,file="./tmp/OV.dat")
       open(1,file=trim(tmp_file_name)//"/OV.dat")
         do i = 1 , size(overlap,1)
           do j = i , size(overlap,1)
@@ -133,7 +132,6 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
         end do 
       close(1)
 
-      !open(1,file="./tmp/OV_matrix.dat")
       open(1,file=trim(tmp_file_name)//"/OV_matrix.dat")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(overlap,1))
       do i = 1 , size(overlap,1)
