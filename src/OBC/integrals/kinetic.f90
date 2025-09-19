@@ -126,12 +126,11 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
       open(1,file=trim(tmp_file_name)//"/KI.dat")
       do i = 1 , size(kinetic,1)
         do j = i , size(kinetic,1)
-          if (abs(kinetic(i,j)) > 1e-8 ) write(1,*) i, j , kinetic(i,j)
+          if (abs(kinetic(i,j)) > 1e-15 ) write(1,*) i, j , kinetic(i,j)
         end do 
       end do 
       close(1)
 
-      !open(1,file="./tmp/KI_matrix.dat")
       open(1,file=trim(tmp_file_name)//"/KI_matrix.dat")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(kinetic,1))
       do i = 1 , size(kinetic,1)
