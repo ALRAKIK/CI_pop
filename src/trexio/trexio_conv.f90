@@ -191,6 +191,12 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
+
+
+
+
+
+
       !       - Writing the Basis set (basis group) information -       !
 
       rc = trexio_write_basis_type(trexio_file,"Gaussian",8)
@@ -214,7 +220,6 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
-
       Nshell(:) = 1.d0
 
 
@@ -224,6 +229,19 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
+
+
+
+
+
+
+
+
+
+
+
+
+
       
       !          - Writing the Orbitals (AO group) information -        !
 
@@ -354,6 +372,12 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
           end do
         end do 
       end do
+
+      if (icount > 0_8) then
+      rc = trexio_write_ao_2e_int_eri(trexio_file, offset, BUFSIZE, buffer_index, buffer_values)
+      call trexio_assert(rc, TREXIO_SUCCESS)
+      end if
+      
 
 
 end subroutine trexio_conv_integrals
