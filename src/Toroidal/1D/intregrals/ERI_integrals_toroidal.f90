@@ -97,10 +97,11 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
                nu    = gamma + delta
 
               const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx 
+              !const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx!*Lx
 
               test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              if (test < 1e-15) cycle
+              if (test < 1e-12) cycle
 
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
@@ -111,6 +112,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
 
               call integrate_ERI_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+              !call integrate_ERI_mod_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+
 
               value  = value    + const * value_s
 
@@ -121,6 +124,141 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
       end do 
 
 end subroutine ERI_integral_4_function_toroidal
+
+!subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
+!      
+!      use quadpack , only : dqagi
+!      use iso_c_binding
+!      use torus_init
+!      use gsl_bessel_mod
+!
+!      use, intrinsic :: ieee_arithmetic
+!
+!      implicit none
+!
+!      ! Input parameters
+!      double precision, intent(in)       :: p_x , p
+!      double precision, intent(in)       :: q_x , q
+!      double precision, intent(in)       :: phi
+!      double precision, intent(in)       :: xpA , xpB 
+!      double precision, intent(in)       :: xqC , xqD
+!      double precision, intent(in)       :: xa , xb , xc ,xd ,xp ,xq 
+!      integer         , intent(in)       :: pattern_id
+!      
+!
+!      ! Output parameters
+!
+!      double precision, intent(out)      :: result
+!    
+!      ! Local variables
+!
+!      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+!      integer,parameter                  :: inf = 1 
+!      double precision,parameter         :: bound = 0.0d0
+!      integer, parameter                 :: limit = 50
+!      integer, parameter                 :: lenw = limit*4
+!      integer                            :: ier, iwork(limit), last, neval
+!      double precision                   :: abserr, work(lenw)
+!      integer,parameter                  :: Nmax = 60
+!      integer,parameter                  :: Nmax_t = 2000
+!      double precision,parameter         :: pi   = 3.14159265358979323846D00
+!      double precision,parameter         :: pi2  = pi * pi
+!      
+!      
+!      call dqagi(f_decay2, bound, inf, epsabs, epsrel, result, abserr,   &
+!      &          neval, ier,Limit,Lenw,Last,Iwork,Work)
+!
+!      if (ier /= 0) then
+!        write(*,'(A,I8,A)') 'Error code = ', ier
+!      end if
+!
+!      contains
+!
+!      function f_decay2(t) result(ft)
+!
+!        double precision, intent(in) :: t
+!        double precision             :: ft
+!
+!         ft =  F(t)
+!
+!      end function f_decay2
+!
+!      double precision function F(t) result(sum)
+!
+!      use quadpack , only : dqag
+!      use gsl_bessel_mod
+!
+!      implicit none
+!      double precision, intent(in)         :: t
+!      double precision                     :: const 
+!      double precision                     :: tol  = 1D-15
+!      COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
+!      integer                              :: n, small_count
+!      COMPLEX(KIND=KIND(1.0D0))            :: termAn, termBn
+!      double precision                     :: termC
+!      integer                              :: Max_term
+!      COMPLEX(KIND=KIND(1.0D0))            :: term1, term2
+!
+!
+!      call dqag(G, 0.d0, Lx, Epsabs, Epsrel, 4, sum, Abserr, Neval, Ier, &
+!                    Limit, Lenw, Last, Iwork, Work)
+!      
+!      end function F
+!
+!      double precision function G(x2) result(sum_x2)
+!
+!      double precision, intent(in)         :: x2
+!      double precision                     :: A, B, C, D 
+!      double precision                     :: const
+!      double precision                     :: t 
+!
+!      A   = 2.d0 * p_x / (ax*ax)
+!      B   = 2.d0 * q_x / (ax*ax)
+!      C   = 2.d0 * t*t / (ax*ax)
+!      D   = 1.d0/(dsqrt(p*q+(p+q)*t*t))
+!
+!      const = (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)/(ax*ax))
+!
+!      sum_x2 = dexp(2.d0*q/(ax*ax)*dcos(ax*(x2-xq))) *                  &
+!      & bessi_scaled(0, dsqrt(A*A + C*C + 2.d0 * A * C * dcos(ax*(xp-x2))))
+!
+!      sum_x2 = sum_x2 * const 
+!
+!      end function G
+!
+!end subroutine integrate_ERI_mod_mod_mod
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
       
@@ -149,7 +287,7 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-6
+      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
@@ -215,21 +353,21 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       
       select case(pattern_id)
 
-        case (0000) ! | s   s   s   s    ( 1 ) 
-n           = 0
-const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)/ax2)
-termAn      = bessi_scaled(n, A)
-termBn      = bessi_scaled(n, B)
-sum         = const * bessi_scaled(n, C) * termAn * termBn 
-do n = 1 , Max_term
-  termAn  = bessi_scaled(n, A)
-  termBn  = bessi_scaled(n, B)
-  termc   = bessi_scaled(n, C) 
-  term1   = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
-  term2   = conjg(term1)
-  sum     = sum + real(term1+term2) * const
-  if (abs(real(term1+term2) * const) < tol) exit
-end do
+      case (0000) ! | s   s   s   s    ( 1 ) 
+        n           = 0
+        const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)/ax2)
+        termAn      = bessi_scaled(n, A)
+        termBn      = bessi_scaled(n, B)
+        sum         = const * bessi_scaled(n, C) * termAn * termBn 
+        do n = 1 , Max_term
+          termAn  = bessi_scaled(n, A)
+          termBn  = bessi_scaled(n, B)
+          termc   = bessi_scaled(n, C) 
+          term1   = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
+          term2   = conjg(term1)
+          if (abs(real(term1+term2) * const) < tol) exit
+          sum     = sum + real(term1+term2) * const
+        end do
 
 case (0001) ! | s   s   s   px   ( 2 ) 
 n           = 0
