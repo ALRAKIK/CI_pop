@@ -20,8 +20,8 @@ subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type,type)
         number_of_atoms = number_of_atoms + 1
       end do 
 
-
 3     close(1)
+
 
       open(1,file="supermolecule.mol")
       do i = 1 , number_of_atoms

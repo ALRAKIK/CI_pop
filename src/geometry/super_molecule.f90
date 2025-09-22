@@ -1,4 +1,4 @@
-subroutine build_super_molecule(keyword)
+subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
       implicit none 
       
@@ -32,6 +32,7 @@ subroutine build_super_molecule(keyword)
       ! output !
 
       character(len=10),intent(out)  ::            keyword(10)
+      integer                        :: num_atom_per_unitcell
 
       !-----------------------------------------------------------------!
 
@@ -124,6 +125,8 @@ subroutine build_super_molecule(keyword)
       end do
 
       close(1)
+
+      num_atom_per_unitcell = num_atoms
 
       allocate(unitcell(num_atoms,3))
       allocate(a_names(num_atoms))

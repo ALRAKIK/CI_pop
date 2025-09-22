@@ -20,6 +20,7 @@ program CI
       double precision                ::       geometry_tmp(100,3)
       integer                         ::           charge_tmp(100)
       character*(2)                   ::            label_tmp(100)
+      integer                         ::           n_atom_unitcell 
       integer                         ::       number_of_functions
       integer                         ::      number_of_primitives
       integer                         ::          number_of_shells
@@ -60,7 +61,7 @@ program CI
       !                   build the super molecule                      !
       ! --------------------------------------------------------------- !
       
-      call build_super_molecule(keyword)
+      call build_super_molecule(keyword,n_atom_unitcell)
 
       ! --------------------------------------------------------------- !
       !                        Read key words                           !
@@ -145,7 +146,7 @@ program CI
 
       nBAS = 0 
       do i = 1 , n_atoms
-        nBAS = nBAS & 
+        nBAS = nBAS                                                     & 
         &  + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do
 
@@ -157,7 +158,7 @@ program CI
 
       number_of_shells = 0
       do i = 1 , n_atoms
-        number_of_shells = number_of_shells                     &
+        number_of_shells = number_of_shells                             &
         &  + atoms(i)%num_s_function + atoms(i)%num_p_function
       end do
 
@@ -187,6 +188,23 @@ program CI
 
       call print_orbital_table(AO,number_of_functions)
 
+      ! --------------------------------------------------------------- !
+      !           print  Informations from the Basis set                !
+      ! --------------------------------------------------------------- !
+
+      write(outfile,'(A,I10)')'The number of AO functions            :',&
+      &                        number_of_functions 
+      write(outfile,'(A,I10)')'The number of the Gaussian primitives :',&
+      &                        number_of_primitives
+      write(outfile,'(A,I10)')'The number of shells                  :',&
+      &                        number_of_shells
+
+      write(outfile,'(A)')
+
+      write(outfile,'(A,I10)')'The number of atoms in the unitcell   :',&
+      &                     n_atom_unitcell
+
+      write(outfile,'(A)')
 
       ! --------------------------------------------------------------- !
       !                    Nuclear repulsion energy                     !
