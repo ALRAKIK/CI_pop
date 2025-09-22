@@ -100,7 +100,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              if (test < 1e-12) cycle
+              if (test < 1e-10) cycle
 
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
@@ -190,7 +190,7 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       double precision                     :: D, D2, ax2 
       double precision                     :: t2, t4 
       double precision                     :: const 
-      double precision                     :: tol  = 1D-15
+      double precision                     :: tol  = 1D-12
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n, small_count
       COMPLEX(KIND=KIND(1.0D0))            :: termAn, termBn
