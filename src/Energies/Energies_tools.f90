@@ -20,11 +20,6 @@ subroutine read_integrals(nBas,S,T,V,Hc,G)
       double precision,intent(out)  :: Hc(nBas,nBas)
       double precision,intent(out)  :: G(nBas,nBas,nBas,nBas)
 
-      !open( 8,file='./tmp/OV.dat' )
-      !open( 9,file='./tmp/KI.dat' )
-      !open(10,file='./tmp/NA.dat' )
-      !open(11,file='./tmp/ERI.dat')
-
       open( 8,file=trim(tmp_file_name)// "/OV.dat" )
       open( 9,file=trim(tmp_file_name)// "/KI.dat" )
       open(10,file=trim(tmp_file_name)// "/NA.dat" )
@@ -510,3 +505,66 @@ function trace_matrix(n,A) result(Tr)
 end function trace_matrix
 !------------------------------------------------------------------------
 
+function erfcx(t) result(sum)
+
+        implicit none 
+        double precision, intent(in) :: t
+        double precision             :: sum 
+
+        integer                      :: i 
+        double precision,parameter   :: pi = 3.14159265358979323846D00
+        integer                      :: factorial2
+
+        sum = 0 
+
+        if (t > 5.0d0) then 
+         do i = 1 , 30
+          sum = sum + (-1.d0)**(i-1) * factorial2((2*i-3)) / ( sqrt(pi) * 2.d0**(i-1) * t**(2*i-1) )
+         end do 
+        else 
+          sum = erfc(t) * dexp(t*t)
+        end if 
+
+end function erfcx 
+
+pure function factorial(x)  result(fac)
+
+      implicit none 
+
+      integer ,intent(in) :: x
+      integer             :: fac 
+
+      integer             :: i 
+
+      if (x <=1) then 
+        fac = 1
+        return 
+      end if 
+
+      fac = 1
+      do i = x , 2 , -1 
+        fac = fac * i 
+      end do 
+
+end function factorial
+
+pure function factorial2(x)  result(fac)
+
+      implicit none 
+
+      integer ,intent(in) :: x
+      integer             :: fac 
+
+      integer             :: i 
+
+      if (x <= 1 ) then 
+        fac = 1 
+        return 
+      end if 
+
+      fac = 1.d0 
+      do i = x , 2 , -2
+        fac = fac * i 
+      end do 
+
+end function factorial2

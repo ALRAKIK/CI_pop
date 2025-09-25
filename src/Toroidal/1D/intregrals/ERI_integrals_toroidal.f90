@@ -97,11 +97,10 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
                nu    = gamma + delta
 
               const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx 
-              const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx!*Lx
 
               test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              if (test < 1e-15) cycle
+              if (test < 1e-30) cycle
 
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
@@ -111,7 +110,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
 
-              call integrate_ERI_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+              !call integrate_ERI_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+              call integrate_ERI_mod_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
 
               value  = value    + const * value_s
 
@@ -122,6 +122,90 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
       end do 
 
 end subroutine ERI_integral_4_function_toroidal
+
+subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
+
+      use quadpack , only : dqag , dqng ,dqags ,dqagi
+      use iso_c_binding
+      use torus_init
+      use gsl_bessel_mod
+      use, intrinsic :: ieee_arithmetic
+
+      implicit none
+
+      ! Input parameters
+      double precision, intent(in)       :: p_x , p
+      double precision, intent(in)       :: q_x , q
+      double precision, intent(in)       :: phi
+      double precision, intent(in)       :: xpA , xpB 
+      double precision, intent(in)       :: xqC , xqD
+      double precision, intent(in)       :: xa , xb , xc ,xd ,xp ,xq 
+      integer         , intent(in)       :: pattern_id
+      
+
+      ! Output parameters
+
+      double precision, intent(out)      :: result
+
+      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
+      double precision,parameter         :: bound = 0.0d0
+      integer, parameter                 :: limit = 400
+      integer, parameter                 :: lenw = limit*4
+      integer                            :: ier,last, neval , iwork(limit)
+      double precision                   :: abserr, work(lenw)
+      integer, parameter                 :: key  = 6
+      double precision,parameter         :: pi   = 3.14159265358979323846D00
+      double precision,parameter         :: pi2  = pi * pi
+
+
+      call dqag(f, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
+            abserr, neval, ier, limit, lenw, last, &
+            iwork, work)
+
+      if (ier /= 0) then
+        write(*,'(A,I8,A)') 'Error code = ', ier
+      end if
+
+      contains
+
+      double precision function f(theta)
+
+      use gsl_bessel_mod
+      use torus_init
+
+      implicit none
+
+      double precision, intent(in) :: theta
+      
+      ! local !
+      double precision             :: A , B 
+      double precision             :: Z
+      double precision             :: ax2
+      double precision             :: term
+      double precision             :: const
+      double precision             :: erfcx
+
+      ax2 = ax * ax
+
+      A = 2.d0 * p_x / (ax2)
+      B = 2.d0 * q_x / (ax2)
+
+      term  = dsqrt(2.d0*p*q/(p+q)*(1-dcos(phi-theta)))/ax
+
+      Z = dsqrt( A*A + B*B + 2.d0 * A * B * dcos(theta) )
+
+      const = pi2 /  (4.d0*dsqrt(p*q*(p+q)))
+
+      f = bessi_scaled(0, Z) * erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const
+
+      end function f
+
+end subroutine integrate_ERI_mod_mod_mod
+
+
+
+
+
 
 subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
       
@@ -157,7 +241,7 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 60
+      integer,parameter                  :: Nmax = 6000
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi
       
@@ -189,7 +273,7 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       double precision                     :: A,  B, C 
       double precision                     :: D, D2
       double precision                     :: const 
-      double precision                     :: tol  = 1D-12
+      double precision                     :: tol  = 1D-15
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n 
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
