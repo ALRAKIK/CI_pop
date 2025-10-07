@@ -115,7 +115,6 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
 
       call shift_integrals(two_electron,two_eri,number_of_functions,number_of_functions_per_unitcell)
 
-      !open(1,file="./tmp/ERI.dat")
       open(1,file=trim(tmp_file_name)//"/ERI.dat")
         do i = 1, number_of_functions
           do j = 1 , number_of_functions

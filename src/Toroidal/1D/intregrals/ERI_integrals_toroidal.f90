@@ -36,7 +36,9 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
       double precision                :: mu  , nu 
       double precision                :: xpA , xpB , xqC , xqD , phi 
       double precision                :: test 
+      double precision,parameter      :: eta = 1e-15
       integer                         :: pattern_id, encode_orbital_pattern
+      integer                         :: px_count  , count_px_orbitals
 
 
 
@@ -100,7 +102,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              if (test < 1e-30) cycle
+              !if (test < 1e-30) cycle
 
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
@@ -109,9 +111,10 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               phi     = ax*(xp - xq)
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
+              px_count   = count_px_orbitals(o1, o2, o3, o4)
 
               !call integrate_ERI_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
-              call integrate_ERI_mod_mod_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+              call integrate_ERI_mod_mod_mod(pattern_id,px_count,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
 
               value  = value    + const * value_s
 
@@ -123,9 +126,9 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
 end subroutine ERI_integral_4_function_toroidal
 
-subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
+subroutine integrate_ERI_mod_mod_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
 
-      use quadpack , only : dqag , dqng ,dqags ,dqagi
+      use quadpack , only : dqag ,dqags
       use iso_c_binding
       use torus_init
       use gsl_bessel_mod
@@ -141,6 +144,7 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
       double precision, intent(in)       :: xqC , xqD
       double precision, intent(in)       :: xa , xb , xc ,xd ,xp ,xq 
       integer         , intent(in)       :: pattern_id
+      integer         , intent(in)       :: px_count 
       
 
       ! Output parameters
@@ -148,8 +152,7 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
       double precision, intent(out)      :: result
 
       double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
-      double precision,parameter         :: bound = 0.0d0
-      integer, parameter                 :: limit = 400
+      integer, parameter                 :: limit = 50
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier,last, neval , iwork(limit)
       double precision                   :: abserr, work(lenw)
@@ -158,13 +161,16 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
       double precision,parameter         :: pi2  = pi * pi
 
 
-      call dqag(f, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
-            abserr, neval, ier, limit, lenw, last, &
-            iwork, work)
+      !call dqag(f, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
+      !      abserr, neval, ier, limit, lenw, last, &
+      !      iwork, work)
 
-      if (ier /= 0) then
-        write(*,'(A,I8,A)') 'Error code = ', ier
-      end if
+      call dqags(f, 0.d0, 2.d0*pi, Epsabs, Epsrel, Result, Abserr, Neval, Ier, &
+                     Limit, Lenw, Last, Iwork, Work)
+
+      !if (ier /= 0) then
+      !  write(*,'(A,I8,A)') 'Error code = ', ier
+      !end if
 
       contains
 
@@ -180,13 +186,15 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
       ! local !
 
       integer                      :: o1,o2,o3,o4 
-      double precision             :: A , B  , A2 , B2 
-      double precision             :: z, z2, z3, z5, d1z
+      double precision             :: A, A2, A3, A4, A5, A6, A7 
+      double precision             :: B, B2, B3, B4, B5, B6, B7 
+      double precision             :: z, z2, z3, z4, z5, z6, z7, z8
+      double precision             :: bz0, bz1, bz2, bz3, bz4 
       double precision             :: ax2, ax3, ax4
       double precision             :: term
       double precision             :: const
       double precision             :: erfcx
-      double precision,parameter   :: eta = 1e-20
+      double precision,parameter   :: eta = 1e-40
 
       double precision             :: spa   , cpa  , spb   , cpb
       double precision             :: sqc   , cqc  , sqd   , cqd  
@@ -216,36 +224,48 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
       double precision             :: d3_AAB  , d3_ABB , d3_AAT , d3_ATT
       double precision             :: d3_BBT  , d3_BTT , d3_ABT
 
-      double precision             :: d_z_A     , d2_z_A_A
-      double precision             :: d_z_B     , d2_z_B_B
-      double precision             :: d_z_T     , d2_z_T_T 
-
-      double precision             :: d2_z_A_B   , d2_z_A_T   , d2_z_B_T 
-      double precision             :: d3_z_A_A_A , d3_z_A_A_B , d3_z_A_B_B 
-      double precision             :: d3_z_A_A_T , d3_z_A_T_T , d3_z_A_B_T 
-      double precision             :: d3_z_B_B_B , d3_z_B_B_T , d3_z_B_T_T
       double precision             :: d4_ABTT    , d4_ABBT    , d4_AABT 
       double precision             :: d4_AABB 
 
-      double precision             :: d4_z_A_B_T_T , d4_z_A_A_B_T , d4_z_A_B_B_T , d4_z_A_A_T_T 
+      double precision             ::  st ,  ct 
+      double precision             :: st2 , ct2 
+      double precision             :: st3 , ct3 
+      double precision             :: st4 , ct4 
+
 
       ax2 = ax  * ax
       ax3 = ax2 * ax 
-      ax4 = ax2 * ax2 
+      ax4 = ax3 * ax 
 
       A = 2.d0 * p_x / (ax2)
+      
+      A2 = A  * A
+      A3 = A2 * A 
+      A4 = A3 * A 
+      A5 = A4 * A 
+      A6 = A5 * A
+      A7 = A6 * A 
+
       B = 2.d0 * q_x / (ax2)
 
-      A2 = A*A
-      B2 = B*B 
+      B2 = B  * B 
+      B3 = B2 * B 
+      B4 = B3 * B 
+      B5 = B4 * B  
+      B6 = B5 * B
+      B7 = B6 * B
+      
+      term  = dsqrt( dabs( 2.d0*p*q/(p+q)* (1.d0 - dcos( phi - theta ) ) ) ) / ax
 
-      term  = dsqrt(2.d0*p*q/(p+q)*(1-dcos(phi-theta)))/ax
-
-      z = dsqrt( A2 + B2 + 2.d0 * A * B * dcos(theta) ) + eta
-
+      z     = dsqrt(  dabs ( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
+  
       z2 = z  * z 
       z3 = z2 * z
-      z5 = z2 * z3
+      z4 = z3 * z 
+      z5 = z4 * z
+      z6 = z5 * z 
+      z7 = z6 * z 
+      z8 = z7 * z 
 
       spa = dsin(xpa); spb = dsin(xpb); sqc = dsin(xqc); sqd  = dsin(xqd)
       cpa = dcos(xpa); cpb = dcos(xpb); cqc = dcos(xqc); cqd  = dcos(xqd)
@@ -255,23 +275,37 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
       
       cab =  dcos(xpa) * dcos(xpb)    ; ccd  = dcos(xqc) *  dcos(xqd)
 
+      st = dsin(theta)               
+      st2 = st  * st                  
+      st3 = st2 * st                 
+      st4 = st3 * st                
+
+      ct  = dcos(theta)
+      ct2 = ct  * ct
+      ct3 = ct2 * ct
+      ct4 = ct3 * ct
+
       psi = phi - theta 
 
-      !const = pi2 /  (4.d0*dsqrt(p*q*(p+q)))
-
-      const = 0.5d0 * pi * dexp(z-(2.d0*(p+q)/(ax2)))
-
-      d1z    = bessi_scaled(1,z)
+      const = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       ! -------------------- general integral ------------------------- !
 
-      beta     = 2.d0 * (1.d0-dcos(psi)) / ax2 ; beta2    = beta * beta
-      q2       = q  * q ; p2 =  p  * p 
-      q3       = q2 * q ; p3 =  p2 * p
+      beta     = 2.d0 * (1.d0-dcos(psi)) / ax2 
+      beta2    = beta * beta
+
+
+      q2 = q  * q 
+      q3 = q2 * q
+      p2 = p  * p 
+      p3 = p2 * p
+
+
       ppq      = p+q 
       ppq2     = ppq  * ppq 
       ppq3     = ppq2 * ppq
-      ppq4     = ppq2 * ppq2 
+      ppq4     = ppq3 * ppq
+
       inv      = ppq/(p*q)
 
       ! xxxx !
@@ -334,335 +368,121 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
 
       ! --------------------------------------------------------------- !
 
-
-
-
-
       o1 = pattern_id / 1000
       o2 = MOD(pattern_id / 100, 10)
       o3 = MOD(pattern_id / 10, 10)
       o4 = MOD(pattern_id, 10)
 
+      ! -------------------------- Derivative ------------------------- !
 
-!      if ( (o1<=1 .and. o2 <= 1 .and. o3 <= 1 .and. o4<=1) .and. o1+o2+o3+o4 == 1 ) then 
-!
-!        d_z_A    =    (A + B * dcos(theta)) / z
-!        d_z_B    =    (B + A * dcos(theta)) / z
-!        d_z_T    =  -  A * B * dsin(theta)  / z 
-!
-!        d1_A     =    d_z_A * d1z
-!        d1_B     =    d_z_B * d1z
-!        d1_T     =    d_z_T * d1z
-!
-!      end if 
-!
-!      if ( (o1<=1 .and. o2 <= 1 .and. o3 <= 1 .and. o4<=1) .and. o1+o2+o3+o4 == 2 ) then 
-!
-!        d_z_A      =    (A + B * dcos(theta)) / z
-!        d_z_B      =    (B + A * dcos(theta)) / z
-!        d_z_T      =  -  A * B * dsin(theta)  / z 
-!
-!        d2_z_A_A   =  1.d0/z - 0.25d0*(2.d0*A+2.d0*B*dcos(theta))**2/z3
-!        d2_z_B_B   =  1.d0/z - 0.25d0*(2.d0*B+2.d0*A*dcos(theta))**2/z3
-!
-!        d2_z_A_B   =       dcos(theta)/z - 0.25d0 * (2.d0*B+2.d0*A*dcos(theta)) * (2.d0*A+2.d0*B*dcos(theta))/ z3 
-!        d2_z_A_T   =  -  B*dsin(theta)/z + 0.50d0 * (A*B*dsin(theta))           * (2.d0*A+2.d0*B*dcos(theta))/ z3 
-!        d2_z_B_T   =  -  A*dsin(theta)/z + 0.50d0 * (A*B*dsin(theta))           * (2.d0*B+2.d0*A*dcos(theta))/ z3 
-!
-!        
-!        d2_z_T_T   =  -  A * B * dcos(theta) / z - (A*A*B*B*dsin(theta)*dsin(theta)) / z3
-!
-!        d1_A       =   d_z_A * d1z
-!        d1_B       =   d_z_B * d1z
-!        d1_T       =   d_z_T * d1z 
-!
-!        d2_AA      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_A*d_z_A)   + bessi_scaled(1,z) * d2_z_A_A
-!        d2_BB      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_B*d_z_B)   + bessi_scaled(1,z) * d2_z_B_B
-!        d2_TT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_T*d_z_T)   + bessi_scaled(1,z) * d2_z_T_T
-!        d2_AB      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_B*d_z_A)   + bessi_scaled(1,z) * d2_z_A_B
-!        d2_AT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_A*d_z_T)   + bessi_scaled(1,z) * d2_z_A_T
-!        d2_BT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_B*d_z_T)   + bessi_scaled(1,z) * d2_z_B_T
-!
-!
-!      end if
-!
-!      if ( (o1<=1 .and. o2 <= 1 .and. o3 <= 1 .and. o4<=1) .and. o1+o2+o3+o4 == 3 ) then 
-!
-!        d_z_A      =    (A + B * dcos(theta)) / z
-!        d_z_B      =    (B + A * dcos(theta)) / z
-!        d_z_T      =  -  A * B * dsin(theta)  / z 
-!
-!        d2_z_A_A   =  1.d0/z - 0.25d0*(2.d0*A+2.d0*B*dcos(theta))**2/z3
-!        d2_z_B_B   =  1.d0/z - 0.25d0*(2.d0*B+2.d0*A*dcos(theta))**2/z3
-!        d2_z_T_T   =  -  A * B * dcos(theta) / z - (A*A*B*B*dsin(theta)*dsin(theta)) / z3
-!
-!        d2_z_A_B   =       dcos(theta)/z - 0.25d0 * (2.d0*B+2.d0*A*dcos(theta)) * (2.d0*A+2.d0*B*dcos(theta))/ z3 
-!        d2_z_A_T   =  -  B*dsin(theta)/z + 0.50d0 * (A*B*dsin(theta))           * (2.d0*A+2.d0*B*dcos(theta))/ z3 
-!        d2_z_B_T   =  -  A*dsin(theta)/z + 0.50d0 * (A*B*dsin(theta))           * (2.d0*B+2.d0*A*dcos(theta))/ z3 
-!
-!        d3_z_A_A_B =  - (2.d0*B+2.d0*A*cos(theta))/(2.d0*z3) - dcos(theta)*(2.d0*A+2.d0*B*dcos(theta))/z3 + 3.d0 * (2.d0*B+2.d0*A*cos(theta)) * (2.d0*A+2.d0*B*dcos(theta))*(2.d0*A+2.d0*B*dcos(theta))/(8.d0*z5)
-!        d3_z_A_B_B =  - (2.d0*A+2.d0*B*cos(theta))/(2.d0*z3) - dcos(theta)*(2.d0*B+2.d0*A*dcos(theta))/z3 + 3.d0 * (2.d0*B+2.d0*A*cos(theta)) * (2.d0*B+2.d0*A*dcos(theta))*(2.d0*A+2.d0*B*dcos(theta))/(8.d0*z5)
-!
-!        d3_z_B_T_T =  - A * dcos(theta)/z  + A*B*dcos(theta) * (2.d0*B+2.d0*A*dcos(theta))/(2.d0*z3) - 2.d0*B*(A*dsin(theta))*(A*dsin(theta))/z3 + 3.d0*(A*B*dsin(theta))*(A*B*dsin(theta))*(2.d0*B+2.d0*A*dcos(theta))/(2.d0*z5)
-!        d3_z_A_T_T =  - B * dcos(theta)/z  + A*B*dcos(theta) * (2.d0*A+2.d0*B*dcos(theta))/(2.d0*z3) - 2.d0*A*(B*dsin(theta))*(B*dsin(theta))/z3 + 3.d0*(A*B*dsin(theta))*(A*B*dsin(theta))*(2.d0*A+2.d0*B*dcos(theta))/(2.d0*z5)
-!
-!        d3_z_A_A_T =    A*B*dsin(theta)/z3 + B * dsin(theta) * (2.d0*A+2.d0*B*dcos(theta))/z3             - 3.d0*A*B*dsin(theta)*(2.d0*A+2.d0*B*dcos(theta))*(2.d0*A+2.d0*B*dcos(theta))/(4.d0*z5)
-!        d3_z_B_B_T =    A*B*dsin(theta)/z3 + A * dsin(theta) * (2.d0*B+2.d0*A*dcos(theta))/z3             - 3.d0*A*B*dsin(theta)*(2.d0*B+2.d0*A*dcos(theta))*(2.d0*B+2.d0*A*dcos(theta))/(4.d0*z5)
-!
-!        d3_z_A_B_T = - dsin(theta)/z + A*B*dcos(theta)*dsin(theta)/z3 + B*dsin(theta)*(2.d0*B+2.d0*A*dcos(theta))/(2.d0*z3) + A*dsin(theta)*(2.d0*A+2.d0*B*dcos(theta))/(2.d0*z3) - 3.d0*A*B*dsin(theta)*(2.d0*B+2.d0*A*cos(theta))*(2.d0*A+2.d0*B*cos(theta))/(4.d0*z5)
-!        
-!        d1_A       =   d_z_A * d1z
-!        d1_B       =   d_z_B * d1z
-!        d1_T       =   d_z_T * d1z
-!
-!        d2_AA      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_A*d_z_A)   + bessi_scaled(1,z) * d2_z_A_A
-!        d2_BB      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_B*d_z_B)   + bessi_scaled(1,z) * d2_z_B_B
-!        d2_TT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_T*d_z_T)   + bessi_scaled(1,z) * d2_z_T_T
-!        d2_AB      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_A*d_z_B)   + bessi_scaled(1,z) * d2_z_A_B
-!        d2_AT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_A*d_z_T)   + bessi_scaled(1,z) * d2_z_A_T
-!        d2_BT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_B*d_z_T)   + bessi_scaled(1,z) * d2_z_B_T
-!
-!
-!        d3_AAB     =     0.5d0 * (bessi_scaled(1,z) * d_z_B + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_B ) * d_z_A * d_z_A & 
-!                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_A_B & 
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_A_A &
-!                       +          bessi_scaled(1,z)                    * d3_z_A_A_B
-!
-!        d3_AAT     =     0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_A * d_z_A & 
-!                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_A_T & 
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_A_A &
-!                       +          bessi_scaled(1,z)                    * d3_z_A_A_T
-!
-!        d3_ATT    =      0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_A * d_z_T & 
-!                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_A_T &
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_T_T &
-!                       +          bessi_scaled(1,z)                    * d3_z_A_T_T
-!
-!        d3_BBT    =      0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_B * d_z_B & 
-!                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_B_T & 
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_B_B &
-!                       +          bessi_scaled(1,z)                    * d3_z_B_B_T
-!
-!        d3_BTT    =      0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_B * d_z_T & 
-!                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_B_T &
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_T_T &
-!                       +          bessi_scaled(1,z)                    * d3_z_B_T_T
-!
-!        d3_ABB    =      0.5d0 * (bessi_scaled(1,z) * d_z_B + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_B ) * d_z_A * d_z_B & 
-!                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_A_B & 
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_B_B &
-!                       +          bessi_scaled(1,z)                    * d3_z_A_B_B
-!
-!        d3_ABT    =      0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_A * d_z_B & 
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_B_T & 
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_A_T &
-!                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_A_B &
-!                       +          bessi_scaled(1,z)                    * d3_z_A_B_T
-!                       
-!      end if
-!
-!      if ( (o1<=1 .and. o2 <= 1 .and. o3 <= 1 .and. o4<=1) .and. o1+o2+o3+o4 == 4 ) then 
+      select case (px_count)
+        case (0)
 
-        d_z_A      =    (A + B * dcos(theta)) / z
-        d_z_B      =    (B + A * dcos(theta)) / z
-        d_z_T      =  -  A * B * dsin(theta)  / z 
+          ! Handle no px orbitals
 
-        d2_z_A_A   =  1.d0/z - 0.25d0*(2.d0*A+2.d0*B*dcos(theta))**2/z3
-        d2_z_B_B   =  1.d0/z - 0.25d0*(2.d0*B+2.d0*A*dcos(theta))**2/z3
-        d2_z_T_T   =  -  A * B * dcos(theta) / z - (A*A*B*B*dsin(theta)*dsin(theta)) / z3
+        case (1) 
 
-        d2_z_A_B   =       dcos(theta)/z - 0.25d0 * (2.d0*B+2.d0*A*dcos(theta)) * (2.d0*A+2.d0*B*dcos(theta))/ z3 
-        d2_z_A_T   =  -  B*dsin(theta)/z + 0.50d0 * (A*B*dsin(theta))           * (2.d0*A+2.d0*B*dcos(theta))/ z3 
-        d2_z_B_T   =  -  A*dsin(theta)/z + 0.50d0 * (A*B*dsin(theta))           * (2.d0*B+2.d0*A*dcos(theta))/ z3 
+          ! Handle exactly one px orbital
 
-        d3_z_A_A_B =  - (2.d0*B+2.d0*A*cos(theta))/(2.d0*z3) - dcos(theta)*(2.d0*A+2.d0*B*dcos(theta))/z3 + 3.d0 * (2.d0*B+2.d0*A*cos(theta)) * (2.d0*A+2.d0*B*dcos(theta))*(2.d0*A+2.d0*B*dcos(theta))/(8.d0*z5)
-        d3_z_A_B_B =  - (2.d0*A+2.d0*B*cos(theta))/(2.d0*z3) - dcos(theta)*(2.d0*B+2.d0*A*dcos(theta))/z3 + 3.d0 * (2.d0*B+2.d0*A*cos(theta)) * (2.d0*B+2.d0*A*dcos(theta))*(2.d0*A+2.d0*B*dcos(theta))/(8.d0*z5)
+          bz1 = bessi_scaled(1,z)
+          
+          d1_A = (A + B * ct) * bz1 * z / (z2+eta)
+          d1_B = (A * ct + B) * bz1 * z / (z2+eta)
+          d1_T = -A * B * st  * bz1 * z / (z2+eta)
 
-        d3_z_B_T_T =  - A * dcos(theta)/z  + A*B*dcos(theta) * (2.d0*B+2.d0*A*dcos(theta))/(2.d0*z3) - 2.d0*B*(A*dsin(theta))*(A*dsin(theta))/z3 + 3.d0*(A*B*dsin(theta))*(A*B*dsin(theta))*(2.d0*B+2.d0*A*dcos(theta))/(2.d0*z5)
-        d3_z_A_T_T =  - B * dcos(theta)/z  + A*B*dcos(theta) * (2.d0*A+2.d0*B*dcos(theta))/(2.d0*z3) - 2.d0*A*(B*dsin(theta))*(B*dsin(theta))/z3 + 3.d0*(A*B*dsin(theta))*(A*B*dsin(theta))*(2.d0*A+2.d0*B*dcos(theta))/(2.d0*z5)
+        case (2)
+          
+          ! Handle two px orbitals
 
-        d3_z_A_A_T =    A*B*dsin(theta)/z3 + B * dsin(theta) * (2.d0*A+2.d0*B*dcos(theta))/z3             - 3.d0*A*B*dsin(theta)*(2.d0*A+2.d0*B*dcos(theta))*(2.d0*A+2.d0*B*dcos(theta))/(4.d0*z5)
-        d3_z_B_B_T =    A*B*dsin(theta)/z3 + A * dsin(theta) * (2.d0*B+2.d0*A*dcos(theta))/z3             - 3.d0*A*B*dsin(theta)*(2.d0*B+2.d0*A*dcos(theta))*(2.d0*B+2.d0*A*dcos(theta))/(4.d0*z5)
+          bz0 = bessi_scaled(0,z)
+          bz1 = bessi_scaled(1,z)
+          bz2 = bessi_scaled(2,z)
+          
+          d1_A = (A + B * ct) * bz1 * z / (z2+eta)
+          d1_B = (A * ct + B) * bz1 * z / (z2+eta)
+          d1_T = -A * B * st  * bz1 * z / (z2+eta)
 
-        d3_z_A_B_T = - dsin(theta)/z + A*B*dcos(theta)*dsin(theta)/z3 + B*dsin(theta)*(2.d0*B+2.d0*A*dcos(theta))/(2.d0*z3) + A*dsin(theta)*(2.d0*A+2.d0*B*dcos(theta))/(2.d0*z3) - 3.d0*A*B*dsin(theta)*(2.d0*B+2.d0*A*cos(theta))*(2.d0*A+2.d0*B*cos(theta))/(4.d0*z5)
+          d2_AA =   ( 2.d0 * B2  *     st2      * bz1 + z * (A + B*ct) * (A + B*ct) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_BB =   ( 2.d0 * A2  *     st2      * bz1 + z * (A*ct + B) * (A*ct + B) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_AB = - ( 2.d0 * A*B *     st2      * bz1 - z * (A + B*ct) * (A*ct + B) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_AT =    B    * st   * ( - A2 * z   * bz0 + A2                          *  bz1 - A*B*ct*z  * bz0 - B2 *      bz1) * z / (z4+eta)
+          d2_BT =    A    * st   * ( - A2       * bz1 - A*B*ct*z                    *  bz0 - B2*z      * bz0 + B2 *      bz1) * z / (z4+eta)
+          d2_TT =    A    * B    * ( - A2 * ct  * bz1 + A*B*st2*z                   *  bz0 - 2.d0*A*B  * bz1 - B2 * ct * bz1) * z / (z4+eta)
 
-        d4_z_A_B_T_T = - dcos(theta) * (2.d0*B+2.d0*A*cos(theta))/z3 - 2.d0*A+2.d0*B*dcos(theta)/(2.d0*z3) + 3.d0*(2.d0*B+2.d0*A*dcos(theta))*(2.d0*B+2.d0*A*dcos(theta))*(2.d0*A+2.d0*B*dcos(theta))/(8.d0*z5)
-        
-        d1_A        =   d_z_A * d1z
-        d1_B        =   d_z_B * d1z
-        d1_T        =   d_z_T * d1z
+        case (3)
 
-        d2_AA      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_A*d_z_A)   + bessi_scaled(1,z) * d2_z_A_A
-        d2_BB      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_B*d_z_B)   + bessi_scaled(1,z) * d2_z_B_B
-        d2_TT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_T*d_z_T)   + bessi_scaled(1,z) * d2_z_T_T
-        d2_AB      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_A*d_z_B)   + bessi_scaled(1,z) * d2_z_A_B
-        d2_AT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_A*d_z_T)   + bessi_scaled(1,z) * d2_z_A_T
-        d2_BT      =   0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * (d_z_B*d_z_T)   + bessi_scaled(1,z) * d2_z_B_T
+          ! Handle three px orbitals
+
+          bz0 = bessi_scaled(0,z)
+          bz1 = bessi_scaled(1,z)
+          bz2 = bessi_scaled(2,z)
+          bz3 = bessi_scaled(3,z)
+
+          d1_A = (A + B * ct) * bz1 * z / (z2+eta)
+          d1_B = (A * ct + B) * bz1 * z / (z2+eta)
+          d1_T = -A * B * st  * bz1 * z / (z2+eta)
+
+          d2_AA =   ( 2.d0 * B2  *     st2      * bz1 + z * (A + B*ct) * (A + B*ct) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_BB =   ( 2.d0 * A2  *     st2      * bz1 + z * (A*ct + B) * (A*ct + B) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_AB = - ( 2.d0 * A*B *     st2      * bz1 - z * (A + B*ct) * (A*ct + B) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_AT =    B    * st   * ( - A2 * z   * bz0 + A2                          *  bz1 - A*B*ct*z  * bz0 - B2 *      bz1) * z / (z4+eta)
+          d2_BT =    A    * st   * ( - A2       * bz1 - A*B*ct*z                    *  bz0 - B2*z      * bz0 + B2 *      bz1) * z / (z4+eta)
+          d2_TT =    A    * B    * ( - A2 * ct  * bz1 + A*B*st2*z                   *  bz0 - 2.d0*A*B  * bz1 - B2 * ct * bz1) * z / (z4+eta)
+
+          d3_AAA = (A + B * ct ) * ( 6.d0   * B2 * st2 * z   *  (bz0 + bz2) - 12*B2*st2*bz1 + z2*(A + B*ct)**2*(3*bz1 + bz3))*z/(4*(z6+eta))
+          d3_AAB = (-4.d0 * A * B * st2 * z * (A + B*ct)     *  (bz0 + bz2) + 2*B2*st2*z*(A*ct + B)*(bz0 + bz2) + 4*B*st2*(2*A2 + A*B*ct - B2)*bz1 + z2*(A + B*ct)**2*(A*ct + B)*(3*bz1 + bz3))*z/(4*(z6+eta))
+          d3_AAT = - B * st * (A3 * z2 * bz1 - A3 * z * bz0 + 2.d0 * A3 * bz1 + 2.d0 * A2 * B * ct * z2 * bz1 + A * B2 * ct2 * z2 * bz1 + A * B2 * ct2 * z * bz0 - A * B2 * ct2 * bz1 + A * B2 * st2 * z * bz0 - A * B2 * st2 * bz1 + 2.d0 * A * B2 * z * bz0 - 5.d0 * A * B2 * bz1 + 2.d0 * B3 * ct * z * bz0 - 4.d0 * B3 * ct * bz1) * z /(z6+eta)
+          d3_ABB = (-4.d0 * A * B * st2 * z * (A*ct + B) * (bz0 + bz2) + 4.d0 * A * st2 * (-A2 + A*B*ct + 2.d0*B2)*bz1 + z * (A + B * ct)*(2.d0 * A2 * st2 * (bz0 + bz2) + z * (A*ct + B)*(A*ct + B) * (3.d0 * bz1 + bz3))) * z / ( 4.d0 * (z6+eta))
+          d3_ABT = -st * (A4 * z * bz0 - A4 * bz1 + A3 * B * ct * z2 * bz1 + A3 * B * ct * z * bz0 + 2.d0 * A3 * B * ct * bz1 + A2 * B2 * ct2 * z2 * bz1 + A2 * B2 * ct2 * z * bz0 - A2 * B2 * st2 * z * bz0 + A2 * B2 * z2 * bz1 - A2 * B2 * z * bz0 + 6.d0 * A2 * B2 * bz1 + A * B3 * ct * z2 * bz1 + A * B3 * ct * z * bz0 + 2.d0 * A * B3 * ct * bz1 + B4 * z * bz0 - B4 * bz1) * z /(z6+eta)
+          d3_ATT = B * (-A4 * ct * z * bz0 + A4 * ct * bz1 - 2.d0 * A3 * B * ct2 * z * bz0 + A3 * B * st2 * z2 * bz1 - A3 * B * st2 * z * bz0 + 2.d0 * A3 * B * st2 * bz1 - A3 * B * z * bz0 + 2.d0 * A3 * B * bz1 - A2 * B2 * ct3 * z * bz0 + A2 * B2 * ct * st2 * z2 * bz1 + A2 * B2 * ct * st2 * z * bz0 - 2.d0 * A2 * B2 * ct * z * bz0 - A * B3 * ct2 * z * bz0 + 2.d0 * A * B3 * st2 * z * bz0 - 2.d0 * A * B3 * st2 * bz1 - 2.d0 * A * B3 * bz1 - B4 * ct * bz1) * z/(z6+eta)
+          d3_BBB = ( A * ct + B) * (6.d0 * A2 * st2 * z * (bz0 + bz2) - 12.d0 * A2 * st2 * bz1 + z2 * (A * ct + B)* (A * ct + B) * (3.d0 * bz1 + bz3)) * z /(4.d0*(z6+eta))
+          d3_BBT = -A * st * (2.d0 * A3 * ct * z * bz0 - 4.d0 * A3 * ct * bz1 + A2 * B * ct2 * z2 * bz1 + A2 * B * ct2 * z * bz0 - A2 * B * ct2 * bz1 + A2 * B * st2 * z * bz0 - A2 * B * st2 * bz1 + 2.d0 * A2 * B * z * bz0 - 5.d0 * A2 * B * bz1 + 2.d0 * A * B2 * ct * z2 * bz1 + B3 * z2 * bz1 - B3 * z * bz0 + 2.d0 * B3 * bz1) * z /(z6+eta)
+          d3_BTT =  A * (-A4 * ct * bz1 - A3 * B * ct2 * z * bz0 + 2.d0 * A3 * B * st2 * z * bz0 - 2.d0 * A3 * B * st2 * bz1 - 2.d0 * A3 * B * bz1 - A2 * B2 * ct3 * z * bz0 + A2 * B2 * ct * st2 * z2 * bz1 + A2 * B2 * ct * st2 * z * bz0 - 2.d0 * A2 * B2 * ct * z * bz0 - 2.d0 * A * B3 * ct2 * z * bz0 + A * B3 * st2 * z2 * bz1 - A * B3 * st2 * z * bz0 + 2.d0 * A * B3 * st2 * bz1 - A * B3 * z * bz0 + 2.d0 * A * B3 * bz1 - B4 * ct * z * bz0 + B4 * ct * bz1) * z /(z6+eta)
+          d3_TTT = A * B * st * (-A2 * B2 * st2 * z2 * ( 3.d0 * bz1 + bz3) + 6.d0 * A * B * z * (bz0 + bz2) * (A2 * ct + A * B * ct2 + A * B + B2 * ct) + 4.d0 * ( A4 + A3 * B * ct - A2 * B2 * st2 + A * B3 * ct + B4 ) * bz1) * z/(4.d0 * (z6+eta))
+
+          case (4)
+
+          ! Handle four px orbitals
+
+          bz0 = bessi_scaled(0,z)
+          bz1 = bessi_scaled(1,z)
+          bz2 = bessi_scaled(2,z)
+          bz3 = bessi_scaled(3,z)
+          bz4 = bessi_scaled(4,z)
+
+          d1_A = (A + B * ct) * bz1 * z / (z2+eta)
+          d1_B = (A * ct + B) * bz1 * z / (z2+eta)
+          d1_T = -A * B * st  * bz1 * z / (z2+eta)
+
+          d2_AA =   ( 2.d0 * B2  *     st2      * bz1 + z * (A + B*ct) * (A + B*ct) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_BB =   ( 2.d0 * A2  *     st2      * bz1 + z * (A*ct + B) * (A*ct + B) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_AB = - ( 2.d0 * A*B *     st2      * bz1 - z * (A + B*ct) * (A*ct + B) * (bz0 + bz2)) * z / (2.d0*(z4+eta))
+          d2_AT =    B    * st   * ( - A2 * z   * bz0 + A2                          *  bz1 - A*B*ct*z  * bz0 - B2 *      bz1) * z / (z4+eta)
+          d2_BT =    A    * st   * ( - A2       * bz1 - A*B*ct*z                    *  bz0 - B2*z      * bz0 + B2 *      bz1) * z / (z4+eta)
+          d2_TT =    A    * B    * ( - A2 * ct  * bz1 + A*B*st2*z                   *  bz0 - 2.d0*A*B  * bz1 - B2 * ct * bz1) * z / (z4+eta)
+
+          d3_AAA = (A + B * ct ) * ( 6.d0   * B2 * st2 * z   *  (bz0 + bz2) - 12*B2*st2*bz1 + z2*(A + B*ct)**2*(3*bz1 + bz3))*z/(4*(z6+eta))
+          d3_AAB = (-4.d0 * A * B * st2 * z * (A + B*ct)     *  (bz0 + bz2) + 2*B2*st2*z*(A*ct + B)*(bz0 + bz2) + 4*B*st2*(2*A2 + A*B*ct - B2)*bz1 + z2*(A + B*ct)**2*(A*ct + B)*(3*bz1 + bz3))*z/(4*(z6+eta))
+          d3_AAT = - B * st * (A3 * z2 * bz1 - A3 * z * bz0 + 2.d0 * A3 * bz1 + 2.d0 * A2 * B * ct * z2 * bz1 + A * B2 * ct2 * z2 * bz1 + A * B2 * ct2 * z * bz0 - A * B2 * ct2 * bz1 + A * B2 * st2 * z * bz0 - A * B2 * st2 * bz1 + 2.d0 * A * B2 * z * bz0 - 5.d0 * A * B2 * bz1 + 2.d0 * B3 * ct * z * bz0 - 4.d0 * B3 * ct * bz1) * z /(z6+eta)
+          d3_ABB = (-4.d0 * A * B * st2 * z * (A*ct + B) * (bz0 + bz2) + 4.d0 * A * st2 * (-A2 + A*B*ct + 2.d0*B2)*bz1 + z * (A + B * ct)*(2.d0 * A2 * st2 * (bz0 + bz2) + z * (A*ct + B)*(A*ct + B) * (3.d0 * bz1 + bz3))) * z / ( 4.d0 * (z6+eta))
+          d3_ABT = -st * (A4 * z * bz0 - A4 * bz1 + A3 * B * ct * z2 * bz1 + A3 * B * ct * z * bz0 + 2.d0 * A3 * B * ct * bz1 + A2 * B2 * ct2 * z2 * bz1 + A2 * B2 * ct2 * z * bz0 - A2 * B2 * st2 * z * bz0 + A2 * B2 * z2 * bz1 - A2 * B2 * z * bz0 + 6.d0 * A2 * B2 * bz1 + A * B3 * ct * z2 * bz1 + A * B3 * ct * z * bz0 + 2.d0 * A * B3 * ct * bz1 + B4 * z * bz0 - B4 * bz1) * z /(z6+eta)
+          d3_ATT = B * (-A4 * ct * z * bz0 + A4 * ct * bz1 - 2.d0 * A3 * B * ct2 * z * bz0 + A3 * B * st2 * z2 * bz1 - A3 * B * st2 * z * bz0 + 2.d0 * A3 * B * st2 * bz1 - A3 * B * z * bz0 + 2.d0 * A3 * B * bz1 - A2 * B2 * ct3 * z * bz0 + A2 * B2 * ct * st2 * z2 * bz1 + A2 * B2 * ct * st2 * z * bz0 - 2.d0 * A2 * B2 * ct * z * bz0 - A * B3 * ct2 * z * bz0 + 2.d0 * A * B3 * st2 * z * bz0 - 2.d0 * A * B3 * st2 * bz1 - 2.d0 * A * B3 * bz1 - B4 * ct * bz1) * z/(z6+eta)
+          d3_BBB = ( A * ct + B) * (6.d0 * A2 * st2 * z * (bz0 + bz2) - 12.d0 * A2 * st2 * bz1 + z2 * (A * ct + B)* (A * ct + B) * (3.d0 * bz1 + bz3)) * z /(4.d0*(z6+eta))
+          d3_BBT = -A * st * (2.d0 * A3 * ct * z * bz0 - 4.d0 * A3 * ct * bz1 + A2 * B * ct2 * z2 * bz1 + A2 * B * ct2 * z * bz0 - A2 * B * ct2 * bz1 + A2 * B * st2 * z * bz0 - A2 * B * st2 * bz1 + 2.d0 * A2 * B * z * bz0 - 5.d0 * A2 * B * bz1 + 2.d0 * A * B2 * ct * z2 * bz1 + B3 * z2 * bz1 - B3 * z * bz0 + 2.d0 * B3 * bz1) * z /(z6+eta)
+          d3_BTT =  A * (-A4 * ct * bz1 - A3 * B * ct2 * z * bz0 + 2.d0 * A3 * B * st2 * z * bz0 - 2.d0 * A3 * B * st2 * bz1 - 2.d0 * A3 * B * bz1 - A2 * B2 * ct3 * z * bz0 + A2 * B2 * ct * st2 * z2 * bz1 + A2 * B2 * ct * st2 * z * bz0 - 2.d0 * A2 * B2 * ct * z * bz0 - 2.d0 * A * B3 * ct2 * z * bz0 + A * B3 * st2 * z2 * bz1 - A * B3 * st2 * z * bz0 + 2.d0 * A * B3 * st2 * bz1 - A * B3 * z * bz0 + 2.d0 * A * B3 * bz1 - B4 * ct * z * bz0 + B4 * ct * bz1) * z /(z6+eta)
+          d3_TTT = A * B * st * (-A2 * B2 * st2 * z2 * ( 3.d0 * bz1 + bz3) + 6.d0 * A * B * z * (bz0 + bz2) * (A2 * ct + A * B * ct2 + A * B + B2 * ct) + 4.d0 * ( A4 + A3 * B * ct - A2 * B2 * st2 + A * B3 * ct + B4 ) * bz1) * z/(4.d0 * (z6+eta))
+
+          d4_ABTT = ( - A6 * ct * z * bz0 + A6 * ct * bz1 - A5 * B * ct2 * z2 * bz1 - A5 * B * ct2 * z * bz0 - 4.d0 * A5 * B * ct2 * bz1 + 2.d0 * A5 * B * st2 * z2 * bz1 - 2.d0 * A5 * B * st2 * z * bz0 + 4.d0 * A5 * B * st2 * bz1 - 2.d0 * A5 * B * z * bz0 + 4.d0 * A5 * B * bz1 - 2.d0 * A4 * B2 * ct3 * z2 * bz1 - 2.d0 * A4 * B2 * ct3 * z * bz0 - A4 * B2 * ct3 * bz1 + A4 * B2 * ct * st2 * z3 * bz0 + 2.d0 * A4 * B2 * ct * st2 * z2 * bz1 + 6.d0 * A4 * B2 * ct * st2 * z * bz0 - 5.d0 * A4 * B2 * ct * st2 * bz1 - 2.d0 * A4 * B2 * ct * z2 * bz1 - A4 * B2 * ct * z * bz0 - 8.d0 * A4 * B **2*ct*bz1 - A3 * B3 * ct4 * z2 * bz1 - A3 * B3 * ct4 * z * bz0 - A3 * B3 * ct4 * bz1 + A3 * B3 * ct2 * st2 * z3 * bz0 + 2.d0 * A3 * B3 * ct2 * st2 * z2 * bz1 + 2.d0 * A3 * B3 * ct2 * st2 * z * bz0 - A3 * B3 * ct2 * st2 * bz1 - 4.d0 * A3 * B3 * ct2 * z2 * bz1 - 4.d0 * A3 * B3 * ct2 * z * bz0 - A3 * B3 * st4 * z2 * bz1 - A3 * B3 * st4 * z * bz0 + A3 * B3 * st2 * z3 * bz0 - 2.d0 * A3 * B3 * st2 * z2 * bz1 + 14.d0 * A3 * B3 * st*2 * z * bz0 - 17.d0 * A3 * B3 * st2 * bz1 - A3 * B3 * z2 * bz1 + 3.d0 * A3 * B3 * z * bz0 - 15.d0 * A3 * B3 * bz1 - 2.d0 * A2 * B4 * ct3 * z2 * bz1 - 2.d0 * A2 * B4 * ct3 * z * bz0 - A2 * B4 * ct3 * bz1 + A2 * B4 * ct * st2 * z3 * bz0 + 2.d0 * A2 * B4 * ct * st2 * z2 * bz1 + 6.d0 * A2 * B4 * ct * st2 * z * bz0 - 5.d0 * A2 * B4 * ct * st2 * bz1 - 2.d0 * A2 * B4 * ct * z2 * bz1 - A2 * B4 * ct * z * bz0 - 8.d0 * A2 * B4 * ct * bz1 - A * B5 * ct2 * z2 * bz1 - A * B5 * ct2 * z * bz0 - 4.d0 * A * B5 * ct2 * bz1 + 2.d0 * A * B5 * st2 * z2 * bz1 - 2.d0 * A * B5 * st2 * z * bz0 + 4.d0 * A * B5 * st2 * bz1 - 2.d0 * A * B5 * z * bz0 + 4.d0 * A * B5 * bz1 - B6 * ct * z * bz0 + B6 * ct * bz1)*z/(z8+eta)
+          d4_AABT = -st * (A5 * z2 * bz1 - A5 * z * bz0 + 2.d0 * A5 * bz1 + A4 * B * ct * z3 * bz0 + A4 * B * ct * z2 * bz1 + 4.d0 * A4 * B * ct * z * bz0 - 8.d0 * A4 * B * ct * bz1 + 2.d0 * A3 * B2 * ct2 * z3 * bz0 + A3 * B2 * ct2 * z2 * bz1 + 3.d0 * A3 * B2 * ct2 * z * bz0 - 5.d0 * A3 * B2 * ct2 * bz1 - 2 * A3 * B2 * st2 * z2 * bz1 + 3.d0 * A3 * B2 * st2 * z * bz0 - 5.d0 * A3 * B2 * st2 * bz1 + A3 * B2 * z3 * bz0 - 2.d0 * A3 * B2 * z2 * bz1 + 11.d0 * A3 * B2 * z * bz0 - 23.d0 * A3 * B2 * bz1 + A2 * B3 * ct3 * z3 * bz0 + A2 * B3 * ct3 * z2 * bz1 - A2 * B3 * ct3 * z * bz0 - A2 * B3 * ct * st2 * z2 * bz1 - A2 * B3 * ct * st2 * z * bz0 + 2.d0 * A2 * B3 * ct * z3 * bz0 + 9.d0 * A2 * B3 * ct * z * bz0 - 16.d0 * A2 * B3 * ct * bz1 + A * B4 * ct2 * z3 * bz0 + 2.d0 * A * B4 * ct2 * z2 * bz1 - 3.d0 * A * B4 * ct2 * bz1 + A * B4 * st2 * z2 * bz1 - 4.d0 * A * B4 * st2 * z * bz0 + 5.d0 * A * B4 * st2 * bz1 + 2.d0 * A * B4 * z2 * bz1 - 5.d0 * A * B4 * z * bz0 + 13.d0 * A * B4 * bz1 + 2.d0 * B5 * ct * z2 * bz1 - 4.d0 * B5 * ct * z * bz0 + 8.d0 * B5 * ct * bz1)*z/(z8+eta)
+          d4_ABBT = st * ( -2.d0 * A7 * ct * bz1 - A6 * B * ct2 * z * bz0 - 5.d0 * A6 * B * ct2 * bz1 - 3.d0 * A6 * B * bz1 - 3.d0 * A5 * B2 * ct3 * z * bz0 - 4.d0 * A5 * B2 * ct3 * bz1 - 2.d0 * A5 * B2 * ct * z * bz0 - 7.d0 * A5 * B2 * ct * bz1 + 4.d0 * A5 * ct * z * bz0 - 8.d0 * A5 * ct * bz1 - 2.d0 * A4 * B3 * ct4 * z * bz0 - 4.d0 * A4 * B3 * ct4 * bz1 - 7.d0 * A4 * B3 * ct2 * z * bz0 - 2.d0 * A4 * B3 * ct2 * bz1 - A4 * B3 * z * bz0 + A4 * B3 * bz1 - 4.d0 * A4 * B * ct2 * z * bz0 + 8.d0 * A4 * B * ct2 * bz1 + 9.d0 * A4 * B * z * bz0 - 18.d0 * A4 * B * bz1 - 5.d0 * A3 * B4 * ct3 * z * bz0 - 8.d0 * A3 * B4 * ct3 * bz1 - 5.d0 * A3 * B4 * ct * z * bz0 + 8.d0 * A3 * B4 * ct * bz1 - 8.d0 * A3 * B2 * ct * z * bz0 + 16.d0 * A3 * B2 * ct * bz1 - 4.d0 * A2 * B5 * ct2 * z * bz0 - 5.d0 * A2 * B5 * ct2 * bz1 - A2 * B5 * z * bz0 + 3.d0 * A2 * B5 * bz1 - 14.d0 * A2 * B3 * z * bz0 + 28.d0 * A2 * B3 * bz1 - A * B6 * ct * z * bz0 - 3.d0 * A * B6 * ct * bz1 - 4.d0 * A * B4 * ct * z * bz0 + 8.d0  * A * B4 * ct * bz1 - B7 * bz1 + B5 * z * bz0 - 2.d0 * B5 * bz1)*z/(z8+eta)
+          d4_AABB = (12.d0 * A2 * B2 * st4 * z * (bz0 + bz2) - 8.d0  * A * B * st2 * z2 * ( A + B * ct) * (A * ct + B) * ( 3.d0 * bz1 + bz3) + 8.d0 * A * st2 * z *(A + B*ct) * (bz0 + bz2) * (- A2 + A*B*ct + 2.d0 * B2) + 2.d0 * B2 * st2 * z2 * (A * ct + B)**2 * (3.d0 * bz1 + bz3) + 8.d0 * B * st2 * z * (A * ct + B) * (bz0 + bz2) * (2.d0 * A2 + A * B * ct - B2) + 8.d0 * st2 *(2.d0 * A4 - 4.d0 * A3 * B * ct + A2 * B2 * st2 - 12.d0 * A2 * B2 - 4.d0 * A * B3 * ct + 2.d0 * B4)*bz1 + z2 * (A + B * ct)**2 *(2.d0 * A2 * st2 * (bz1 + bz3) + 4.d0 * A2 * st2 * bz1 + 2.d0 * z * (A*ct + B)**2*(bz0 + bz2) + z * (A*ct + B)**2 * (bz0 + 2.d0*bz2 + bz4))) * z /( 8.d0 * (z8+eta))
 
 
-        d3_AAB     =     0.5d0 * (bessi_scaled(1,z) * d_z_B + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_B ) * d_z_A * d_z_A & 
-                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_A_B & 
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_A_A &
-                       +          bessi_scaled(1,z)                    * d3_z_A_A_B
-        d3_AAT     =     0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_A * d_z_A & 
-                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_A_T & 
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_A_A &
-                       +          bessi_scaled(1,z)                    * d3_z_A_A_T
-        d3_ATT    =      0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_A * d_z_T & 
-                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_A_T &
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_T_T &
-                       +          bessi_scaled(1,z)                    * d3_z_A_T_T
+      end select
 
-        d3_BBT    =      0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_B * d_z_B & 
-                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_B_T & 
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_B_B &
-                       +          bessi_scaled(1,z)                    * d3_z_B_B_T
-
-        d3_BTT    =      0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_B * d_z_T & 
-                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_B_T &
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_T_T &
-                       +          bessi_scaled(1,z)                    * d3_z_B_T_T
-
-        d3_ABB    =      0.5d0 * (bessi_scaled(1,z) * d_z_B + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_B ) * d_z_A * d_z_B & 
-                       +         (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_A_B & 
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_B_B &
-                       +          bessi_scaled(1,z)                    * d3_z_A_B_B
-
-        d3_ABT    =      0.5d0 * (bessi_scaled(1,z) * d_z_T + 0.5d0 * ( bessi_scaled(1,z) + bessi_scaled(3,z) ) * d_z_T ) * d_z_A * d_z_B & 
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_A * d2_z_B_T & 
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_B * d2_z_A_T &
-                       + 0.5d0 * (bessi_scaled(0,z)+bessi_scaled(2,z)) * d_z_T * d2_z_A_B &
-                       +          bessi_scaled(1,z)                    * d3_z_A_B_T
-
-        d4_ABTT = (-A**6*z*bessi_scaled(0, z)*cos(theta) + A**6*bessi_scaled(1, z)*cos(theta) - 3*A**5*B*z**2*bessi_scaled(1, z)*cos(theta)**2 + 2*A**5*B*z**2*bessi_scaled(1, z) + A**5*B*z*bessi_scaled(0, z)*cos(theta)**2 - 4*A**5*B*z*bessi_scaled(0, z) - 8*A**5*B*bessi_scaled(1, z)*cos(theta)**2 + 8*A**5*B*bessi_scaled(1, z) - A**4*B**2*z**3*bessi_scaled(0, z)*cos(theta)**3 + A**4*B**2*z**3*bessi_scaled(0, z)*cos(theta) - 4*A**4*B**2*z**2*bessi_scaled(1, z)*cos(theta)**3 - 8*A**4*B**2*z*bessi_scaled(0, z)*cos(theta)**3 + 5*A**4*B**2*z*bessi_scaled(0, z)*cos(theta) + 4*A**4*B**2*bessi_scaled(1, z)*cos(theta)**3 - 13*A**4*B**2*bessi_scaled(1, z)*cos(theta) - A**3*B**3*z**3*bessi_scaled(0, z)*cos(theta)**4 + A**3*B**3*z**3*bessi_scaled(0, z) - 4*A**3*B**3*z**2*bessi_scaled(1, z)*cos(theta)**4 + 2*A**3*B**3*z**2*bessi_scaled(1, z)*cos(theta)**2 - 4*A**3*B**3*z**2*bessi_scaled(1, z) - 4*A**3*B**3*z*bessi_scaled(0, z)*cos(theta)**4 - 14*A**3*B**3*z*bessi_scaled(0, z)*cos(theta)**2 + 16*A**3*B**3*z*bessi_scaled(0, z) + 16*A**3*B**3*bessi_scaled(1, z)*cos(theta)**2 - 32*A**3*B**3*bessi_scaled(1, z) - A**2*B**4*z**3*bessi_scaled(0, z)*cos(theta)**3 + A**2*B**4*z**3*bessi_scaled(0, z)*cos(theta) - 4*A**2*B**4*z**2*bessi_scaled(1, z)*cos(theta)**3 - 8*A**2*B**4*z*bessi_scaled(0, z)*cos(theta)**3 + 5*A**2*B**4*z*bessi_scaled(0, z)*cos(theta) + 4*A**2*B**4*bessi_scaled(1, z)*cos(theta)**3 - 13*A**2*B**4*bessi_scaled(1, z)*cos(theta) - 3*A*B**5*z**2*bessi_scaled(1, z)*cos(theta)**2 + 2*A*B**5*z**2*bessi_scaled(1, z) + A*B**5*z*bessi_scaled(0, z)*cos(theta)**2 - 4*A*B**5*z*bessi_scaled(0, z) - 8*A*B**5*bessi_scaled(1, z)*cos(theta)**2 + 8*A*B**5*bessi_scaled(1, z) - B**6*z*bessi_scaled(0, z)*cos(theta) + B**6*bessi_scaled(1, z)*cos(theta))/z**7
-        d4_AABT = -(A**5*z**2*bessi_scaled(1, z) - A**5*z*bessi_scaled(0, z) + 2*A**5*bessi_scaled(1, z) + A**4*B*z**3*bessi_scaled(0, z)*cos(theta) + A**4*B*z**2*bessi_scaled(1, z)*cos(theta) + 4*A**4*B*z*bessi_scaled(0, z)*cos(theta) - 8*A**4*B*bessi_scaled(1, z)*cos(theta) + 2*A**3*B**2*z**3*bessi_scaled(0, z)*cos(theta)**2 + A**3*B**2*z**3*bessi_scaled(0, z) + 3*A**3*B**2*z**2*bessi_scaled(1, z)*cos(theta)**2 - 4*A**3*B**2*z**2*bessi_scaled(1, z) + 14*A**3*B**2*z*bessi_scaled(0, z) - 28*A**3*B**2*bessi_scaled(1, z) + A**2*B**3*z**3*bessi_scaled(0, z)*cos(theta)**3 + 2*A**2*B**3*z**3*bessi_scaled(0, z)*cos(theta) + 2*A**2*B**3*z**2*bessi_scaled(1, z)*cos(theta)**3 - A**2*B**3*z**2*bessi_scaled(1, z)*cos(theta) + 8*A**2*B**3*z*bessi_scaled(0, z)*cos(theta) - 16*A**2*B**3*bessi_scaled(1, z)*cos(theta) + A*B**4*z**3*bessi_scaled(0, z)*cos(theta)**2 + A*B**4*z**2*bessi_scaled(1, z)*cos(theta)**2 + 3*A*B**4*z**2*bessi_scaled(1, z) + 4*A*B**4*z*bessi_scaled(0, z)*cos(theta)**2 - 9*A*B**4*z*bessi_scaled(0, z) - 8*A*B**4*bessi_scaled(1, z)*cos(theta)**2 + 18*A*B**4*bessi_scaled(1, z) + 2*B**5*z**2*bessi_scaled(1, z)*cos(theta) - 4*B**5*z*bessi_scaled(0, z)*cos(theta) + 8*B**5*bessi_scaled(1, z)*cos(theta))*sin(theta)/z**7
-        d4_ABBT = (-2*A**7*bessi_scaled(1, z)*cos(theta) - A**6*B*z*bessi_scaled(0, z)*cos(theta)**2 - 5*A**6*B*bessi_scaled(1, z)*cos(theta)**2 - 3*A**6*B*bessi_scaled(1, z) - 3*A**5*B**2*z*bessi_scaled(0, z)*cos(theta)**3 - 2*A**5*B**2*z*bessi_scaled(0, z)*cos(theta) - 4*A**5*B**2*bessi_scaled(1, z)*cos(theta)**3 - 7*A**5*B**2*bessi_scaled(1, z)*cos(theta) + 4*A**5*z*bessi_scaled(0, z)*cos(theta) - 8*A**5*bessi_scaled(1, z)*cos(theta) - 2*A**4*B**3*z*bessi_scaled(0, z)*cos(theta)**4 - 7*A**4*B**3*z*bessi_scaled(0, z)*cos(theta)**2 - A**4*B**3*z*bessi_scaled(0, z) - 4*A**4*B**3*bessi_scaled(1, z)*cos(theta)**4 - 2*A**4*B**3*bessi_scaled(1, z)*cos(theta)**2 + A**4*B**3*bessi_scaled(1, z) - 4*A**4*B*z*bessi_scaled(0, z)*cos(theta)**2 + 9*A**4*B*z*bessi_scaled(0, z) + 8*A**4*B*bessi_scaled(1, z)*cos(theta)**2 - 18*A**4*B*bessi_scaled(1, z) - 5*A**3*B**4*z*bessi_scaled(0, z)*cos(theta)**3 - 5*A**3*B**4*z*bessi_scaled(0, z)*cos(theta) - 8*A**3*B**4*bessi_scaled(1, z)*cos(theta)**3 + 8*A**3*B**4*bessi_scaled(1, z)*cos(theta) - 8*A**3*B**2*z*bessi_scaled(0, z)*cos(theta) + 16*A**3*B**2*bessi_scaled(1, z)*cos(theta) - 4*A**2*B**5*z*bessi_scaled(0, z)*cos(theta)**2 - A**2*B**5*z*bessi_scaled(0, z) - 5*A**2*B**5*bessi_scaled(1, z)*cos(theta)**2 + 3*A**2*B**5*bessi_scaled(1, z) - 14*A**2*B**3*z*bessi_scaled(0, z) + 28*A**2*B**3*bessi_scaled(1, z) - A*B**6*z*bessi_scaled(0, z)*cos(theta) - 3*A*B**6*bessi_scaled(1, z)*cos(theta) - 4*A*B**4*z*bessi_scaled(0, z)*cos(theta) + 8*A*B**4*bessi_scaled(1, z)*cos(theta) - B**7*bessi_scaled(1, z) + B**5*z*bessi_scaled(0, z) - 2*B**5*bessi_scaled(1, z))*sin(theta)/z**7
-        d4_AABB = (A**4*z**3*bessi_scaled(0, z)*cos(theta)**2 - 3*A**4*z**2*bessi_scaled(1, z)*cos(theta)**2 + A**4*z**2*bessi_scaled(1, z) + 6*A**4*z*bessi_scaled(0, z)*cos(theta)**2 - 3*A**4*z*bessi_scaled(0, z) - 12*A**4*bessi_scaled(1, z)*cos(theta)**2 + 6*A**4*bessi_scaled(1, z) + 2*A**3*B*z**3*bessi_scaled(0, z)*cos(theta)**3 + 2*A**3*B*z**3*bessi_scaled(0, z)*cos(theta) - 2*A**3*B*z**2*bessi_scaled(1, z)*cos(theta)**3 - 6*A**3*B*z**2*bessi_scaled(1, z)*cos(theta) + 12*A**3*B*z*bessi_scaled(0, z)*cos(theta) - 24*A**3*B*bessi_scaled(1, z)*cos(theta) + A**2*B**2*z**3*(1 - cos(theta)**2)**2*bessi_scaled(0, z) + 6*A**2*B**2*z**3*bessi_scaled(0, z)*cos(theta)**2 - 6*A**2*B**2*z**2*bessi_scaled(1, z)*cos(theta)**2 - 6*A**2*B**2*z**2*bessi_scaled(1, z) + 18*A**2*B**2*z*bessi_scaled(0, z) - 36*A**2*B**2*bessi_scaled(1, z) + 2*A*B**3*z**3*bessi_scaled(0, z)*cos(theta)**3 + 2*A*B**3*z**3*bessi_scaled(0, z)*cos(theta) - 2*A*B**3*z**2*bessi_scaled(1, z)*cos(theta)**3 - 6*A*B**3*z**2*bessi_scaled(1, z)*cos(theta) + 12*A*B**3*z*bessi_scaled(0, z)*cos(theta) - 24*A*B**3*bessi_scaled(1, z)*cos(theta) + B**4*z**3*bessi_scaled(0, z)*cos(theta)**2 - 3*B**4*z**2*bessi_scaled(1, z)*cos(theta)**2 + B**4*z**2*bessi_scaled(1, z) + 6*B**4*z*bessi_scaled(0, z)*cos(theta)**2 - 3*B**4*z*bessi_scaled(0, z) - 12*B**4*bessi_scaled(1, z)*cos(theta)**2 + 6*B**4*bessi_scaled(1, z))/z**7
-
-        
-                       
-      !end if
-
-
+      ! ----------------------- End Derivative ------------------------ !  
+                      
       select case (pattern_id)
-
-      !case (0000) ! ssss ! 
-      !  f = bessi_scaled(0, Z) * erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const
-      !case (1000) ! psss !
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const &
-      !      * (   1.d0/A * dcos(xpA) * d_T + dsin(xpA) * d_A) / ax 
-      !case (0100) ! spss !
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const &
-      !      * (   1.d0/A * dcos(xpB) * d_T + dsin(xpB) * d_A) / ax
-      !case (0010) ! ssps !
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const &
-      !      * ( - 1.d0/B * dcos(xqC) * d_T + dsin(xqC) * d_B) / ax
-      !case (0001) ! sssp ! 
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const &
-      !      * ( - 1.d0/B * dcos(xqD) * d_T + dsin(xqD) * d_B) / ax
-      !case (1001) ! pssp ! 
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const & 
-      !      * ( ( - 1.d0/(A*B) * dcos(xpa) * dcos(xqd) * d2_TT    ) &
-      !        + (   1.d0/A     * dcos(xpa) * dsin(xqd) * d2_BT   ) &
-      !        + ( - 1.d0/B     * dsin(xpa) * dcos(xqd) * d2_AT   ) &
-      !        + (                dsin(xpa) * dsin(xqd) * d2_AB   ) )/ax2
-      !case (1010) ! psps !
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const & 
-      !      * ( ( - 1.d0/(A*B) * dcos(xpa) * dcos(xqc) * d2_TT  ) &
-      !        + (   1.d0/A     * dcos(xpa) * dsin(xqc) * d2_BT  ) &
-      !        + ( - 1.d0/B     * dsin(xpa) * dcos(xqc) * d2_AT  ) &
-      !        + (                dsin(xpa) * dsin(xqc) * d2_AB  ) )/ax2
-      !case (0110) ! spps !
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const & 
-      !      * ( ( - 1.d0/(A*B) * dcos(xpb) * dcos(xqc) * d2_TT ) &
-      !        + (   1.d0/A     * dcos(xpb) * dsin(xqc) * d2_BT ) &
-      !        + ( - 1.d0/B     * dsin(xpb) * dcos(xqc) * d2_AT ) &
-      !        + (                dsin(xpb) * dsin(xqc) * d2_AB ) )/ax2
-      !case (0101) ! spsp !
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const & 
-      !      * ( ( - 1.d0/(A*B) * dcos(xpb) * dcos(xqd) * d2_TT ) &
-      !        + (   1.d0/A     * dcos(xpb) * dsin(xqd) * d2_BT ) &
-      !        + ( - 1.d0/B     * dsin(xpb) * dcos(xqd) * d2_AT ) &
-      !        + (                dsin(xpb) * dsin(xqd) * d2_AB ) )/ax2
-      !case (1100) ! ppss !
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const &
-      !         * (  dcos(xpa) * dcos(xpb) * bessi_scaled(0,z)      & 
-      !           - 1.d0/(A*A) * dsin(ax*(2.d0*xp-xa-xb)) * d_T     &
-      !           + 1/A        * dsin(ax*(2.d0*xp-xa-xb)) * d2_AT   &
-      !           -              dcos(ax*(2.d0*xp-xa-xb)) * d2_AA ) /ax2
-      !case (0011) ! sspp !
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const &
-      !        * ( dcos(xqc)   * dcos(xqd) * bessi_scaled(0,z)     & 
-      !          - 1.d0/(B*B)  * dsin(ax*(2.d0*xq-xc-xd)) * d_T    &
-      !          + 1/B         * dsin(ax*(2.d0*xq-xc-xd)) * d2_BT  & 
-      !          -               dcos(ax*(2.d0*xq-xc-xd)) * d2_BB ) /ax2 
-      !case (1110) !ppps! 
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const          &
-      !      * ( - 1.d0/B       * dcos(xpa) *    dcos(xpb) * dcos(xqc) * d_T                & 
-      !          + 1.d0/(A*A*B) * dsin(ax*(2.d0*xp-xa-xb)) * dcos(xqc) * d2_TT              & 
-      !          - 1.d0/(A*B)   * dsin(ax*(2.d0*xp-xa-xb)) * dcos(xqc) * d3_ATT             & 
-      !          + 1.d0/B       * dcos(ax*(2.d0*xp-xa-xb)) * dcos(xqc) * d3_AAT             & 
-      !          +                dcos(xpa) *    dcos(xpb) * dsin(xqc) * d_B                &
-      !          - 1.d0/(A*A)   * dsin(ax*(2.d0*xp-xa-xb)) * dsin(xqc) * d2_BT              &
-      !          + 1.d0/A       * dsin(ax*(2.d0*xp-xa-xb)) * dsin(xqc) * d3_ABT             &
-      !          -                dcos(ax*(2.d0*xp-xa-xb)) * dsin(xqc) * d3_AAB            ) /ax3
-      !case (1101) !ppsp! 
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const          &
-      !      * ( - 1.d0/B       * dcos(xpa) *    dcos(xpb) * dcos(xqd) * d_T                & 
-      !          + 1.d0/(A*A*B) * dsin(ax*(2.d0*xp-xa-xb)) * dcos(xqd) * d2_TT              & 
-      !          - 1.d0/(A*B)   * dsin(ax*(2.d0*xp-xa-xb)) * dcos(xqd) * d3_ATT             & 
-      !          + 1.d0/B       * dcos(ax*(2.d0*xp-xa-xb)) * dcos(xqd) * d3_AAT             & 
-      !          +                dcos(xpa) *    dcos(xpb) * dsin(xqd) * d_B                &
-      !          - 1.d0/(A*A)   * dsin(ax*(2.d0*xp-xa-xb)) * dsin(xqd) * d2_BT              &
-      !          + 1.d0/A       * dsin(ax*(2.d0*xp-xa-xb)) * dsin(xqd) * d3_ABT             &
-      !          -                dcos(ax*(2.d0*xp-xa-xb)) * dsin(xqd) * d3_AAB            ) /ax3
-      !case (1011) !pspp! 
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const          &
-      !      * (   1.d0/A       * dcos(xqc) *    dcos(xqd) * dcos(xpa) * d_T                & 
-      !          - 1.d0/(B*B*A) * dsin(ax*(2.d0*xq-xc-xd)) * dcos(xpa) * d2_TT              & 
-      !          + 1.d0/(A*B)   * dsin(ax*(2.d0*xq-xc-xd)) * dcos(xpa) * d3_BTT             & 
-      !          - 1.d0/A       * dcos(ax*(2.d0*xq-xc-xd)) * dcos(xpa) * d3_BBT             & 
-      !          +                dcos(xqc) *    dcos(xqd) * dsin(xpa) * d_A                &
-      !          - 1.d0/(A*A)   * dsin(ax*(2.d0*xq-xc-xd)) * dsin(xpa) * d2_AT              &
-      !          + 1.d0/A       * dsin(ax*(2.d0*xq-xc-xd)) * dsin(xpa) * d3_ABT             &
-      !          -                dcos(ax*(2.d0*xq-xc-xd)) * dsin(xpa) * d3_ABB            ) /ax3
-      !case (0111) !sppp! 
-      !  f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const          &
-      !      * (   1.d0/A       * dcos(xqc) *    dcos(xqd) * dcos(xpb) * d_T                & 
-      !          - 1.d0/(B*B*A) * dsin(ax*(2.d0*xq-xc-xd)) * dcos(xpb) * d2_TT              & 
-      !          + 1.d0/(A*B)   * dsin(ax*(2.d0*xq-xc-xd)) * dcos(xpb) * d3_BTT             & 
-      !          - 1.d0/A       * dcos(ax*(2.d0*xq-xc-xd)) * dcos(xpb) * d3_BBT             & 
-      !          +                dcos(xqc) *    dcos(xqd) * dsin(xpb) * d_A                &
-      !          - 1.d0/(A*A)   * dsin(ax*(2.d0*xq-xc-xd)) * dsin(xpb) * d2_AT              &
-      !          + 1.d0/A       * dsin(ax*(2.d0*xq-xc-xd)) * dsin(xpb) * d3_ABT             &
-      !          -                dcos(ax*(2.d0*xq-xc-xd)) * dsin(xpb) * d3_ABB            ) /ax3
-      !case (1111) ! pppp ! 
-      !    sp  = dsin(ax*(2.d0*xp-xa-xb))
-      !    cp  = dcos(ax*(2.d0*xp-xa-xb))
-      !    sq  = dsin(ax*(2.d0*xq-xc-xd))
-      !    cq  = dcos(ax*(2.d0*xq-xc-xd))
-      !    cab = dcos(xpa) * dcos(xpb)
-      !    ccd = dcos(xqc) * dcos(xqd)
-      !   f =                      erfcx(term) * dexp(z-(2.d0*(p+q)/(ax2))) * const    &
-      !       *  (                   cab * ccd * bessi_scaled(0,z)                     &
-      !           - 1.d0/(B*B)     * cab * sq  * d_T                                   &
-      !           + 1.d0/B         * cab * sq  * d2_BT                                 &
-      !           -                  cab * cq  * d2_BB                                 &
-      !           - 1.d0/(A*A)     * sp  * ccd * d_T                                   &
-      !           + 1.d0/(A*A*B*B) * sp  * sq  * d2_TT                                 &
-      !           - 1.d0/(A*A*B)   * sp  * sq  * d3_BTT                                &
-      !           + 1.d0/(A*A)     * sp  * cq  * d3_BBT                                &
-      !           + 1.d0/(A)       * sp  * ccd * d2_AT                                 &
-      !           - 1.d0/(A*B*B)   * sp  * sq  * d3_ATT                                & 
-      !           + 1.d0/(A*B)     * sp  * sq  * d4_ABTT                               &
-      !           - 1.d0/(A)       * sp  * cq  * d4_ABBT                               &
-      !           -                  cp  * ccd * d2_AA                                 &
-      !           + 1.d0/(B*B)     * cp  * sq  * d3_AAT                                &
-      !           - 1.d0/(B)       * cp  * sq  * d4_AABT                               &
-      !           +                  cp  * cq  * d4_AABB  )           / ax4 
-    
-
-      ! --------------------------------------------------------------- !
         
       case (0000) ! | s   s   s   s    ( 1 ) 
         const_t          = int_xxxx
@@ -691,9 +511,9 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
       
       case (0011) ! | s   s   px  px   ( 6 ) 
         const_t          = int_xxxx
-        integral_t       = ccd*bessi_scaled(0, z)/ax2 - cqcd*d2_BB/ax2 - 1.0*d1_T*sqcd/(B2*ax2) + 1.0*d2_BT*sqcd/(B*ax2)
-        f                = const_t * integral_t
-      
+        integral_t       = (ccd*bessi_scaled(0, z) - cqcd*d2_BB - d1_T*sqcd*B/(B2*B+eta) + d2_BT*sqcd*B/(B*B+eta))/ax2 
+        f                = const_t * integral_t 
+
       case (0012) ! | s   s   px  py   ( 7 ) 
         const_t          = 0
         integral_t       = (B*d1_B*sqc - 1.0*cqc*d1_T)/(B*ax)
@@ -771,7 +591,7 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
       
       case (0111) ! | s   px  px  px   ( 22) 
         const_t          = int_xxxx
-        integral_t       = (A*B*B2*spb*(ccd*d1_A - cqcd*d3_ABB) - 1.0*A*B*d2_AT*spb*sqcd + 1.0*A*B2*d3_ABT*spb*sqcd + 1.0*B*B2*cpb*(ccd*d1_T - cqcd*d3_BBT) - 1.0*B*cpb*d2_TT*sqcd + 1.0*B2*cpb*d3_BTT*sqcd)/(A*B*B2*ax*ax2)
+        integral_t       = (A*B*B2*spb*(ccd*d1_A - cqcd*d3_ABB) - 1.0*A*B*d2_AT*spb*sqcd + 1.0*A*B2*d3_ABT*spb*sqcd + 1.0*B*B2*cpb*(ccd*d1_T - cqcd*d3_BBT) - 1.0*B*cpb*d2_TT*sqcd + 1.0*B2*cpb*d3_BTT*sqcd)*(A*B*B2)/((A*B*B2*A*B*B2+eta)*ax*ax2)
         f                = const_t * integral_t
       
       case (0112) ! | s   px  px  py   ( 23) 
@@ -1944,13 +1764,13 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,
         integral_t       = bessi_scaled(0, z)
         f                = const_t * integral_t
 
-      case default
-        f = 0.0d0
-      end select
+       case default
+         f = 0.0d0
+       end select
 
       
 
-      end function f
+       end function f
 
 end subroutine integrate_ERI_mod_mod_mod
 
@@ -1961,7 +1781,7 @@ end subroutine integrate_ERI_mod_mod_mod
 
 subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
       
-      use quadpack , only : dqagi
+      use quadpack , only : dqagi , dqags
       use iso_c_binding
       use torus_init
       use gsl_bessel_mod
@@ -1986,20 +1806,22 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 6000
+      integer,parameter                  :: Nmax = 600
       double precision,parameter         :: pi   = 3.14159265358979323846D00
-      double precision,parameter         :: pi2  = pi * pi
-      
+      double precision,parameter         :: pi2  = pi * pi      
       
       call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr,   &
       &          neval, ier,Limit,Lenw,Last,Iwork,Work)
+
+      !call dqags(f_decay, 0.d0, 10000d0, Epsabs, Epsrel, Result, Abserr, Neval, Ier, &
+      !               Limit, Lenw, Last, Iwork, Work)
 
       if (ier /= 0) then
         write(*,'(A,I8,A)') 'Error code = ', ier
@@ -2025,18 +1847,19 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
       double precision                     :: A,  B, C 
       double precision                     :: D, D2
       double precision                     :: const 
-      double precision                     :: tol  = 1D-15
+      double precision                     :: tol  = 1D-30
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n 
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
       double precision                     :: termC
       COMPLEX(KIND=KIND(1.0D0))            :: term1  , term2 
+      double precision,parameter           :: eta = 1e-40
 
 
 
-      A   = 2.d0*p_x/(ax*ax)
-      B   = 2.d0*q_x/(ax*ax)
-      C   = 2.d0*t*t/(ax*ax)
+      A   = 2.d0*p_x/(ax*ax) + eta 
+      B   = 2.d0*q_x/(ax*ax) + eta
+      C   = 2.d0*t*t/(ax*ax) + eta
 
       D   = 1.d0/(dsqrt(p*q+(p+q)*t*t))
       D2  = D * D 
@@ -2097,6 +1920,7 @@ subroutine integrate_ERI_mod_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,x
         case (0011) ! | s   s   px  px   ( 6 ) 
         n         = 0
         const     =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)/(ax*ax))
+                                              
         termAn    = bessi_scaled(n, A)
         termBn    = (cos(xqC)*cos(xqD)*bessi_scaled(n,B)-cos(ax*(2.d0*xq-xC-xD))*(0.25d0*(bessi_scaled(n-2,B)+2.d0*bessi_scaled(n,B)+bessi_scaled(n+2,B)))-I_dp/B*n*sin(ax*(2.d0*xq-xC-xD))*(0.5d0*(bessi_scaled(n-1,B)+bessi_scaled(n+1,B))))/ax/ax
         sum       =  const * bessi_scaled(n, C) * termAn * termBn 
@@ -3276,3 +3100,15 @@ end function S
 
 
 end subroutine integrate_ERI_mod_mod
+
+
+integer function count_px_orbitals(o1, o2, o3, o4)
+    implicit none
+    character(len=*), intent(in) :: o1, o2, o3, o4
+    
+    count_px_orbitals = 0
+    if (o1 == "px") count_px_orbitals = count_px_orbitals + 1
+    if (o2 == "px") count_px_orbitals = count_px_orbitals + 1
+    if (o3 == "px") count_px_orbitals = count_px_orbitals + 1
+    if (o4 == "px") count_px_orbitals = count_px_orbitals + 1
+end function count_px_orbitals
