@@ -1,4 +1,4 @@
-subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry)
+subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
 
       use files
       use torus_init
@@ -16,9 +16,14 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry)
 
       ! - local - !
 
-      double precision             :: start,end,time
+      double precision               :: start,end,time
 
       ! - output - ! 
+
+      double precision,intent(out)   ::  OV(number_of_functions,number_of_functions)
+      double precision,intent(out)   ::   K(number_of_functions,number_of_functions)
+      double precision,intent(out)   ::  NA(number_of_functions,number_of_functions)
+      double precision,intent(out)   :: ERI(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
 
       ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - !
 
@@ -33,10 +38,10 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry)
 
       call cpu_time(start)
 
-        call overlap_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
-        call kinetic_matrix_toroidal(n_atoms,number_of_functions,atoms,AO)
-        call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO)
-        call ERI_integral_toroidal(n_atoms,geometry,atoms)
+        call overlap_matrix_toroidal(n_atoms,number_of_functions,atoms,AO,OV)
+        call kinetic_matrix_toroidal(n_atoms,number_of_functions,atoms,AO,K)
+        call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO,NA)
+        call ERI_integral_toroidal(n_atoms,geometry,number_of_functions,atoms,ERI)
         
       call cpu_time(end)
 

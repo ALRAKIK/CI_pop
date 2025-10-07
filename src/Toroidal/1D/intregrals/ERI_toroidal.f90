@@ -1,4 +1,4 @@
-subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
+subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,atoms,two_electron_integrals)
 
       use files
       use omp_lib
@@ -11,9 +11,9 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
 
       !-----------------------------------------------------------------!
 
-      integer                        :: i , j , k , l , num_int , num_total_int !, p ,q 
-      !integer                        :: actual_total_int
+      integer                        :: i , j , k , l , num_int , num_total_int
       integer                        :: number_of_atoms
+      integer                        :: number_of_functions
       type(atom)                     :: atoms(number_of_atoms)
       type(ERI_function),allocatable :: ERI  (:)
 
@@ -22,11 +22,14 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
       double precision,allocatable   :: two_eri(:,:,:,:)
       double precision               :: value
       double precision               :: start_time, end_time
-      integer                        :: number_of_functions
+      
       integer                        :: number_of_functions_per_unitcell 
       integer                        :: index_sym
 
       integer                        :: days, hours, minutes, seconds , t 
+
+
+      double precision,intent(out)   :: two_electron_integrals(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
 
 
       !-----------------------------------------------------------------!
@@ -39,10 +42,10 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
         number_of_functions_per_unitcell = number_of_functions_per_unitcell + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
 
-      number_of_functions = 0 
-      do i = 1 , number_of_atoms
-        number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do
+      !number_of_functions = 0 
+      !do i = 1 , number_of_atoms
+      !  number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
+      !end do
 
       allocate(ERI(number_of_functions))
       allocate(two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
@@ -115,18 +118,30 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,atoms)
 
       call shift_integrals(two_electron,two_eri,number_of_functions,number_of_functions_per_unitcell)
 
-      open(1,file=trim(tmp_file_name)//"/ERI.dat")
-        do i = 1, number_of_functions
+      two_electron_integrals = 0.d0 
+
+      do i = 1, number_of_functions
           do j = 1 , number_of_functions
             do k = 1 , number_of_functions
               do l = 1 , number_of_functions
-                if (abs(two_eri(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)                   
-                !if (abs(two_electron(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_electron(i,j,k,l)
+                if (abs(two_eri(i,j,k,l)) > 1e-30 )  two_electron_integrals(i,j,k,l) = two_eri(i,j,k,l) 
               end do 
             end do 
           end do 
-        end do 
-      close(1)
+        end do
+      
+      !open(1,file=trim(tmp_file_name)//"/ERI.dat")
+      !  do i = 1, number_of_functions
+      !    do j = 1 , number_of_functions
+      !      do k = 1 , number_of_functions
+      !        do l = 1 , number_of_functions
+      !          if (abs(two_eri(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)                   
+      !          !if (abs(two_electron(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_electron(i,j,k,l)
+      !        end do 
+      !      end do 
+      !    end do 
+      !  end do 
+      !close(1)
 
       deallocate(ERI)
       deallocate(two_electron)

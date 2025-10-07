@@ -264,7 +264,7 @@ program CI
           case ("Torus")
             call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)  ! Torus with PBC 
           case ("Tori1D")
-            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Toroidal 1D Gaussian TRR
+            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)     ! Toroidal 1D Gaussian TRR
           case ("Tori2D")
             call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 2D Gaussian
           case ("Tori3D")
@@ -276,6 +276,7 @@ program CI
         end select          
       end if
         
+
       ! --------------------------------------------------------------- !
       !            Read the one and the two electron integrals     
       ! --------------------------------------------------------------- !      
@@ -288,7 +289,8 @@ program CI
       if (c_read) then
         call read_integrals_from_file(nBas,S,T,V,Hc,ERI,calculation_type)
       else 
-        call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
+        !call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
+        HC (:,:) = T(:,:) + V(:,:)
       end if
       
       

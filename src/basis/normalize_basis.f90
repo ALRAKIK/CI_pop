@@ -353,37 +353,37 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
         end do 
       end do 
         
-        !do n = 1 , n_contraction
-        !  
-        !  sum = 0.d0
-!
-        !  do i = 1 , n_gaussian
-        !    do j = 1 , n_gaussian
-!
-        !      alpha = exponent(i)
-        !      beta  = exponent(j)
-        !      gamma = alpha + beta
-!
-        !      I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax**2)
-        !      
-!
-        !      c1 = contractionN(i,n)
-        !      c2 = contractionN(j,n)
-!
-        !      const = c1*c2*Lx
-!
-        !      sum  = sum + const*I_0_gamma_x*(pi/gamma)
-        !    end do 
-        !  end do 
-!
-        !  IF (SQRT(sum) .LT. THRMIN) GOTO 20
-        !  sum=1.d0/SQRT(sum)
-        !  do j = 1, n_gaussian
-        !    contractionN(j,n)= contractionN(j,n)*sum
-        !  end do 
-!
-        !end do 
-!
+        do n = 1 , n_contraction
+          
+          sum = 0.d0
+
+          do i = 1 , n_gaussian
+            do j = 1 , n_gaussian
+
+              alpha = exponent(i)
+              beta  = exponent(j)
+              gamma = alpha + beta
+
+              I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax**2)
+             
+
+              c1 = contractionN(i,n)
+              c2 = contractionN(j,n)
+
+              const = c1*c2*Lx
+
+              sum  = sum + const*I_0_gamma_x*(pi/gamma)
+            end do 
+          end do 
+
+          IF (SQRT(sum) .LT. THRMIN) GOTO 20
+          sum=1.d0/SQRT(sum)
+          do j = 1, n_gaussian
+            contractionN(j,n)= contractionN(j,n)*sum
+          end do 
+
+        end do 
+
       end if 
       
 20    continue 
