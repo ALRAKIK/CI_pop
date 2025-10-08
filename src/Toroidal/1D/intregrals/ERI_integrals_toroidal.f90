@@ -151,15 +151,14 @@ subroutine integrate_ERI_mod_mod_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xpB
 
       double precision, intent(out)      :: result
 
-      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
-      integer, parameter                 :: limit = 100
+      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      integer, parameter                 :: limit = 50
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier,last, neval , iwork(limit)
       double precision                   :: abserr, work(lenw)
       integer, parameter                 :: key  = 6
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi
-      double precision                   :: result1 , result2 
 
 
 

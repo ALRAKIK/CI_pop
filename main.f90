@@ -51,7 +51,7 @@ program CI
       character(len=2),allocatable    ::                  label(:)
 
       logical                         :: c_read, c_Integral, c_trexio
-      logical                         :: c_Angstrom
+      logical                         :: c_Angstrom, c_plot
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
@@ -71,6 +71,7 @@ program CI
       c_read     = any(keyword == 'Read'    )
       c_trexio   = any(keyword == 'Trexio'  )
       c_Angstrom = any(keyword == 'Angstrom')
+      c_plot     = any(keyword == 'Plot')
       
       ! --------------------------------------------------------------- !
       !               Read the Geometry, Label and the Charge           !
@@ -246,7 +247,9 @@ program CI
       !               ---------------------------------                 !
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      !  call plot(n_atoms,geometry,calculation_type)
+      if (c_plot) then 
+        call plot(n_atoms,geometry,calculation_type)
+      end if 
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !               ---------------------------------                 !
@@ -289,8 +292,8 @@ program CI
       if (c_read) then
         call read_integrals_from_file(nBas,S,T,V,Hc,ERI,calculation_type)
       else 
-        !call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
-        HC (:,:) = T(:,:) + V(:,:)
+        call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
+        !HC (:,:) = T(:,:) + V(:,:)
       end if
       
       

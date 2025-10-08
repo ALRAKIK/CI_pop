@@ -89,7 +89,7 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
         if (trim(line) == 'Angstrom' )   keyword(4) = 'Angstrom'
 
-        if (trim(line) == 'Angstrom' )   keyword(4) = 'Plot'
+        if (trim(line) == 'Plot'     )   keyword(5) = 'Plot'
 
 
         ! here add the keyword for the threshold of the integrals !

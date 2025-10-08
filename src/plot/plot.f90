@@ -12,7 +12,7 @@ subroutine  plot(n_atoms,geometry,calculation_type)
 
       call system("rm -r plot_tmp")
 
-      open(30,file="./tmp/parameter.dat")
+      open(30,file="parameter.dat")
         write(30,"(f16.8)")  Lx
         write(30,"(10f16.8)")  geometry(1,1), geometry(2,1) , geometry((n_atoms/2)+1,1) 
       close(30)
