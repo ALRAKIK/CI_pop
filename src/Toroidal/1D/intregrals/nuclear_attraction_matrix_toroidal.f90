@@ -121,20 +121,20 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
         end do 
       end do 
 
-      !open(1,file=trim(tmp_file_name)//"/NA.dat ")
-      !  do i = 1 , size(NA,1)
-      !    do j = i , size(NA,1)
-      !      if (abs(NA(i,j)) > 1e-15 ) write(1,*) i , j ,  NA(i,j)
-      !    end do 
-      !  end do 
-      !close(1)
+      open(1,file=trim(tmp_file_name)//"/NA.dat ")
+        do i = 1 , size(NA,1)
+          do j = i , size(NA,1)
+            if (abs(NA(i,j)) > 1e-15 ) write(1,*) i , j ,  NA(i,j)
+          end do 
+        end do 
+      close(1)
 
-      !open(1,file=trim(tmp_file_name)//"/NA_matrix.dat ")
-      !write(1,'(15x,1000(i3,15x))') (i,i=1,size(NA,1))
-      !do i = 1 , size(NA,1)
-      !  write(1,'(i3,6x,1000(f16.12,2x))') i , (NA(i,j),j=1,size(NA,1))
-      !end do 
-      !close(1)
+      open(1,file=trim(tmp_file_name)//"/NA_matrix.dat ")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(NA,1))
+      do i = 1 , size(NA,1)
+        write(1,'(i3,6x,1000(f16.12,2x))') i , (NA(i,j),j=1,size(NA,1))
+      end do 
+      close(1)
 
       !deallocate(NA)
 

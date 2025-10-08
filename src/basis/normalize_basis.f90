@@ -15,8 +15,6 @@ subroutine normalize_basis()
 
       double precision,allocatable  :: exponent(:) , contraction(:,:) , contractionN(:,:) 
 
-      !open(1,file="./tmp/Basis_scratch")
-      !open(2,file="./tmp/Basis_normalized")
       open(1,file=trim(tmp_file_name)//"/Basis_scratch")
       open(2,file=trim(tmp_file_name)//"/Basis_normalized")
 
@@ -36,7 +34,8 @@ subroutine normalize_basis()
           call norm_orb(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN)
           write(2,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            !write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           deallocate(exponent,contraction,contractionN)
         end if
@@ -53,7 +52,8 @@ subroutine normalize_basis()
           call norm_orb(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN)
           write(2,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            !write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           deallocate(exponent,contraction,contractionN)
         end if
@@ -162,10 +162,10 @@ subroutine normalize_basis_tor()
           write(2,'(4I4)') n_gaussian ,  n_contraction
           write(3,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           do i = 1 , n_gaussian
-            write(3,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            write(3,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           deallocate(exponent,contraction,contractionN)
         end if
@@ -182,12 +182,12 @@ subroutine normalize_basis_tor()
           call norm_orb_tor(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
           write(2,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           call norm_orb_tor_p(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
           write(3,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            write(3,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            write(3,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           deallocate(exponent,contraction,contractionN)
         end if
@@ -402,36 +402,32 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
         end do 
       end do
 
-        !do n = 1 , n_contraction
-        !  sum = 0.d0
-        !  do i = 1 , n_gaussian
-        !    do j = 1 , n_gaussian
-        !      alpha = exponent(i)
-        !      beta  = exponent(j)
-        !      gamma = alpha + beta
-!
-        !      if ( gamma == 0.d0 ) cycle
-  !
-        !      I_0_gamma_x = bessi_scaled(1,2.d0*gamma/ax**2)
-        !      
-        !      c1 = contraction(i,n)
-        !      c2 = contraction(j,n)
-        !        
-        !      const = c1*c2*Lx*(1/(2.d0*gamma))
-        !      sum  = sum + const*I_0_gamma_x * (pi/gamma)
-!
-        !    end do 
-        !  end do 
-!
-!
-        !IF (SQRT(sum) .LT. THRMIN) GOTO 30
-        !  sum=1.d0/SQRT(sum)
-!
-        !  do j = 1, n_gaussian
-        !    contractionN(j,n)= contractionN(j,n)*sum
-        !  end do 
-!
-        !end do
+        do n = 1 , n_contraction
+          sum = 0.d0
+          do i = 1 , n_gaussian
+            do j = 1 , n_gaussian
+              alpha = exponent(i)
+              beta  = exponent(j)
+              gamma = alpha + beta
+                
+              I_0_gamma_x = bessi_scaled(1,2.d0*gamma/ax**2)
+              
+              c1 = contractionN(i,n)
+              c2 = contractionN(j,n)
+                
+              const = c1*c2*Lx*(1.d0/(2.d0*gamma))
+              sum  = sum + const*I_0_gamma_x * (pi/gamma)
+              
+            end do 
+          end do 
+        
+        IF (SQRT(sum) .LT. THRMIN) GOTO 30
+          sum=1.d0/SQRT(sum)
+          do j = 1, n_gaussian
+            contractionN(j,n)= contractionN(j,n)*sum
+          end do 
+        
+        end do
 
       end if 
       
@@ -678,41 +674,37 @@ subroutine norm_orb_tor_p(n_gaussian , n_contraction, exponent, contraction  , n
         do i = 1 , n_gaussian
 
            Norm(i) = 1.d0 / dsqrt( Lx  * (pi/(2.d0*exponent(i))) *  bessi_scaled(0,4.d0*exponent(i)/(ax*ax)) * (1.d0/(4.d0*exponent(i))) )
-
           contractionN(i,n) =  contraction(i,n) * Norm(i) 
 
         end do 
       end do
 
-      !  do n = 1 , n_contraction
-      !    sum = 0.d0
-      !    do i = 1 , n_gaussian
-      !      do j = 1 , n_gaussian
-      !        alpha = exponent(i)
-      !        beta  = exponent(j)
-      !        gamma = alpha + beta
-      !        if ( gamma == 0.d0 ) cycle
-!
-      !        I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax**2)
-!
-      !        c1 = contraction(i,n)
-      !        c2 = contraction(j,n)
-!
-      !        const = c1*c2*Lx*(1/(2.d0*gamma))
-      !        sum  = sum + const*I_0_gamma_x * (pi/gamma)
-      !        
-      !      end do 
-      !    end do 
-!
-!
-      !  IF (SQRT(sum) .LT. THRMIN) GOTO 30
-      !    sum=1.d0/SQRT(sum)
-!
-      !    do j = 1, n_gaussian
-      !      contractionN(j,n)= contraction(j,n)*sum
-      !    end do 
-!
-      !  end do
+        do n = 1 , n_contraction
+          sum = 0.d0
+          do i = 1 , n_gaussian
+            do j = 1 , n_gaussian
+              alpha = exponent(i)
+              beta  = exponent(j)
+              gamma = alpha + beta
+              if ( gamma == 0.d0 ) cycle
+
+              I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax**2)
+
+              c1 = contraction(i,n)
+              c2 = contraction(j,n)
+
+              const = c1*c2*Lx*(1/(2.d0*gamma))
+              sum  = sum + const*I_0_gamma_x * (pi/gamma)
+              
+            end do 
+          end do 
+
+        IF (SQRT(sum) .LT. THRMIN) GOTO 30
+          sum=1.d0/SQRT(sum)
+          do j = 1, n_gaussian
+            contractionN(j,n)= contraction(j,n)*sum
+          end do 
+        end do
 
       end if 
       

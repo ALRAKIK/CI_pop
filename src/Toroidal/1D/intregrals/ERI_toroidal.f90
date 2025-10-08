@@ -130,18 +130,17 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
           end do 
         end do
       
-      !open(1,file=trim(tmp_file_name)//"/ERI.dat")
-      !  do i = 1, number_of_functions
-      !    do j = 1 , number_of_functions
-      !      do k = 1 , number_of_functions
-      !        do l = 1 , number_of_functions
-      !          if (abs(two_eri(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)                   
-      !          !if (abs(two_electron(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_electron(i,j,k,l)
-      !        end do 
-      !      end do 
-      !    end do 
-      !  end do 
-      !close(1)
+      open(1,file=trim(tmp_file_name)//"/ERI.dat")
+        do i = 1, number_of_functions
+          do j = 1 , number_of_functions
+            do k = 1 , number_of_functions
+              do l = 1 , number_of_functions
+                if (abs(two_eri(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)                   
+              end do 
+            end do 
+          end do 
+        end do 
+      close(1)
 
       deallocate(ERI)
       deallocate(two_electron)

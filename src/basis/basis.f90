@@ -8,7 +8,6 @@ subroutine basis(number_of_atoms,charge,atoms)
       integer,intent(in)      :: number_of_atoms
       integer,intent(in)      :: charge(number_of_atoms)
       type(atom),intent(out)  :: atoms(number_of_atoms)
-      character(len=100)      :: command 
 
       integer                 :: i 
 
@@ -37,7 +36,6 @@ subroutine basis_tor(number_of_atoms,charge,atoms,norm_helper,calculation_type)
       character(len=10),intent(in)   :: calculation_type
       type(atom)       ,intent(out)  :: atoms(number_of_atoms)
       type(atom)       ,intent(out)  :: norm_helper(number_of_atoms)
-      character(len=100)             :: command
 
       integer                        :: i 
 

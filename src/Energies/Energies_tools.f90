@@ -172,22 +172,19 @@ subroutine get_X_from_overlap(N,over,X)
       call diagonalize_matrix(N,Evec,Eval)
 
       ! //////////////////////////////////////////////////////////////// !
-      call header_under("The Overlap Eigenvalues",-1)
-
-      write(outfile, "(5f16.8)") (Eval(i), i=1,n)
-
-      write(outfile,*) ""
-      write(outfile,*) ""
-      write(outfile,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
-      write(outfile,*) ""
-
-      if (Minval(Eval) < 0.d0) then 
-        call header("Error",-1)
-          write(outfile,'(a80)')'*******************************************************************************************'
-          write(outfile,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
-          write(outfile,'(a80)')'*******************************************************************************************'
-          stop            
-      end if
+      !call header_under("The Overlap Eigenvalues",-1)
+      !write(outfile, "(5f16.8)") (Eval(i), i=1,n)
+      !write(outfile,*) ""
+      !write(outfile,*) ""
+      !write(outfile,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
+      !write(outfile,*) ""
+      !if (Minval(Eval) < 0.d0) then 
+      !  call header("Error",-1)
+      !    write(outfile,'(a80)')'*******************************************************************************************'
+      !    write(outfile,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
+      !    write(outfile,'(a80)')'*******************************************************************************************'
+      !    stop            
+      !end if
       ! //////////////////////////////////////////////////////////////// !
 
       do i = 1 , N
@@ -568,3 +565,54 @@ pure function factorial2(x)  result(fac)
       end do 
 
 end function factorial2
+
+
+
+
+subroutine check_the_overlap(N,over)
+
+      use files 
+      implicit none 
+
+      ! input !
+
+      integer,intent(in)            :: N
+      double precision, intent(in)  :: over(N,N)
+
+      ! local !
+
+      integer                       :: i , o
+      double precision              :: Evec(N,N)
+      double precision              :: Eval(N)
+      double precision,parameter    :: thresh = 1d-6
+
+      double precision              :: Xt(N,N)
+
+      ! output !
+      
+      Evec(:,:) = over(:,:)
+
+      call diagonalize_matrix(N,Evec,Eval)
+
+      ! //////////////////////////////////////////////////////////////// !
+      call header_under("The Overlap Eigenvalues",-1)
+
+      write(outfile, "(5f16.8)") (Eval(i), i=1,n)
+
+      write(outfile,*) ""
+      write(outfile,*) ""
+      write(outfile,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
+      write(outfile,*) ""
+
+      if (Minval(Eval) < 0.d0) then 
+        call header("Error",-1)
+          write(outfile,'(a80)')'*******************************************************************************************'
+          write(outfile,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
+          write(outfile,'(a80)')'*******************************************************************************************'
+          stop            
+      end if
+      ! /////////////////////////////////////////////////////////////// !
+
+      ! --------------------------------------------------------------- !
+  
+end subroutine check_the_overlap
