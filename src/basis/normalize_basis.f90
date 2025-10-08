@@ -690,8 +690,8 @@ subroutine norm_orb_tor_p(n_gaussian , n_contraction, exponent, contraction  , n
 
               I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax**2)
 
-              c1 = contraction(i,n)
-              c2 = contraction(j,n)
+              c1 = contractionN(i,n)
+              c2 = contractionN(j,n)
 
               const = c1*c2*Lx*(1/(2.d0*gamma))
               sum  = sum + const*I_0_gamma_x * (pi/gamma)
@@ -702,7 +702,7 @@ subroutine norm_orb_tor_p(n_gaussian , n_contraction, exponent, contraction  , n
         IF (SQRT(sum) .LT. THRMIN) GOTO 30
           sum=1.d0/SQRT(sum)
           do j = 1, n_gaussian
-            contractionN(j,n)= contraction(j,n)*sum
+            contractionN(j,n)= contractionN(j,n)*sum
           end do 
         end do
 
