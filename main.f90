@@ -263,7 +263,7 @@ program CI
         write(outfile,'(A)') 'The integrals will be calculated'
         select case (trim(calculation_type))
           case ("OBC", "Ring", "OBC2D")
-            call molecule(n_atoms,geometry,atoms)                          ! Molecule 
+            call molecule(n_atoms,number_of_functions,atoms,geometry,S,T,V,ERI)                          ! Molecule 
           case ("Torus")
             call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)  ! Torus with PBC 
           case ("Tori1D")
@@ -292,8 +292,8 @@ program CI
       if (c_read) then
         call read_integrals_from_file(nBas,S,T,V,Hc,ERI,calculation_type)
       else 
-        call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
-        !HC (:,:) = T(:,:) + V(:,:)
+        !call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
+        HC (:,:) = T(:,:) + V(:,:)
       end if
       
       

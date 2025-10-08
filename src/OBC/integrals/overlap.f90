@@ -1,4 +1,4 @@
-subroutine overlap_matrix(number_of_atoms,geometry,atoms)
+subroutine overlap_matrix(number_of_atoms,number_of_functions,geometry,atoms,overlap)
 
       use files
       use atom_basis
@@ -8,6 +8,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
       !-----------------------------------------------------------------!
 
       integer                      :: i , j , k , l 
+      integer                      :: number_of_functions
       integer                      :: func_index(1:number_of_atoms)
       integer                      :: idx_s  , idx_p 
       integer                      :: idx_p1 , idx_p2 
@@ -17,7 +18,7 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
 
       double precision             :: geometry(number_of_atoms,3)
 
-      double precision,allocatable :: overlap(:,:)
+      double precision             :: overlap(number_of_functions,number_of_functions)
       double precision             :: r1(3) , r2(3)
 
       double precision,parameter   :: pi = dacos(-1.d0)
@@ -26,17 +27,8 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
       double precision             :: SS 
       double precision             :: SP(3) , PS(3)
       double precision             :: PP(3,3)
-      integer                      :: total_functions
 
       !-----------------------------------------------------------------!
-
-      total_functions = 0 
-
-      do i = 1 , number_of_atoms
-        total_functions = total_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do 
-      
-      allocate(overlap(total_functions,total_functions))
 
       overlap(:,:) = 0.d0 
 
@@ -138,8 +130,5 @@ subroutine overlap_matrix(number_of_atoms,geometry,atoms)
         write(1,'(i3,6x,1000(f16.12,2x))') i ,  (overlap(i,j),j=1,size(overlap,1))
       end do 
       close(1)
-
-      deallocate(overlap)
-
 
 end subroutine

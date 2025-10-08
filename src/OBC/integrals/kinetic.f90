@@ -1,4 +1,4 @@
-subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
+subroutine kinetic_matrix(number_of_atoms,number_of_functions,geometry,atoms,kinetic)
 
       use files
       use atom_basis
@@ -6,6 +6,7 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
       implicit none 
 
       integer                      :: i , j , k , l 
+      integer                      :: number_of_functions
       integer                      :: func_index(1:number_of_atoms)
       integer                      :: idx_s  , idx_p 
       integer                      :: idx_p1 , idx_p2 
@@ -15,7 +16,7 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
 
       double precision             :: geometry(number_of_atoms,3)
 
-      double precision,allocatable :: kinetic(:,:)
+      double precision             :: kinetic(number_of_functions,number_of_functions)
       double precision             :: r1(3) , r2(3)
 
       double precision,parameter   :: pi = dacos(-1.d0)
@@ -24,17 +25,6 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
       double precision             :: SS 
       double precision             :: SP(3) , PS(3)
       double precision             :: PP(3,3)
-      integer                      :: total_functions
-
-
-
-      total_functions = 0 
-
-      do i = 1 , number_of_atoms
-        total_functions = total_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do 
-    
-      allocate(kinetic(total_functions,total_functions))
     
       kinetic(:,:) = 0.d0 
     
@@ -122,7 +112,6 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
         end do 
       end do 
 
-      !open(1,file="./tmp/KI.dat")
       open(1,file=trim(tmp_file_name)//"/KI.dat")
       do i = 1 , size(kinetic,1)
         do j = i , size(kinetic,1)
@@ -137,8 +126,6 @@ subroutine kinetic_matrix(number_of_atoms,geometry,atoms)
         write(1,'(i3,6x,1000(f16.12,2x))') i ,   (kinetic(i,j),j=1,size(kinetic,1))
       end do 
       close(1)
-
-      deallocate(kinetic)
 
 
 end subroutine

@@ -1,4 +1,4 @@
-subroutine ERI_integral(number_of_atoms,geometry,atoms)
+subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_electron)
 
       use files 
       use omp_lib
@@ -17,7 +17,7 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
       integer                        :: i , j , k , l  , p , q  , actual_total_int , num_int
       integer                        :: number_of_functions
       double precision               :: geometry(number_of_atoms,3)
-      double precision,allocatable   :: two_electron(:,:,:,:)
+      double precision               :: two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
       double precision               :: value 
 
       double precision               :: start_time, end_time
@@ -28,14 +28,9 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
       call omp_set_dynamic(.false.)
       call omp_set_num_threads(omp_get_max_threads())
 
-      number_of_functions = 0 
-      do i = 1 , number_of_atoms
-        number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do 
-
+      
       allocate(ERI(number_of_functions))
-      allocate(two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
-
+      
       call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
 
       !$omp parallel
@@ -124,7 +119,5 @@ subroutine ERI_integral(number_of_atoms,geometry,atoms)
           end do 
         end do 
       close(1)
-
-      deallocate(ERI)
 
 end subroutine

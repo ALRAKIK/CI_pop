@@ -1,4 +1,4 @@
-subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
+subroutine nuclear_attraction_matrix(number_of_atoms,number_of_functions,geometry,atoms,NA)
 
       use files
       use atom_basis
@@ -8,30 +8,23 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
       !-----------------------------------------------------------------!
 
       integer         ,intent(in)  :: number_of_atoms
+      integer         ,intent(in)  :: number_of_functions
       type(atom)      ,intent(in)  :: atoms(number_of_atoms)
       double precision,intent(in)  :: geometry(number_of_atoms,3)
 
       type(atom)                   :: atom1 , atom2 
       integer                      :: i , j , k , l 
+
       integer                      :: func_index(1:number_of_atoms)
       integer                      :: idx_s  , idx_p 
       integer                      :: idx_p1 , idx_p2
-      integer                      :: total_functions
       double precision,parameter   :: pi     = 3.14159265358979323846D00
       double precision             :: r1(3) , r2(3)
-      double precision,allocatable :: NA(:,:)
+      double precision             :: NA(number_of_functions,number_of_functions)
       double precision             :: SS , SP(3) , PS(3) , PP(3,3)
       
       !-----------------------------------------------------------------!
-
-      total_functions = 0 
-
-      do i = 1 , number_of_atoms
-        total_functions = total_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do 
-    
-      allocate(NA(total_functions,total_functions))
-    
+    !
       NA(:,:) = 0.d0 
     
       func_index(1) = 1
@@ -143,8 +136,6 @@ subroutine nuclear_attraction_matrix(number_of_atoms,geometry,atoms)
         write(1,'(i3,6x,1000(f16.12,2x))') i , (NA(i,j),j=1,size(NA,1))
       end do 
       close(1)
-
-      deallocate(NA)
 
 
 end subroutine nuclear_attraction_matrix

@@ -1,4 +1,4 @@
-subroutine molecule(n_atoms,geometry,atoms)
+subroutine molecule(n_atoms,number_of_functions,atoms,geometry,OV,K,NA,ERI)
 
       use files
       use torus_init
@@ -9,6 +9,7 @@ subroutine molecule(n_atoms,geometry,atoms)
       ! - input - !
        
       integer          ,intent(in) :: n_atoms
+      integer          ,intent(in) :: number_of_functions
       double precision ,intent(in) :: geometry(n_atoms,3)
       type(atom)       ,intent(in) :: atoms(n_atoms)
 
@@ -17,6 +18,11 @@ subroutine molecule(n_atoms,geometry,atoms)
       double precision             :: start,end,time
 
       ! - output - ! 
+
+      double precision,intent(out)   ::  OV(number_of_functions,number_of_functions)
+      double precision,intent(out)   ::   K(number_of_functions,number_of_functions)
+      double precision,intent(out)   ::  NA(number_of_functions,number_of_functions)
+      double precision,intent(out)   :: ERI(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
 
       ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - !
 
@@ -27,10 +33,11 @@ subroutine molecule(n_atoms,geometry,atoms)
 
       call cpu_time(start)
 
-        call overlap_matrix             (n_atoms,geometry,atoms)
-        call kinetic_matrix             (n_atoms,geometry,atoms)
-        call nuclear_attraction_matrix  (n_atoms,geometry,atoms)  
-        call ERI_integral               (n_atoms,geometry,atoms)
+        call overlap_matrix             (n_atoms,number_of_functions,geometry,atoms,OV)
+        call check_the_overlap          (number_of_functions,OV)
+        call kinetic_matrix             (n_atoms,number_of_functions,geometry,atoms,K)
+        call nuclear_attraction_matrix  (n_atoms,number_of_functions,geometry,atoms,NA)  
+        call ERI_integral               (n_atoms,number_of_functions,geometry,atoms,ERI)
 
       call cpu_time(end)
 
