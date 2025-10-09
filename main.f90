@@ -263,15 +263,15 @@ program CI
         write(outfile,'(A)') 'The integrals will be calculated'
         select case (trim(calculation_type))
           case ("OBC", "Ring", "OBC2D")
-            call molecule(n_atoms,number_of_functions,atoms,geometry,S,T,V,ERI)                          ! Molecule 
+            call molecule(n_atoms,number_of_functions,atoms,geometry,S,T,V,ERI)           ! Molecule 
           case ("Torus")
-            call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)  ! Torus with PBC 
+            call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)                 ! Torus with PBC 
           case ("Tori1D")
-            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)     ! Toroidal 1D Gaussian TRR
+            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)          ! Toroidal 1D Gaussian TRR
           case ("Tori2D")
-            call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 2D Gaussian
+            call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)                    ! Real Toroidal 2D Gaussian
           case ("Tori3D")
-            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry)     ! Real Toroidal 3D Gaussian  
+            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry)                    ! Real Toroidal 3D Gaussian  
           case default
             write(outfile,'(A)') 'Unknown calculation type: ',          &
             &                     trim(calculation_type)
@@ -342,7 +342,7 @@ program CI
       write(outfile,*)
       
       call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
-      call system("rm -r " // trim(tmp_file_name))
+      !call system("rm -r " // trim(tmp_file_name))
       
       !-----------------------------------------------------------------!
       !-----------------------------------------------------------------!
