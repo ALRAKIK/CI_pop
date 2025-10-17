@@ -46,7 +46,6 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
       double precision                   :: term
       double precision                   :: const
       double precision                   :: erfcx
-      double precision,parameter         :: eta = 1e-40
 
       double precision                   :: spa   , cpa  , spb   , cpb
       double precision                   :: sqc   , cqc  , sqd   , cqd  
@@ -105,15 +104,14 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
         call dqag(f0000, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                   abserr, neval, ier, limit, lenw, last, &
                   iwork, work)
-      
-
+        
       ! --------------------- one  p function ------------------------- !
 
         case (0001) ! | s   s   s   px   ( 2 ) 
 
           call dqag(f0001, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
-                    abserr, neval, ier, limit, lenw, last, &
-                    iwork, work)
+                  abserr, neval, ier, limit, lenw, last, &
+                  iwork, work)
 
         case (0010) ! | s   s   px  s    ( 5 ) 
 
@@ -127,6 +125,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+         
         case (1000) ! | px  s   s   s    ( 65) 
 
           call dqag(f1000, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
