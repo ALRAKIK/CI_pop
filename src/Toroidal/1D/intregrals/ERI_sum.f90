@@ -25,22 +25,19 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
+      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 600
+      integer,parameter                  :: Nmax = 40
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi      
       
       call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr,   &
       &          neval, ier,Limit,Lenw,Last,Iwork,Work)
-
-      !call dqags(f_decay, 0.d0, 10000d0, Epsabs, Epsrel, Result, Abserr, Neval, Ier, &
-      !               Limit, Lenw, Last, Iwork, Work)
 
       if (ier /= 0) then
         write(*,'(A,I8,A)') 'Error code = ', ier
@@ -66,7 +63,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       double precision                     :: A,  B, C 
       double precision                     :: D, D2
       double precision                     :: const 
-      double precision                     :: tol  = 1D-30
+      double precision                     :: tol  = 1D-40
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n 
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
@@ -76,9 +73,9 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
 
 
-      A   = 2.d0*p_x/(ax*ax) + eta 
-      B   = 2.d0*q_x/(ax*ax) + eta
-      C   = 2.d0*t*t/(ax*ax) + eta
+      A   = 2.d0*p_x/(ax*ax)
+      B   = 2.d0*q_x/(ax*ax)
+      C   = 2.d0*t*t/(ax*ax)
 
       D   = 1.d0/(dsqrt(p*q+(p+q)*t*t))
       D2  = D * D 
@@ -138,8 +135,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
         
         case (0011) ! | s   s   px  px   ( 6 ) 
         n         = 0
-        const     =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)/(ax*ax))
-                                              
+        const     =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)/(ax*ax))                            
         termAn    = bessi_scaled(n, A)
         termBn    = (cos(xqC)*cos(xqD)*bessi_scaled(n,B)-cos(ax*(2.d0*xq-xC-xD))*(0.25d0*(bessi_scaled(n-2,B)+2.d0*bessi_scaled(n,B)+bessi_scaled(n+2,B)))-I_dp/B*n*sin(ax*(2.d0*xq-xC-xD))*(0.5d0*(bessi_scaled(n-1,B)+bessi_scaled(n+1,B))))/ax/ax
         sum       =  const * bessi_scaled(n, C) * termAn * termBn 

@@ -100,9 +100,9 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx 
 
-              test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
+              ! test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              if (test < 1e-30) cycle
+              ! if (test < 1e-30) cycle
 
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
