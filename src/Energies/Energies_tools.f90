@@ -518,7 +518,7 @@ function erfcx(t) result(sum)
          do i = 1 , 20
           sum = sum + (-1.d0)**(i-1) * factorial2((2*i-3)) / ( sqrt(pi) * 2.d0**(i-1) * t**(2*i-1) )
          end do 
-        else 
+        else
           sum = erfc(t) * dexp(t*t)
         end if 
 
