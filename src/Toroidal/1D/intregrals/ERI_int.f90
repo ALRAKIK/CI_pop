@@ -53,6 +53,7 @@ subroutine integrate_ERI_integral(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xpB,xq
 
       use gsl_bessel_mod
       use torus_init
+      use tools 
 
       implicit none
 
@@ -68,7 +69,6 @@ subroutine integrate_ERI_integral(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xpB,xq
       double precision             :: ax2, ax3, ax4
       double precision             :: term
       double precision             :: const
-      double precision             :: erfcx
       double precision,parameter   :: eta = 1e-40
 
       double precision             :: spa   , cpa  , spb   , cpb
