@@ -34,7 +34,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       ! New variables for manual collapse
       integer                        :: total_ij_pairs, ij_index
       integer, allocatable           :: i_index(:), j_index(:)
-      integer                        :: local_int
+      integer                        :: num_threads, optimal_chunk_size
 
 
       !-----------------------------------------------------------------!
@@ -65,9 +65,25 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       endif
       !$omp end parallel
 
+      !$omp parallel
+        !$omp single
+          num_threads = omp_get_num_threads()
+        !$omp end single
+      !$omp end parallel
+
+      ! Calculate optimal chunk size based on available threads
+      if (num_threads <= 16) then
+        optimal_chunk_size = 16    ! Good for laptops (8-16 cores)
+      else if (num_threads <= 64) then
+        optimal_chunk_size = 8     ! Good for medium clusters
+      else 
+        optimal_chunk_size = 1     ! Good for large clusters (128+ cores)
+      end if
+
       start_time = omp_get_wtime()
 
       ! Precompute all i-j pairs for manual collapse
+      
       total_ij_pairs = 0
       do i = 1, number_of_functions_per_unitcell
         do j = i, number_of_functions
@@ -102,36 +118,40 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
       write(*,*) 'Will compute ', num_total_int, ' unique integrals'
 
-      !$omp parallel do private(ij_index,i,j,k,l,value,local_int) &
+      !$omp parallel do private(ij_index,i,j,k,l,value) &
       !$omp shared(two_electron, ERI, i_index, j_index) &
-      !$omp schedule(dynamic,16)
+      !$omp schedule(dynamic,optimal_chunk_size)
 
       do ij_index = 1, total_ij_pairs
-        i = i_index(ij_index)
-        j = j_index(ij_index)
+       i = i_index(ij_index)
+       j = j_index(ij_index)
   
       do k = 1, number_of_functions
-        do l = k, number_of_functions    
-          if (i <= k .or. (i == k .and. j <= l)) then
+       do l = k, number_of_functions    
+         if (i <= k .or. (i == k .and. j <= l)) then
 
-            call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
-                
-            two_electron(i,j,k,l) = value
-            two_electron(i,j,l,k) = value
-            two_electron(j,i,k,l) = value
-            two_electron(j,i,l,k) = value
-            two_electron(k,l,i,j) = value
-            two_electron(k,l,j,i) = value  
-            two_electron(l,k,i,j) = value
-            two_electron(l,k,j,i) = value
+           call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
+               
+           two_electron(i,j,k,l) = value
+           two_electron(i,j,l,k) = value
+           two_electron(j,i,k,l) = value
+           two_electron(j,i,l,k) = value
+           two_electron(k,l,i,j) = value
+           two_electron(k,l,j,i) = value  
+           two_electron(l,k,i,j) = value
+           two_electron(l,k,j,i) = value
 
-          end if 
-        end do
+         end if 
+       end do
       end do
 
       end do
       
       !$omp end parallel do
+
+
+
+
 
       deallocate(i_index, j_index)
 
