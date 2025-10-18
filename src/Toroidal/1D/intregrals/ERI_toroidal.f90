@@ -12,6 +12,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       !-----------------------------------------------------------------!
 
       integer                        :: i , j , k , l , num_int , num_total_int
+      integer                        :: p , q 
       integer                        :: number_of_atoms
       integer                        :: number_of_functions
       type(atom)                     :: atoms(number_of_atoms)
@@ -27,9 +28,13 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       integer                        :: index_sym
 
       integer                        :: days, hours, minutes, seconds , t 
-
-
+      
       double precision,intent(out)   :: two_electron_integrals(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
+
+      ! New variables for manual collapse
+      integer                        :: total_ij_pairs, ij_index
+      integer, allocatable           :: i_index(:), j_index(:)
+      integer                        :: local_int
 
 
       !-----------------------------------------------------------------!
@@ -41,11 +46,6 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       do i = 1 , number_of_atom_in_unitcell
         number_of_functions_per_unitcell = number_of_functions_per_unitcell + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
-
-      !number_of_functions = 0 
-      !do i = 1 , number_of_atoms
-      !  number_of_functions = number_of_functions + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      !end do
 
       allocate(ERI(number_of_functions))
       allocate(two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
@@ -59,8 +59,6 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
         index_sym = index_sym + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
       end do 
 
-      ! 2-fold symmetry implementation (k,l permutation only)
-
       !$omp parallel
       if (omp_get_thread_num() == 0) then
         print *, "Running with", omp_get_num_threads(), "threads"
@@ -69,37 +67,78 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
       start_time = omp_get_wtime()
 
-      num_int = 0
-      num_total_int = number_of_functions_per_unitcell * (number_of_functions) * (number_of_functions) * (number_of_functions+1) / 2 
+      ! Precompute all i-j pairs for manual collapse
+      total_ij_pairs = 0
+      do i = 1, number_of_functions_per_unitcell
+        do j = i, number_of_functions
+          total_ij_pairs = total_ij_pairs + 1
+        end do
+      end do
 
-      !$omp parallel do collapse(3) private(j,l, value) shared(two_electron, ERI,num_int) schedule(dynamic,16)
+      allocate(i_index(total_ij_pairs), j_index(total_ij_pairs))
 
-            do i = 1, number_of_functions_per_unitcell
-              do j = 1, number_of_functions
-                  do k = 1, number_of_functions
-                      do l = k, number_of_functions      
+      total_ij_pairs = 0
+      do i = 1, number_of_functions_per_unitcell
+        do j = i, number_of_functions
+          total_ij_pairs = total_ij_pairs + 1
+          i_index(total_ij_pairs) = i
+          j_index(total_ij_pairs) = j
+        end do
+      end do
 
-                        call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
-                          
-                          !$omp atomic
-                          num_int = num_int + 1
-                          two_electron(i,j,k,l) = value
-                          two_electron(i,j,l,k) = value
 
-                          !$omp critical
-                          call progress_bar(num_int,num_total_int)
-                          !$omp end critical
-                      end do
-                  end do
-              end do
-            end do
+      num_total_int = 0
+      do ij_index = 1, total_ij_pairs
+        i = i_index(ij_index)
+        j = j_index(ij_index)
+        do k = 1, number_of_functions
+          do l = k, number_of_functions    
+            if (i <= k .or. (i == k .and. j <= l)) then
+              num_total_int = num_total_int + 1
+            end if
+          end do
+        end do
+      end do
 
+      write(*,*) 'Will compute ', num_total_int, ' unique integrals'
+
+      !$omp parallel do private(ij_index,i,j,k,l,value,local_int) &
+      !$omp shared(two_electron, ERI, i_index, j_index) &
+      !$omp schedule(dynamic,16)
+
+      do ij_index = 1, total_ij_pairs
+        i = i_index(ij_index)
+        j = j_index(ij_index)
+  
+      do k = 1, number_of_functions
+        do l = k, number_of_functions    
+          if (i <= k .or. (i == k .and. j <= l)) then
+
+            call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
+                
+            two_electron(i,j,k,l) = value
+            two_electron(i,j,l,k) = value
+            two_electron(j,i,k,l) = value
+            two_electron(j,i,l,k) = value
+            two_electron(k,l,i,j) = value
+            two_electron(k,l,j,i) = value  
+            two_electron(l,k,i,j) = value
+            two_electron(l,k,j,i) = value
+
+          end if 
+        end do
+      end do
+
+      end do
+      
       !$omp end parallel do
+
+      deallocate(i_index, j_index)
 
       end_time = omp_get_wtime()
 
       write(outfile,"(a)") ""
-      write(outfile,"(a)") "Translation symmetry applied to integrals"
+      write(outfile,"(a)") "8-fold symmetry with translation applied to integrals"
       write(outfile,"(a)") "" 
 
       t = int(end_time - start_time)
@@ -119,22 +158,24 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
       two_electron_integrals = 0.d0 
 
+      !do i = 1, number_of_functions_per_unitcell
       do i = 1, number_of_functions
-          do j = 1 , number_of_functions
-            do k = 1 , number_of_functions
-              do l = 1 , number_of_functions
-                if (abs(two_eri(i,j,k,l)) > 1e-30 )  two_electron_integrals(i,j,k,l) = two_eri(i,j,k,l) 
-              end do 
+        do j = 1 , number_of_functions
+          do k = 1 , number_of_functions
+            do l = 1 , number_of_functions
+              if (abs(two_eri(i,j,k,l)) > 1e-15 )  two_electron_integrals(i,j,k,l) = two_eri(i,j,k,l) 
             end do 
           end do 
-        end do
+        end do 
+      end do
       
       open(1,file=trim(tmp_file_name)//"/ERI.dat")
+        !do i = 1, number_of_functions_per_unitcell
         do i = 1, number_of_functions
           do j = 1 , number_of_functions
             do k = 1 , number_of_functions
               do l = 1 , number_of_functions
-                if (abs(two_eri(i,j,k,l)) > 1e-30 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)
+                if (abs(two_eri(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)
               end do 
             end do 
           end do 
