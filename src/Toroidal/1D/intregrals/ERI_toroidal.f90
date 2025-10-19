@@ -11,8 +11,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
       !-----------------------------------------------------------------!
 
-      integer                        :: i , j , k , l , num_int , num_total_int
-      integer                        :: p , q 
+      integer                        :: i , j , k , l , num_total_int
       integer                        :: number_of_atoms
       integer                        :: number_of_functions
       type(atom)                     :: atoms(number_of_atoms)
@@ -117,6 +116,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       end do
 
       write(*,*) 'Will compute ', num_total_int, ' unique integrals'
+      
 
       !$omp parallel do private(ij_index,i,j,k,l,value) &
       !$omp shared(two_electron, ERI, i_index, j_index) &
@@ -151,8 +151,6 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
 
 
-
-
       deallocate(i_index, j_index)
 
       end_time = omp_get_wtime()
@@ -169,6 +167,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
       write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') '2 el-integrals calculation time = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec     "
       write(outfile,"(a)") "" 
+      FLUSH(outfile)
 
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
       !                    symmetry of the integrals                    !
@@ -189,37 +188,10 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
         end do 
       end do
       
-      ! open(1,file=trim(tmp_file_name)//"/ERI.dat")
-      !   !do i = 1, number_of_functions_per_unitcell
-      !     do i = 1, number_of_functions
-      !     do j = 1 , number_of_functions
-      !       do k = 1 , number_of_functions
-      !         do l = 1 , number_of_functions
-      !           if (abs(two_eri(i,j,k,l)) > 1e-24 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)
-      !         end do 
-      !       end do 
-      !     end do 
-      !   end do 
-      ! close(1)
+
 
       deallocate(ERI)
       deallocate(two_electron)
       deallocate(two_eri)
 
 end subroutine ERI_integral_toroidal
-
-subroutine progress_bar(num_int, num_total_int)
-      
-      implicit none
-      integer, intent(in) :: num_int, num_total_int
-      integer, save       :: last_percentage = -1
-      integer             :: current_percentage
-  
-      current_percentage = (num_int * 100) / num_total_int
-  
-      ! Only print when percentage changes and is a multiple of 10
-      if (current_percentage /= last_percentage .and. mod(current_percentage, 10) == 0) then
-         write(*, "(I3,a)") current_percentage, " % done"
-         last_percentage = current_percentage
-      end if
-end subroutine progress_bar

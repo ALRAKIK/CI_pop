@@ -51,7 +51,7 @@ program CI
       character(len=2),allocatable    ::                  label(:)
 
       logical                         :: c_read, c_Integral, c_trexio
-      logical                         :: c_Angstrom, c_plot
+      logical                         :: c_Angstrom, c_plot, c_details
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
@@ -72,6 +72,7 @@ program CI
       c_trexio   = any(keyword == 'Trexio'  )
       c_Angstrom = any(keyword == 'Angstrom')
       c_plot     = any(keyword == 'Plot')
+      c_details  = any(keyword == 'Details')
       
       ! --------------------------------------------------------------- !
       !               Read the Geometry, Label and the Charge           !
@@ -171,7 +172,9 @@ program CI
 
       ! --------------------------------------------------------------- !
 
-      CALL HEADER ('The Geometry',-1)
+      Call Title()
+
+      Call HEADER ('The Geometry',-1)
 
       do i = 1 , n_atoms
         write(outfile,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
@@ -195,10 +198,10 @@ program CI
 
       write(outfile,'(A,I10)')'The number of AO functions            :',&
       &                        number_of_functions 
-      write(outfile,'(A,I10)')'The number of the Gaussian primitives :',&
-      &                        number_of_primitives
-      write(outfile,'(A,I10)')'The number of shells                  :',&
-      &                        number_of_shells
+      !write(outfile,'(A,I10)')'The number of the Gaussian primitives :',&
+      !&                        number_of_primitives
+      !write(outfile,'(A,I10)')'The number of shells                  :',&
+      !&                        number_of_shells
 
       write(outfile,'(A)')
 
@@ -206,6 +209,7 @@ program CI
       &                     n_atom_unitcell
 
       write(outfile,'(A)')
+      flush(outfile)
 
       ! --------------------------------------------------------------- !
       !                    Nuclear repulsion energy                     !
@@ -295,9 +299,15 @@ program CI
         !call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
         HC (:,:) = T(:,:) + V(:,:)
       end if
-      
-      
 
+
+      ! --------------------------------------------------------------- !
+      !                  write the integrals to outputfile              !
+      ! --------------------------------------------------------------- !
+
+      if (c_details) then 
+        call details_integrals(nBas,S,T,V,ERI)
+      end if 
 
       ! --------------------------------------------------------------- !
 
@@ -333,7 +343,7 @@ program CI
       if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) E_nuc = 0.d0 
       
         call cpu_time(start)
-          call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+          call RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
         call cpu_time(end)
 
         time = end - start
@@ -342,8 +352,11 @@ program CI
 
       write(outfile,*)
       
-      call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
-      call system("rm -r " // trim(tmp_file_name))
+      if (c_details) then 
+        call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
+      end if 
+
+      
       
       !-----------------------------------------------------------------!
       !-----------------------------------------------------------------!
@@ -382,8 +395,9 @@ program CI
       close(outfile)
 
       call system("rm torus_parameters.inp")
+      call system("rm -r " // trim(tmp_file_name))
 
-      
+
       ! --------------------------------------------------------------- !
       !            close the TREXIO file and exit                       !
       ! --------------------------------------------------------------- !

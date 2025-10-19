@@ -1,3 +1,46 @@
+subroutine Title()
+
+      use files 
+
+      implicit none 
+
+      ! local ! 
+
+      write(outfile,*) 
+      write(outfile,*) 
+
+      write(outfile,"(8x,a)") "__| |___________________________________________________| |__"
+      write(outfile,"(8x,a)") "__   ___________________________________________________   __"
+      write(outfile,"(8x,a)") "  | |                                                   | |  "
+      write(outfile,"(8x,a)") "  | |                                                   | |  "
+      write(outfile,"(8x,a)") "  | |  ______     __        ______   ______     ______  | |  "
+      write(outfile,"(8x,a)") "  | | /\  ___\   /\ \      /\  == \ /\  __ \   /\  == \ | |  "
+      write(outfile,"(8x,a)") "  | | \ \ \____  \ \ \     \ \  _-/ \ \ \/\ \  \ \  _-/ | |  "
+      write(outfile,"(8x,a)") "  | |  \ \_____\  \ \_\     \ \_\    \ \_____\  \ \_\   | |  "
+      write(outfile,"(8x,a)") "  | |   \/_____/   \/_/      \/_/     \/_____/   \/_/   | |  "
+      write(outfile,"(8x,a)") "  | |                                                   | |  "
+      write(outfile,"(8x,a)") "__| |___________________________________________________| |__"
+      write(outfile,"(8x,a)") "__   ___________________________________________________   __"
+      write(outfile,"(8x,a)") "  | |                                                   | |  "
+
+      write(outfile,'(a)')
+      write(outfile,'(a)')
+      write(outfile,'(a)')  "      CI_POP: Calculate Integrals, is a program to calculate   the" 
+      write(outfile,'(a)')  "              molecular integrals using Clifford Toroidal Gaussian"
+      write(outfile,'(a)')  "              functions for advanced quantum chemistry computations"
+      write(outfile,'(a)')  ""
+      write(outfile,'(2a)') "      ",repeat("=",67)
+      write(outfile,'(2a)') "      ", "Amer Alrakik        Email  : alrakikamer@gmail.com"
+      write(outfile,'(2a)') "      ", "                    Github : https://github.com/ALRAKIK/CI_pop"
+      write(outfile,'(a)')  ""
+      write(outfile,'(2a)') "      ", "Contributors        Arjan Berger"
+      write(outfile,'(2a)') "      ", "                    Stefano Evangelisti"
+      write(outfile,'(2a)') "      ",repeat("=",67)
+      write(outfile,'(a)')  "                          Version: 0.0.2 | Quantum Chemistry | 2025"
+      write(outfile,'(2a)') "      ",repeat("=",67)
+
+end subroutine Title 
+
 subroutine header(HEAD,IN)
 
       use files 
@@ -16,6 +59,7 @@ subroutine header(HEAD,IN)
       WRITE (outfile, '(//,80A)') (' ',I=1,INDENT), HEAD
       WRITE (outfile, '(80A)') (' ',I=1,INDENT), ('=',I=1,LENGTH)
       WRITE (outfile, '()')
+      FLUSH(outfile)
   
 end subroutine Header
 
@@ -61,12 +105,6 @@ subroutine header_HF(HEAD,IN)
     
 end subroutine Header_HF
 
-
-
-
-
-
-
 subroutine print_orbital_table(ERI,number_of_functions)
 
       use files 
@@ -94,5 +132,7 @@ subroutine print_orbital_table(ERI,number_of_functions)
       end do
 
         write(outfile,'(A)') ""
+
+        FLUSH(outfile)
 
 end subroutine print_orbital_table

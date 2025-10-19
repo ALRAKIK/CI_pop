@@ -536,12 +536,14 @@ subroutine check_the_overlap(N,over)
       write(outfile,*) ""
       write(outfile,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
       write(outfile,*) ""
+      FLUSH(outfile)
 
       if (Minval(Eval) < 0.d0) then 
         call header("Error",-1)
           write(outfile,'(a80)')'*******************************************************************************************'
           write(outfile,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
           write(outfile,'(a80)')'*******************************************************************************************'
+          FLUSH(outfile)
           stop            
       end if
       ! /////////////////////////////////////////////////////////////// !

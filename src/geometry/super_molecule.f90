@@ -91,6 +91,8 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
         if (trim(line) == 'Plot'     )   keyword(5) = 'Plot'
 
+        if (trim(line) == 'Details'  )   keyword(6) = 'Details'
+
 
         ! here add the keyword for the threshold of the integrals !
 

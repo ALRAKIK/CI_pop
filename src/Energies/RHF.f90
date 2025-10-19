@@ -1,4 +1,4 @@
-subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
+subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       ! Perform a restricted Hartree-Fock calculation
 
@@ -17,6 +17,8 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,intent(in)   :: X(nBas,nBas) 
       double precision,intent(in)   :: ERI(nBas,nBas,nBas,nBas)
       double precision,intent(in)   :: ENuc
+
+      logical         ,intent(in)   :: c_details
   
       ! Local variables
   
@@ -52,14 +54,17 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,intent(out)  :: c(nBas,nBas)
 
       
-      !open(HFfile,file="./tmp/RHF.out")
-      open(HFfile,file=trim(tmp_file_name)//"/RHF.out")
+      if (c_details) then 
+        open(HFfile,file=trim(tmp_file_name)//"/RHF.out")
+      end if 
 
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
       write(outfile,*)'|                          Restricted Hartree-Fock calculation                           |'
       write(outfile,*)'******************************************************************************************'
       write(outfile,*)
+
+      FLUSH(outfile)
   
       ! Memory allocation
   
@@ -70,7 +75,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       allocate(err_diis(nBas*nBas,max_diis))
       allocate(F_diis(nBas*nBas,max_diis))
        
-      call    guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
+      call    guess_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
          
       ! --------------------------------------------------------------- !
       !              check that P_{mu nu} S_{mu nu} = N 
@@ -165,11 +170,12 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       ! ****************** !
   
+      if (c_details) then 
 
       write(HFfile,'(a)') ""
-      write(HFfile,'(a)')    "!--------------------------------------------!"
+      write(HFfile,'(3a)') "!" ,repeat('-',44), "!"
       write(HFfile,'(a,I3)') "                 Iter  = ", nSCF
-      write(HFfile,'(a)')    "!--------------------------------------------!"
+      write(HFfile,'(3a)') "!" ,repeat('-',44), "!"
       write(HFfile,'(a)') ""
 
     
@@ -194,6 +200,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       end do 
       write(HFfile,'(a)') ""
 
+      end if 
 
       !------------------------------------------------------------------------
       !   Compute HF energy
@@ -261,6 +268,8 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       P(:,:) = 2d0*matmul(c(:,1:nO),transpose(c(:,1:nO)))
 
 
+      if (c_details) then 
+
       call header_HF("Fock matrix in the orthogonal basis Fp =  X^t   F   X  ", -1)
       write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(Fp,1))
       do i = 1 , size(Fp,1)
@@ -301,6 +310,8 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       write(HFfile,'(2a)')  repeat('*_',36) , "*"
       write(HFfile,'(a)')   repeat('_',73)
 
+      end if 
+
       !   Dump results
    
       write(outfile,"(1x,a1,i2,1x,a1,f16.8,1x,a1,f10.6,1x,a1,f10.6,1x,a1,f16.8,4x,a1,f16.8,4x,a1,f16.8,4x,a1)")      & 
@@ -310,8 +321,9 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       write(outfile,*) repeat('-', 110)
 
-      close(HFfile)
-
+      if (c_details) then 
+        close(HFfile)
+      end if 
       !------------------------------------------------------------------------
       ! End of SCF loop
       !------------------------------------------------------------------------

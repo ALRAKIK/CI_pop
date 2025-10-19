@@ -82,9 +82,6 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
                         two_electron(k,l,j,i) = value
                         two_electron(l,k,j,i) = value
 
-                        !$omp critical
-                          call progress_bar(num_int,actual_total_int)
-                        !$omp end critical
 
                     end if
                 end do

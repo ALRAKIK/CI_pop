@@ -83,9 +83,6 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,atoms)
                           two_electron(i,j,k,l) = value
                           two_electron(i,j,l,k) = value
 
-                          !$omp critical
-                          call progress_bar(num_int,num_total_int)
-                          !$omp end critical
 
                       end do
                   end do

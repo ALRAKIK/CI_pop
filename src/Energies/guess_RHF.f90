@@ -1,4 +1,4 @@
-subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
+subroutine guess_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
 
       use files
 
@@ -9,6 +9,7 @@ subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
       double precision, intent(in)  :: HC(nBas,nBas), X(nBas,nBas)
       double precision, intent(in)  ::  T(nBas,nBas), V(nBas,nBas)
       double precision, intent(in)  :: ENuc
+      logical         , intent(in)  :: c_details
       double precision,external     :: trace_matrix
       ! --------------------------------------------------------------- !
       double precision,allocatable  :: cp(:,:), c(:,:) , e(:) , ct(:,:)
@@ -36,13 +37,18 @@ subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
       !                          Print                                  !
       ! --------------------------------------------------------------- !
 
+      ET = trace_matrix(nBas,matmul(P,T))
+      EV = trace_matrix(nBas,matmul(P,V))
 
-      write(HFfile,'(a)') "!--------------------------------------------!"
-      write(HFfile,'(a)') "                 Iter  =   0"
-      write(HFfile,'(a)') "!--------------------------------------------!"
-      write(HFfile,'(a)') ""
+      if (c_details) then 
+
+        write(HFfile,'(3a)') "!" ,repeat('-',44), "!"
+        write(HFfile,'(a)') "                 Iter  =   0"
+        write(HFfile,'(3a)') "!" ,repeat('-',44), "!"
+        write(HFfile,'(a)') ""
       
       call header_HF("Guess F Matrix, F = HC ", -1)
+
       write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(HC,1))
       do i = 1 , size(HC,1)
         write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (HC(i,o),o=1,size(HC,1))
@@ -77,7 +83,6 @@ subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
       end do 
       write(HFfile,'(a)') ""
 
-
       call header_HF("Guess Density Matrix, P = 2 C C^t", -1)
       write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(P,1))
       do i = 1 , size(P,1)
@@ -91,11 +96,7 @@ subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
       end do 
       write(HFfile,'(a)') ""
 
-
-
       write(HFfile,'(a)') ""
-      ET = trace_matrix(nBas,matmul(P,T))
-      EV = trace_matrix(nBas,matmul(P,V))
       write(HFfile,'(a,f16.10)')   " The Kinetic   Energy    = ", ET
       write(HFfile,'(a,f16.10)')   " The Potential Energy    = ", EV
       write(HFfile,'(a,f16.10,a)') " The Nuclear   Energy    = ", ENuc , "  +"
@@ -105,6 +106,16 @@ subroutine guess_RHF(nBas,nO,HC,X,ENuc,T,V,P)
 
       write(HFfile,'(2a)')  repeat('*_',36) , "*"
       write(HFfile,'(a)')   repeat('_',73)
+
+      end if 
+
+      write(outfile,'(a)') ""
+      write(outfile,'(a,f16.10)')   "      The Kinetic   Energy    = ", ET
+      write(outfile,'(a,f16.10)')   "      The Potential Energy    = ", EV
+      write(outfile,'(a,f16.10,a)') "      The Nuclear   Energy    = ", ENuc , "  +"
+      write(outfile,'(a,f16.10)')   "      -----------------------------------"
+      write(outfile,'(a,f16.10)')   "      The guess Energy        = ", ET+EV+ENuc
+      write(outfile,'(a)') ""
 
 
       ! --------------------------------------------------------------- !
