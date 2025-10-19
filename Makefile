@@ -9,14 +9,15 @@ $(shell mkdir -p $(BDIR) $(ODIR)/module)
 
 # Compiler and flags
 FC = gfortran
-FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -march=native  -g -fbacktrace  -fcheck=all -fimplicit-none -fopenmp  
+FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -mcpu=apple-m3   -march=armv8.5-a   -g -fbacktrace  -fcheck=all -fimplicit-none -fopenmp  
 MODDIR = -J$(ODIR) -I$(ODIR)  -I/usr/local/include  # Put and find modules in obj directory
 LIBS   = src/lib/libquadpack.a -lblas -llapack \
         -L/opt/homebrew/Cellar/gsl/2.8/lib -lgsl -lgslcblas \
         -L/usr/local/lib -ltrexio	\
+				-L/opt/homebrew/opt/openblas/lib -lopenblas\
 				-lm -fopenmp
 
-LIBS_CLUSTER   = -fopenmp src/lib/libquadpack.a   /nfs/home/aalrakik/gsl/lib64/libgsl.a  src/lib/liblapack.a src/lib/librefblas.a -ltrexio
+LIBS_CLUSTER   = -fopenmp src/lib/libquadpack.a   /nfs/home/aalrakik/gsl/lib64/libgsl.a  src/lib/liblapack.a src/lib/librefblas.a -ltrexio -lopenblas
 
 FFLAGS_CLUSTER = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -march=native  -lblas -g -fbacktrace  -fcheck=all -fimplicit-none  -lgsl -lgslcblas -lm -ffree-line-length-none  -fopenmp
 

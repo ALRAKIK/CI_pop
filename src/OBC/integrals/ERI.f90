@@ -113,7 +113,7 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
           do j = 1 , number_of_functions
             do k = 1 , number_of_functions
               do l = 1 , number_of_functions
-                if (abs(two_electron(i,j,k,l)) > 1e-30 ) write(1,*) i , j , k , l , two_electron(i,j,k,l)
+                if (abs(two_electron(i,j,k,l)) > 1e-24 ) write(1,*) i , j , k , l , two_electron(i,j,k,l)
               end do 
             end do 
           end do 

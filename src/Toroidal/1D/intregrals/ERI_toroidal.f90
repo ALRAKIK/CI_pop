@@ -127,7 +127,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
        j = j_index(ij_index)
   
       do k = 1, number_of_functions
-       do l = k, number_of_functions    
+       do l = k, number_of_functions
          if (i <= k .or. (i == k .and. j <= l)) then
 
            call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
@@ -183,24 +183,24 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
         do j = 1 , number_of_functions
           do k = 1 , number_of_functions
             do l = 1 , number_of_functions
-              if (abs(two_eri(i,j,k,l)) > 1e-15 )  two_electron_integrals(i,j,k,l) = two_eri(i,j,k,l) 
+              if (abs(two_eri(i,j,k,l)) > 1e-24 )  two_electron_integrals(i,j,k,l) = two_eri(i,j,k,l) 
             end do 
           end do 
         end do 
       end do
       
-      open(1,file=trim(tmp_file_name)//"/ERI.dat")
-        !do i = 1, number_of_functions_per_unitcell
-        do i = 1, number_of_functions
-          do j = 1 , number_of_functions
-            do k = 1 , number_of_functions
-              do l = 1 , number_of_functions
-                if (abs(two_eri(i,j,k,l)) > 1e-15 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)
-              end do 
-            end do 
-          end do 
-        end do 
-      close(1)
+      ! open(1,file=trim(tmp_file_name)//"/ERI.dat")
+      !   !do i = 1, number_of_functions_per_unitcell
+      !     do i = 1, number_of_functions
+      !     do j = 1 , number_of_functions
+      !       do k = 1 , number_of_functions
+      !         do l = 1 , number_of_functions
+      !           if (abs(two_eri(i,j,k,l)) > 1e-24 ) write(1,*) i , j , k , l , two_eri(i,j,k,l)
+      !         end do 
+      !       end do 
+      !     end do 
+      !   end do 
+      ! close(1)
 
       deallocate(ERI)
       deallocate(two_electron)

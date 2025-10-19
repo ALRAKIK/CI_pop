@@ -24,7 +24,7 @@ subroutine shift_integrals(known_integrals, full_integrals, nbasis,nbasis_unitce
         do j = 1, nbasis
           do k = 1, nbasis
             do l = 1, nbasis
-              if (known_integrals(i,j,k,l) /= 0.0D0) full_integrals(i,j,k,l) = known_integrals(i,j,k,l)
+              if (dabs(known_integrals(i,j,k,l)) >  1.d-16) full_integrals(i,j,k,l) = known_integrals(i,j,k,l)
             end do 
           end do 
         end do 

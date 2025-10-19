@@ -333,16 +333,17 @@ program CI
       if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) E_nuc = 0.d0 
       
         call cpu_time(start)
-        call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+          call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
         call cpu_time(end)
 
         time = end - start
+
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',time,' seconds'
 
       write(outfile,*)
       
       call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
-      !call system("rm -r " // trim(tmp_file_name))
+      call system("rm -r " // trim(tmp_file_name))
       
       !-----------------------------------------------------------------!
       !-----------------------------------------------------------------!

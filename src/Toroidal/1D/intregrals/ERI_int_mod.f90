@@ -104,6 +104,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
         call dqag(f0000, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                   abserr, neval, ier, limit, lenw, last, &
                   iwork, work)
+
+      if (ier > 2) then
+        write(*,'(A,I4)') 'Error code from the case ', pattern_id
+        stop 
+      end if
         
       ! --------------------- one  p function ------------------------- !
 
@@ -113,11 +118,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                   abserr, neval, ier, limit, lenw, last, &
                   iwork, work)
 
+          if (ier > 2) then
+            write(*,'(A,I4)') 'Error code from the case ', pattern_id
+            stop 
+          end if
+
         case (0010) ! | s   s   px  s    ( 5 ) 
 
           call dqag(f0010, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+          if (ier > 2) then
+            write(*,'(A,I4)') 'Error code from the case ', pattern_id
+            stop 
+          end if
 
         case (0100) ! | s   px  s   s    ( 17)  
 
@@ -125,12 +140,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+          if (ier > 2) then
+            write(*,'(A,I4)') 'Error code from the case ', pattern_id
+            stop 
+          end if
          
         case (1000) ! | px  s   s   s    ( 65) 
 
           call dqag(f1000, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+          if (ier > 2) then
+            write(*,'(A,I4)') 'Error code from the case ', pattern_id
+            stop 
+          end if
 
       ! --------------------- two  p function ------------------------- ! 
 
@@ -140,11 +164,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (0101) ! | s   px  s   px   ( 18) 
 
           call dqag(f0101, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (0110) ! | s   px  px  s    ( 21)
 
@@ -152,11 +186,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (1001) ! | px  s   s   px   ( 66)
 
           call dqag(f1001, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (1010) ! | px  s   px  s    ( 69)
 
@@ -164,13 +208,23 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (1100) ! | px  px  s   s    ( 81)
 
           call dqag(f1100, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
-      ! ! ---------------------- three  p function ---------------------- !
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
+      ! ---------------------- three  p function ---------------------- !
         
         case (0111) ! | s   px  px  px   ( 22) 
 
@@ -178,31 +232,56 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                       abserr, neval, ier, limit, lenw, last, &
                       iwork, work)
 
+              if (ier > 2) then
+                write(*,'(A,I4)') 'Error code from the case ', pattern_id
+                stop 
+              end if
+
         case (1011) ! | px  s   px  px   ( 70) 
 
             call dqag(f1011, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                       abserr, neval, ier, limit, lenw, last, &
                       iwork, work)
 
+              if (ier > 2) then
+                write(*,'(A,I4)') 'Error code from the case ', pattern_id
+                stop 
+              end if
+
         case (1101) ! | px  px  s   px   ( 82) 
 
-              call dqag(f1101, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
+            call dqag(f1101, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                        abserr, neval, ier, limit, lenw, last, &
                        iwork, work)
+
+              if (ier > 2) then
+                write(*,'(A,I4)') 'Error code from the case ', pattern_id
+                stop 
+              end if
 
         case (1110) ! | px  px  px  s    ( 85) 
 
-             call dqag(f1110, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
+            call dqag(f1110, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                        abserr, neval, ier, limit, lenw, last, &
                        iwork, work)
+
+              if (ier > 2) then
+                write(*,'(A,I4)') 'Error code from the case ', pattern_id
+                stop 
+              end if
           
-      ! ! ---------------------- four   p function ---------------------- !
+      ! ---------------------- four   p function ---------------------- !
 
         case (1111) ! | px  px  px  px   ( 86)
 
           call dqag(f1111, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                       abserr, neval, ier, limit, lenw, last, &
                       iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
       ! ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       ! ! !!!!!!!!!!!!!!!!!!!!!!!!!!!! Y Y !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -213,6 +292,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
           call dqag(f0022, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                       abserr, neval, ier, limit, lenw, last, &
                       iwork, work)
+            
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (0122,0133) ! | s   px  py  py   ( 27) 
 
@@ -220,11 +304,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (0202,0303) ! | s   py  s   py   ( 35) 
 
           call dqag(f0202, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (0212,0313) ! | s   py  px  py   ( 39)
         
@@ -232,11 +326,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (0220,0330) ! | s   py  py  s    ( 41)
 
           call dqag(f0220, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (0221,0331) ! | s   py  py  px   ( 42)
 
@@ -244,11 +348,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (1022,1033) ! | px  s   py  py   ( 75)
 
           call dqag(f1022, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (1122,1133) ! | px  px  py  py   ( 91)
 
@@ -256,10 +370,20 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (1202,1303) ! | px  py  s   py   ( 99)
           call dqag(f1202, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (1212,1313) ! | px  py  px  py   ( 103)
 
@@ -267,11 +391,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (1220,1330) ! | px  py  py  s    ( 105)
 
           call dqag(f1220, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (1221,1331) ! | px  py  py  px   ( 106)
           
@@ -279,11 +413,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
          case (2002,3003) ! | py  s   s   py   ( 131 , 196 ) 
            
           call dqag(f2002, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                      abserr, neval, ier, limit, lenw, last, &
                      iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (2012,3013) ! | py  s   px  py   ( 135,200)
           
@@ -291,17 +435,32 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (2020,3030) ! | py  s   py  s    ( 137,205)
 
           call dqag(f2020, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (2021,3031) ! | py  s   py  px   ( 138)
           
           call dqag(f2021, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
 
         case (2102,3103) ! | py  px  s   py   ( 147) 
@@ -310,11 +469,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                   abserr, neval, ier, limit, lenw, last, &
                   iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (2112,3113) ! | py  px  px  py   ( 151) 
 
           call dqag(f2112, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (2120,3130) ! | py  px  py  s    ( 153)
 
@@ -322,17 +491,32 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (2121,3131) ! | py  px  py  px   ( 154)
 
           call dqag(f2121, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (2200,3300) ! | py  py  s   s    ( 161)
           
           call dqag(f2200, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
       
         case (2201,3301) ! | py  py  s   px   ( 162)
 
@@ -340,11 +524,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                      abserr, neval, ier, limit, lenw, last, &
                      iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
         case (2210,3310) ! | py  py  px  s    ( 165) 
 
          call dqag(f2210, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
         case (2211,3311) ! | py  py  px  px   ( 166)
 
@@ -352,17 +546,32 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
+
           case (2222,3333) ! | py  py  py  py   ( 171)
 
-           call dqag(f2222, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
+          call dqag(f2222, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                      abserr, neval, ier, limit, lenw, last, &
                      iwork, work)
+
+            if (ier > 2) then
+              write(*,'(A,I4)') 'Error code from the case ', pattern_id
+              stop 
+            end if
 
           case (2233,3322) ! | py  py  pz  pz   ( 176)
 
             call dqag(f2233, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                       abserr, neval, ier, limit, lenw, last, &
                       iwork, work)
+
+              if (ier > 2) then
+                write(*,'(A,I4)') 'Error code from the case ', pattern_id
+                stop 
+              end if
             
           case (2323,3232) ! | py  pz  py  pz   ( 188)
 
@@ -370,11 +579,21 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
                       abserr, neval, ier, limit, lenw, last, &
                       iwork, work)
 
+              if (ier > 2) then
+                write(*,'(A,I4)') 'Error code from the case ', pattern_id
+                stop 
+              end if
+
           case (2332,3223) ! | py  pz  pz  py   ( 191)
 
               call dqag(f2332, 0.d0, 2.d0*pi, epsabs, epsrel, key, result, &
                         abserr, neval, ier, limit, lenw, last, &
                         iwork, work)
+
+                if (ier > 2) then
+                  write(*,'(A,I4)') 'Error code from the case ', pattern_id
+                  stop 
+                end if
 
         case default 
           result = 0.d0 
@@ -401,7 +620,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
       const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
-      
+
       ! - derivative part - !
 
       integral_t  = int_xxxx
