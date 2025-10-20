@@ -19,7 +19,6 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       double precision               :: c1    , c2 
       double precision               :: x1 , x2 , y1 , y2 , z1 , z2 
       double precision               :: X , Y , Z
-      double precision               :: eta = 1e-9
       double precision               :: gamma_x
       double precision               :: xp
       double precision               :: I_0_gamma_x
@@ -48,7 +47,7 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
 
-          gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))+eta
+          gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
 
           I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
           I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
@@ -168,7 +167,6 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
       integer                        :: i , j
       double precision,parameter     :: pi = dacos(-1.d0)
-      double precision,parameter     :: eta = 1e-40
       double precision               :: alpha , beta
       double precision               :: c1 , c2 
       double precision               :: x1 , x2 , y1 , y2 , z1 , z2 
@@ -230,11 +228,11 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
               X_K = X_K * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
 
 
-              Y_K = (dsin(ax*(xp-x2)))*(dsin(ax*(xp-x1)))*I_0_gamma_x + dcos(ax*(2*xp-x1-x2))*(ax**2*gamma_x/(2.d0*(gamma_x*gamma_x+eta)))*I_1_gamma_x
+              Y_K = (dsin(ax*(xp-x2)))*(dsin(ax*(xp-x1)))*I_0_gamma_x + 0.5d0 * dcos(ax*(2*xp-x1-x2))*(I_0_gamma_x-I_2_gamma_x)
               Y_K = Y_K * ((alpha*beta)/(alpha+beta)) / (ax*ax) 
               Y_K = Y_K * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
               
-              Z_K = (dsin(ax*(xp-x2)))*(dsin(ax*(xp-x1)))*I_0_gamma_x + dcos(ax*(2*xp-x1-x2))*(ax**2*gamma_x/(2.d0*(gamma_x*gamma_x+eta)))*I_1_gamma_x
+              Z_K = (dsin(ax*(xp-x2)))*(dsin(ax*(xp-x1)))*I_0_gamma_x + 0.5d0 * dcos(ax*(2*xp-x1-x2))*(I_0_gamma_x-I_2_gamma_x)
               Z_K = Z_K * ((alpha*beta)/(alpha+beta)) /ax/ax 
               Z_K = Z_K * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (pi/(alpha+beta))
 

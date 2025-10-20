@@ -620,7 +620,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,px_count,p,q,p_x,q_x,phi,xpA,xp
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
       const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
-
+      
       ! - derivative part - !
 
       integral_t  = int_xxxx

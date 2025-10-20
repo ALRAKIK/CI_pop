@@ -1,7 +1,7 @@
 module gsl_bessel_mod
   use, intrinsic :: iso_c_binding
   implicit none
-  public :: bessi_scaled, bessi
+  public :: bessi_scaled
 
   interface
      ! Scaled version: returns exp(-|x|) * I_n(x)
@@ -30,14 +30,5 @@ contains
     real(c_double)           :: res
     res = gsl_sf_bessel_In_scaled(int(n, c_int), x)
   end function bessi_scaled
-  
-  ! Normal Bessel function wrapper  
-  function bessi(n, x) result(res)
-    use, intrinsic :: iso_c_binding
-    integer, intent(in)      :: n
-    real(c_double), intent(in) :: x
-    real(c_double)           :: res
-    res = gsl_sf_bessel_In(int(n, c_int), x)
-  end function bessi
   
 end module gsl_bessel_mod

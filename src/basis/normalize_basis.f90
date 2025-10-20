@@ -34,7 +34,6 @@ subroutine normalize_basis()
           call norm_orb(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN)
           write(2,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            !write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
             write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           deallocate(exponent,contraction,contractionN)
@@ -52,7 +51,6 @@ subroutine normalize_basis()
           call norm_orb(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN)
           write(2,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            !write(2,'(1000f16.8)') exponent(i) , (contractionN(i,j),j=1,n_contraction)
             write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           deallocate(exponent,contraction,contractionN)
@@ -402,8 +400,8 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
         end do 
       end do
 
-        do n = 1 , n_contraction
-          sum = 0.d0
+      do n = 1 , n_contraction
+        sum = 0.d0
           do i = 1 , n_gaussian
             do j = 1 , n_gaussian
               alpha = exponent(i)
@@ -427,7 +425,7 @@ subroutine norm_orb_tor(n_gaussian , n_contraction, exponent, contraction  , n_t
             contractionN(j,n)= contractionN(j,n)*sum
           end do 
         
-        end do
+      end do
 
       end if 
       
@@ -657,7 +655,7 @@ subroutine norm_orb_tor_p(n_gaussian , n_contraction, exponent, contraction  , n
           IF (SQRT(sum) .LT. THRMIN) GOTO 20
           sum=1.d0/SQRT(sum)
           do j = 1, n_gaussian
-            contractionN(j,n)= contraction(j,n)*sum
+            contractionN(j,n)= contractionN(j,n)*sum
           end do 
 
         end do 

@@ -23,7 +23,6 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
       double precision               :: alpha , beta
       double precision               :: c1    , c2 
       double precision               :: kc
-      double precision               :: eta = 1e-9
       double precision               :: x1 , x2 , X
       double precision               :: y1 , y2 , Y 
       double precision               :: z1 , z2 , Z
@@ -59,7 +58,7 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
             
-            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))+eta
+            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
             gamma_y  = alpha+beta
             gamma_z  = alpha+beta
 
@@ -117,7 +116,6 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
       double precision              :: alpha , beta
       double precision              :: c1    , c2 
       double precision              :: kc
-      double precision              :: eta = 1e-9
       double precision              :: xc , yc , zc
       double precision              :: x1 , x2 , X
       double precision              :: y1 , y2 , Y 
@@ -153,7 +151,7 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
             
-            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))+eta
+            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
             gamma_y  = alpha+beta
             gamma_z  = alpha+beta
 
@@ -176,7 +174,6 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
                 call integrate_NA_sp_Toroidal(gamma_x,xp,xc,x2,alpha+beta,NA)
               
                 S_sp_normal =  S_sp_normal + charge_atom * kc * NA
-
 
               end do
 
@@ -215,7 +212,6 @@ subroutine nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atom
       double precision              :: alpha , beta
       double precision              :: c1    , c2 
       double precision              :: kc
-      double precision              :: eta = 1e-9
       double precision              :: xc , yc , zc
       double precision              :: x1 , x2 , X
       double precision              :: y1 , y2 , Y 
@@ -251,7 +247,7 @@ subroutine nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atom
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
             
-            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))+eta
+            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
             gamma_y  = alpha+beta
             gamma_z  = alpha+beta
 
