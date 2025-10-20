@@ -63,8 +63,6 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       write(outfile,*)'|                          Restricted Hartree-Fock calculation                           |'
       write(outfile,*)'******************************************************************************************'
       write(outfile,*)
-
-      FLUSH(outfile)
   
       ! Memory allocation
   

@@ -52,6 +52,7 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
 
       write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',time,' seconds'
       write(outfile,*)
+      flush(outfile)
 
       call system("rm torus_parameters.inp")
 
