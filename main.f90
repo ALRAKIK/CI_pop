@@ -120,6 +120,21 @@ program CI
       allocate(atoms    (n_atoms))
       allocate(norm_helper(n_atoms))
 
+      ! --------------------------------------------------------------- !
+
+      Call Title()
+
+      Call HEADER ('The Geometry',-1)
+
+      do i = 1 , n_atoms
+        write(outfile,"(6x,I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
+      end do 
+
+      write(outfile,*)
+      write(outfile,*)
+
+
+      ! --------------------------------------------------------------- !
 
       if (calculation_type == "Tori1D" .or. &
       &   calculation_type == "Tori2D" .or. &
@@ -128,6 +143,13 @@ program CI
       else
         call basis(n_atoms,charge,atoms)
       end if 
+
+
+
+
+
+
+
 
       n_electron = 0 
       do i = 1 , n_atoms
@@ -172,13 +194,7 @@ program CI
 
       ! --------------------------------------------------------------- !
 
-      Call Title()
-
-      Call HEADER ('The Geometry',-1)
-
-      do i = 1 , n_atoms
-        write(outfile,"(I2,3f16.8)") charge(i), (geometry(i,j),j=1,3)
-      end do 
+      
 
       if (calculation_type == "Tori1D" .or.                             &
       &   calculation_type == "Tori2D" .or.                             & 

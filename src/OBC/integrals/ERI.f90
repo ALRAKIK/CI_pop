@@ -60,6 +60,7 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
       write(*,*) 'Will compute ', actual_total_int, ' unique integrals'
 
 !$omp parallel do private(j,k,l,value,p,q) shared(two_electron,ERI)
+      
       do i = 1, number_of_functions
         do j = 1, i
             do k = 1, number_of_functions

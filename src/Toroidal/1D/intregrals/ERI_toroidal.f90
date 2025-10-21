@@ -123,11 +123,14 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       !$omp schedule(dynamic,optimal_chunk_size)
 
       do ij_index = 1, total_ij_pairs
-       i = i_index(ij_index)
-       j = j_index(ij_index)
+        i = i_index(ij_index)
+        j = j_index(ij_index)
+
+
   
       do k = 1, number_of_functions
-       do l = k, number_of_functions
+        do l = k, number_of_functions
+
          if (i <= k .or. (i == k .and. j <= l)) then
 
            call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)

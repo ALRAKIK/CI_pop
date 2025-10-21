@@ -120,13 +120,6 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
         end do 
       end do 
 
-      open(1,file=trim(tmp_file_name)//"/OV_matrix.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(overlap,1))
-      do i = 1 , size(overlap,1)
-        write(1,'(i3,6x,1000(f16.12,2x))') i ,  (overlap(i,j),j=1,size(overlap,1))
-      end do 
-      close(1)
-
 end subroutine overlap_matrix_toroidal
 
       !-----------------------------------------------------------------!
