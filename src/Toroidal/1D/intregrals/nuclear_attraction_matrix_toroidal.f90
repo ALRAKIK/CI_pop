@@ -101,7 +101,7 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
 
       do i = 1 , index_unitcell
         do j = 1 , number_of_functions
-          if (abs(NA(i,j)) < 1e-10) NA(i,j) = 0.d0 
+          if (abs(NA(i,j)) < 1e-15) NA(i,j) = 0.d0 
         end do 
       end do 
 

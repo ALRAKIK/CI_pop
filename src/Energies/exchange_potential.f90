@@ -20,8 +20,8 @@ subroutine exchange_potential(nBas,P,ERI,K)
       
       K(:,:) = 0d0
 
-      !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(si,nu,la,mu) &
-      !$OMP COLLAPSE(2) SCHEDULE(static)
+!      !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(si,nu,la,mu) &
+!      !$OMP COLLAPSE(2) SCHEDULE(static)
       do nu=1,nBas
         do mu=1,nBas
           do si=1,nBas
@@ -31,6 +31,6 @@ subroutine exchange_potential(nBas,P,ERI,K)
           end do
         end do
       end do
-      !$OMP END PARALLEL DO
+!      !$OMP END PARALLEL DO
 
 end subroutine exchange_potential

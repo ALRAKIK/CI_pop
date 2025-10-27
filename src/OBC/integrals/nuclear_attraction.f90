@@ -130,12 +130,6 @@ subroutine nuclear_attraction_matrix(number_of_atoms,number_of_functions,geometr
         end do 
       close(1)
 
-      open(1,file=trim(tmp_file_name)//"/NA_matrix.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(NA,1))
-      do i = 1 , size(NA,1)
-        write(1,'(i3,6x,1000(f16.12,2x))') i , (NA(i,j),j=1,size(NA,1))
-      end do 
-      close(1)
 
 
 end subroutine nuclear_attraction_matrix

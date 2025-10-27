@@ -14,7 +14,7 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
 
 
       type(ERI_function),allocatable :: ERI  (:)
-      integer                        :: i , j , k , l  , p , q  , actual_total_int , num_int
+      integer                        :: i , j , k , l  , p , q  , actual_total_int
       integer                        :: number_of_functions
       double precision               :: geometry(number_of_atoms,3)
       double precision               :: two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
@@ -61,19 +61,19 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
 
 !$omp parallel do private(j,k,l,value,p,q) shared(two_electron,ERI)
       
-      do i = 1, number_of_functions
-        do j = 1, i
-            do k = 1, number_of_functions
-                do l = 1, k
+       do i = 1, number_of_functions
+         do j = 1, i
+             do k = 1, number_of_functions
+                 do l = 1, k
+
                     p = i*(i-1)/2 + j
                     q = k*(k-1)/2 + l
 
+
                     if (p >= q) then
+
                       call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l),value)
 
-                        ! Store only in the canonical position
-                        !$omp atomic
-                        num_int = num_int + 1
                         two_electron(i,j,k,l) = value
                         two_electron(j,i,k,l) = value
                         two_electron(i,j,l,k) = value     
@@ -82,7 +82,6 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
                         two_electron(l,k,i,j) = value
                         two_electron(k,l,j,i) = value
                         two_electron(l,k,j,i) = value
-
 
                     end if
                 end do
@@ -106,16 +105,5 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
       write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') '2 el-integrals calculation time = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec     "
       write(outfile,"(a)") "" 
 
-      open(1,file=trim(tmp_file_name)//"/ERI.dat")
-        do i = 1, number_of_functions
-          do j = 1 , number_of_functions
-            do k = 1 , number_of_functions
-              do l = 1 , number_of_functions
-                if (abs(two_electron(i,j,k,l)) > 1e-24 ) write(1,*) i , j , k , l , two_electron(i,j,k,l)
-              end do 
-            end do 
-          end do 
-        end do 
-      close(1)
 
 end subroutine

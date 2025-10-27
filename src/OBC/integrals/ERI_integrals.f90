@@ -191,14 +191,15 @@ subroutine ERI_value(o1,o2,o3,o4&
 
       double precision,intent(in)  :: xPQ , yPQ , zPQ
 
-      integer :: bit_pattern
-
       double precision,intent(out) :: value_s
+
+
+      value_s = 0.d0 
 
       ! ////////////////////////// s s s s //////////////////////////// !
 
       if (o1 == "s" .and. o2=="s" .and. o3=="s" .and. o4=="s") then 
-          value_s = F0 
+        value_s = F0
       end if 
 
       ! ////////////////////////// p s s s //////////////////////////// !
@@ -214,7 +215,7 @@ subroutine ERI_value(o1,o2,o3,o4&
                       &,xPA,yPA,zPA,xPB,yPB,zPB&
                       &,xQC,yQC,zQC,xQD,yQD,zQD&
                       &,xPQ,yPQ,zPQ,value_s)
-        
+
       end if
       
       ! ////////////////////////// p p s s //////////////////////////// !
@@ -399,6 +400,9 @@ subroutine ERI_ppss(o1,o2,o3,o4&
       
       double precision,intent(out) :: value
 
+
+      value = 0.d0 
+
       ! Combination 1: p_x p_x s s
       if (o1 == "px" .and. o2=="px" .and. o3=="s" .and. o4=="s") then 
         value = F1*(-tu + v*(-xPA*xPQ - xPB*xPQ)) + F2*v**2*xPQ**2 + (xPA*xPB + 1/(2*p)) * F0 
@@ -415,8 +419,7 @@ subroutine ERI_ppss(o1,o2,o3,o4&
         value = F1*(pq + u*xPA*xPQ - v*xPQ*xQD) - F2*u*v*xPQ**2 + xPA*xQD * F0
       end if
 
-      ! Combination 4: p_x p_y s s
-      
+      ! Combination 4: p_x p_y s s      
       if (o1 == "px" .and. o2 == "py" .and. o3 == "s" .and. o4 == "s") then
         value = F1*v*(-xPA*yPQ - xPQ*yPB) + F2*v**2*xPQ*yPQ + xPA*yPB * F0
       end if
@@ -471,7 +474,7 @@ subroutine ERI_ppss(o1,o2,o3,o4&
         value = F1*(u*xPB*yPQ - v*xPQ*yQD) - F2*u*v*xPQ*yPQ + xPB*yQD * F0
       end if
         
-          ! Combination 15: p_z p_x s s
+      ! Combination 15: p_z p_x s s
       if (o1 == "pz" .and. o2 == "px" .and. o3 == "s" .and. o4 == "s") then
         value = F1*v*(-xPB*zPQ - xPQ*zPA) + F2*v**2*xPQ*zPQ + xPB*zPA * F0
       end if
@@ -481,7 +484,7 @@ subroutine ERI_ppss(o1,o2,o3,o4&
         value = F1*(u*xPB*zPQ - v*xPQ*zQC) - F2*u*v*xPQ*zPQ + xPB*zQC * F0
       end if
     
-      ! Combination 17: s p_x s p_z
+      !Combination 17: s p_x s p_z
       if (o1 == "s" .and. o2 == "px" .and. o3 == "s" .and. o4 == "pz") then
         value = F1*(u*xPB*zPQ - v*xPQ*zQD) - F2*u*v*xPQ*zPQ + xPB*zQD * F0
       end if
@@ -491,182 +494,182 @@ subroutine ERI_ppss(o1,o2,o3,o4&
         value = F1*(-tv + u*(xPQ*xQC + xPQ*xQD)) + F2*u**2*xPQ**2 + (xQC*xQD + 1/(2*q)) * F0
       end if
     
-      ! Combination 19: p_y s p_x s
+      !Combination 19: p_y s p_x s
       if (o1 == "py" .and. o2 == "s" .and. o3 == "px" .and. o4 == "s") then
         value = F1*(u*xPQ*yPA - v*xQC*yPQ) - F2*u*v*xPQ*yPQ + xQC*yPA * F0
       end if
     
-      ! Combination 20: s p_y p_x s
+      !Combination 20: s p_y p_x s
       if (o1 == "s" .and. o2 == "py" .and. o3 == "px" .and. o4 == "s") then
         value = F1*(u*xPQ*yPB - v*xQC*yPQ) - F2*u*v*xPQ*yPQ + xQC*yPB * F0
       end if
     
-      ! Combination 21: s s p_x p_y
+      !Combination 21: s s p_x p_y
       if (o1 == "s" .and. o2 == "s" .and. o3 == "px" .and. o4 == "py") then
         value = F1*u*(xPQ*yQD + xQC*yPQ) + F2*u**2*xPQ*yPQ + xQC*yQD * F0
       end if
     
-      ! Combination 22: p_z s p_x s
+      !Combination 22: p_z s p_x s
       if (o1 == "pz" .and. o2 == "s" .and. o3 == "px" .and. o4 == "s") then
         value = F1*(u*xPQ*zPA - v*xQC*zPQ) - F2*u*v*xPQ*zPQ + xQC*zPA * F0
       end if
     
-      ! Combination 23: s p_z p_x s
+      !Combination 23: s p_z p_x s
       if (o1 == "s" .and. o2 == "pz" .and. o3 == "px" .and. o4 == "s") then
         value = F1*(u*xPQ*zPB - v*xQC*zPQ) - F2*u*v*xPQ*zPQ + xQC*zPB * F0
       end if
     
-      ! Combination 24: s s p_x p_z
+      !Combination 24: s s p_x p_z
       if (o1 == "s" .and. o2 == "s" .and. o3 == "px" .and. o4 == "pz") then
         value = F1*u*(xPQ*zQD + xQC*zPQ) + F2*u**2*xPQ*zPQ + xQC*zQD * F0
       end if
     
-      ! Combination 25: p_y s s p_x
+      !Combination 25: p_y s s p_x
       if (o1 == "py" .and. o2 == "s" .and. o3 == "s" .and. o4 == "px") then
         value = F1*(u*xPQ*yPA - v*xQD*yPQ) - F2*u*v*xPQ*yPQ + xQD*yPA * F0
       end if
     
-      ! Combination 26: s p_y s p_x
+      !Combination 26: s p_y s p_x
       if (o1 == "s" .and. o2 == "py" .and. o3 == "s" .and. o4 == "px") then
         value = F1*(u*xPQ*yPB - v*xQD*yPQ) - F2*u*v*xPQ*yPQ + xQD*yPB * F0
       end if
     
-      ! Combination 27: s s p_y p_x
+      !Combination 27: s s p_y p_x
       if (o1 == "s" .and. o2 == "s" .and. o3 == "py" .and. o4 == "px") then
         value = F1*u*(xPQ*yQC + xQD*yPQ) + F2*u**2*xPQ*yPQ + xQD*yQC * F0
       end if
     
-      ! Combination 28: p_z s s p_x
+      !Combination 28: p_z s s p_x
       if (o1 == "pz" .and. o2 == "s" .and. o3 == "s" .and. o4 == "px") then
         value = F1*(u*xPQ*zPA - v*xQD*zPQ) - F2*u*v*xPQ*zPQ + xQD*zPA * F0
       end if
     
-      ! Combination 29: s p_z s p_x
+      !Combination 29: s p_z s p_x
       if (o1 == "s" .and. o2 == "pz" .and. o3 == "s" .and. o4 == "px") then
         value = F1*(u*xPQ*zPB - v*xQD*zPQ) - F2*u*v*xPQ*zPQ + xQD*zPB * F0
       end if
     
-      ! Combination 30: s s p_z p_x
+      !Combination 30: s s p_z p_x
       if (o1 == "s" .and. o2 == "s" .and. o3 == "pz" .and. o4 == "px") then
         value = F1*u*(xPQ*zQC + xQD*zPQ) + F2*u**2*xPQ*zPQ + xQD*zQC * F0
       end if
     
-      ! Combination 31: p_y p_y s s
+      !Combination 31: p_y p_y s s
       if (o1 == "py" .and. o2 == "py" .and. o3 == "s" .and. o4 == "s") then
         value = F1*(-tu + v*(-yPA*yPQ - yPB*yPQ)) + F2*v**2*yPQ**2 + (yPA*yPB + 1/(2*p)) * F0
       end if
     
-      ! Combination 32: p_y s p_y s
+      !Combination 32: p_y s p_y s
       if (o1 == "py" .and. o2 == "s" .and. o3 == "py" .and. o4 == "s") then
         value = F1*(pq + u*yPA*yPQ - v*yPQ*yQC) - F2*u*v*yPQ**2 + yPA*yQC * F0
       end if
     
-      ! Combination 33: p_y s s p_y
+      !Combination 33: p_y s s p_y
       if (o1 == "py" .and. o2 == "s" .and. o3 == "s" .and. o4 == "py") then
         value = F1*(pq + u*yPA*yPQ - v*yPQ*yQD) - F2*u*v*yPQ**2 + yPA*yQD * F0
       end if
     
-      ! Combination 34: p_y p_z s s
+      !Combination 34: p_y p_z s s
       if (o1 == "py" .and. o2 == "pz" .and. o3 == "s" .and. o4 == "s") then
         value = F1*v*(-yPA*zPQ - yPQ*zPB) + F2*v**2*yPQ*zPQ + yPA*zPB * F0
       end if
     
-      ! Combination 35: p_y s p_z s
+      !Combination 35: p_y s p_z s
       if (o1 == "py" .and. o2 == "s" .and. o3 == "pz" .and. o4 == "s") then
         value = F1*(u*yPA*zPQ - v*yPQ*zQC) - F2*u*v*yPQ*zPQ + yPA*zQC * F0
       end if
     
-      ! Combination 36: p_y s s p_z
+      !Combination 36: p_y s s p_z
       if (o1 == "py" .and. o2 == "s" .and. o3 == "s" .and. o4 == "pz") then
         value = F1*(u*yPA*zPQ - v*yPQ*zQD) - F2*u*v*yPQ*zPQ + yPA*zQD * F0
       end if
     
-      ! Combination 37: s p_y p_y s
+      !Combination 37: s p_y p_y s
       if (o1 == "s" .and. o2 == "py" .and. o3 == "py" .and. o4 == "s") then
         value = F1*(pq + u*yPB*yPQ - v*yPQ*yQC) - F2*u*v*yPQ**2 + yPB*yQC * F0
       end if
     
-      ! Combination 38: s p_y s p_y
+      !Combination 38: s p_y s p_y
       if (o1 == "s" .and. o2 == "py" .and. o3 == "s" .and. o4 == "py") then
         value = F1*(pq + u*yPB*yPQ - v*yPQ*yQD) - F2*u*v*yPQ**2 + yPB*yQD * F0
       end if
     
-      ! Combination 39: p_z p_y s s
+      !Combination 39: p_z p_y s s
       if (o1 == "pz" .and. o2 == "py" .and. o3 == "s" .and. o4 == "s") then
         value = F1*v*(-yPB*zPQ - yPQ*zPA) + F2*v**2*yPQ*zPQ + yPB*zPA * F0
       end if
     
-      ! Combination 40: s p_y p_z s
+      !Combination 40: s p_y p_z s
       if (o1 == "s" .and. o2 == "py" .and. o3 == "pz" .and. o4 == "s") then
         value = F1*(u*yPB*zPQ - v*yPQ*zQC) - F2*u*v*yPQ*zPQ + yPB*zQC * F0
       end if
     
-      ! Combination 41: s p_y s p_z
+      !Combination 41: s p_y s p_z
       if (o1 == "s" .and. o2 == "py" .and. o3 == "s" .and. o4 == "pz") then
         value = F1*(u*yPB*zPQ - v*yPQ*zQD) - F2*u*v*yPQ*zPQ + yPB*zQD * F0
       end if
     
-      ! Combination 42: s s p_y p_y
+      !Combination 42: s s p_y p_y
       if (o1 == "s" .and. o2 == "s" .and. o3 == "py" .and. o4 == "py") then
         value = F1*(-tv + u*(yPQ*yQC + yPQ*yQD)) + F2*u**2*yPQ**2 + (yQC*yQD + 1/(2*q)) * F0
       end if
     
-      ! Combination 43: p_z s p_y s
+      !Combination 43: p_z s p_y s
       if (o1 == "pz" .and. o2 == "s" .and. o3 == "py" .and. o4 == "s") then
         value = F1*(u*yPQ*zPA - v*yQC*zPQ) - F2*u*v*yPQ*zPQ + yQC*zPA * F0
       end if
     
-      ! Combination 44: s p_z p_y s
+      !Combination 44: s p_z p_y s
       if (o1 == "s" .and. o2 == "pz" .and. o3 == "py" .and. o4 == "s") then
         value = F1*(u*yPQ*zPB - v*yQC*zPQ) - F2*u*v*yPQ*zPQ + yQC*zPB * F0
       end if
     
-      ! Combination 45: s s p_y p_z
+      !Combination 45: s s p_y p_z
       if (o1 == "s" .and. o2 == "s" .and. o3 == "py" .and. o4 == "pz") then
         value = F1*u*(yPQ*zQD + yQC*zPQ) + F2*u**2*yPQ*zPQ + yQC*zQD * F0
       end if
     
-      ! Combination 46: p_z s s p_y
+      !Combination 46: p_z s s p_y
       if (o1 == "pz" .and. o2 == "s" .and. o3 == "s" .and. o4 == "py") then
         value = F1*(u*yPQ*zPA - v*yQD*zPQ) - F2*u*v*yPQ*zPQ + yQD*zPA * F0
       end if
     
-      ! Combination 47: s p_z s p_y
+      !Combination 47: s p_z s p_y
       if (o1 == "s" .and. o2 == "pz" .and. o3 == "s" .and. o4 == "py") then
         value = F1*(u*yPQ*zPB - v*yQD*zPQ) - F2*u*v*yPQ*zPQ + yQD*zPB * F0
       end if
     
-      ! Combination 48: s s p_z p_y
+      !Combination 48: s s p_z p_y
       if (o1 == "s" .and. o2 == "s" .and. o3 == "pz" .and. o4 == "py") then
         value = F1*u*(yPQ*zQC + yQD*zPQ) + F2*u**2*yPQ*zPQ + yQD*zQC * F0
       end if
     
-      ! Combination 49: p_z p_z s s
+      !Combination 49: p_z p_z s s
       if (o1 == "pz" .and. o2 == "pz" .and. o3 == "s" .and. o4 == "s") then
         value = F1*(-tu + v*(-zPA*zPQ - zPB*zPQ)) + F2*v**2*zPQ**2 + (zPA*zPB + 1/(2*p)) * F0
       end if
     
-      ! Combination 50: p_z s p_z s
+      !Combination 50: p_z s p_z s
       if (o1 == "pz" .and. o2 == "s" .and. o3 == "pz" .and. o4 == "s") then
         value = F1*(pq + u*zPA*zPQ - v*zPQ*zQC) - F2*u*v*zPQ**2 + zPA*zQC * F0
       end if
     
-      ! Combination 51: p_z s s p_z
+      !Combination 51: p_z s s p_z
       if (o1 == "pz" .and. o2 == "s" .and. o3 == "s" .and. o4 == "pz") then
         value = F1*(pq + u*zPA*zPQ - v*zPQ*zQD) - F2*u*v*zPQ**2 + zPA*zQD * F0
       end if
     
-      ! Combination 52: s p_z p_z s
+      !Combination 52: s p_z p_z s
       if (o1 == "s" .and. o2 == "pz" .and. o3 == "pz" .and. o4 == "s") then
         value = F1*(pq + u*zPB*zPQ - v*zPQ*zQC) - F2*u*v*zPQ**2 + zPB*zQC * F0
       end if
     
-      ! Combination 53: s p_z s p_z
+      !Combination 53: s p_z s p_z
       if (o1 == "s" .and. o2 == "pz" .and. o3 == "s" .and. o4 == "pz") then
         value = F1*(pq + u*zPB*zPQ - v*zPQ*zQD) - F2*u*v*zPQ**2 + zPB*zQD * F0
       end if
     
-      ! Combination 54: s s p_z p_z
+      !Combination 54: s s p_z p_z
       if (o1 == "s" .and. o2 == "s" .and. o3 == "pz" .and. o4 == "pz") then
         value = F1*(-tv + u*(zPQ*zQC + zPQ*zQD)) + F2*u**2*zPQ**2 + (zQC*zQD + 1/(2*q)) * F0
       end if
@@ -697,6 +700,9 @@ subroutine ERI_ppps(o1,o2,o3,o4&
       double precision,intent(in)  :: u , v , tu , tv , p , q , pq
       
       double precision,intent(out) :: value
+
+
+      value = 0.d0 
 
       ! ////////////////////////// p p p s //////////////////////////// !
 

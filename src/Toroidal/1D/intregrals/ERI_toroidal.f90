@@ -123,13 +123,13 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       !$omp schedule(dynamic,optimal_chunk_size)
 
       do ij_index = 1, total_ij_pairs
-        i = i_index(ij_index)
-        j = j_index(ij_index)
+          i = i_index(ij_index)
+          j = j_index(ij_index)
 
 
-  
-      do k = 1, number_of_functions
-        do l = k, number_of_functions
+         do k = 1, number_of_functions
+           do l = k, number_of_functions
+
 
          if (i <= k .or. (i == k .and. j <= l)) then
 
@@ -151,7 +151,6 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       end do
       
       !$omp end parallel do
-
 
 
       deallocate(i_index, j_index)
@@ -185,7 +184,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
         do j = 1 , number_of_functions
           do k = 1 , number_of_functions
             do l = 1 , number_of_functions
-              if (abs(two_eri(i,j,k,l)) > 1e-24 )  two_electron_integrals(i,j,k,l) = two_eri(i,j,k,l) 
+              if (abs(two_eri(i,j,k,l)) > 1e-30 )  two_electron_integrals(i,j,k,l) = two_eri(i,j,k,l) 
             end do 
           end do 
         end do 

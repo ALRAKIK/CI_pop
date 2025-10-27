@@ -4,6 +4,9 @@ subroutine Title()
 
       implicit none 
 
+      character(len=8)  :: date
+      character(len=10) :: time
+
       ! local ! 
 
       write(outfile,*) 
@@ -38,6 +41,14 @@ subroutine Title()
       write(outfile,'(2a)') "      ",repeat("=",67)
       write(outfile,'(a)')  "                          Version: 0.0.2 | Quantum Chemistry | 2025"
       write(outfile,'(2a)') "      ",repeat("=",67)
+      write(outfile,'(a)')  ""
+
+
+      call date_and_time(date, time)
+
+      write(outfile,'(6x,10a)') "Executing Date : ", date(7:8), "/", date(5:6), "/", date(1:4)
+      write(outfile,'(6x,10a)') "Executing time : ", time(1:2), ":", time(3:4), ":", time(5:6)
+
 
 end subroutine Title 
 

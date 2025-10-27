@@ -104,6 +104,13 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
+
+      do i = 1 , index_unitcell
+        do j = 1 , number_of_functions
+          if (abs(kinetic(i,j)) < 1e-15) kinetic(i,j) = 0.d0 
+        end do 
+      end do 
+
       do i = index_unitcell + 1   , number_of_functions
         do j = index_unitcell + 1 , number_of_functions
           kinetic(i,j) = kinetic(i-index_unitcell,j-index_unitcell)

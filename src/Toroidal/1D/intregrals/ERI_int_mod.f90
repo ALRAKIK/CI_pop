@@ -1,6 +1,6 @@
 subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
 
-      use quadpack , only : dqag , dqags, dqagp
+      use quadpack , only : dqag , dqawo
       use iso_c_binding
       use torus_init
       use gsl_bessel_mod
@@ -82,6 +82,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       double precision                   :: st3 , ct3 
       double precision                   :: st4 , ct4 
 
+
       ! --------------------------------------------------------------- !
 
       ! --------------------------------------------------------------- !
@@ -90,7 +91,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ax3 = ax2 * ax
       ax4 = ax3 * ax
 
-      sf = 15.d0 
+      sf  = 30.d0
 
       select case (pattern_id)
         
@@ -167,7 +168,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
             if (ier > 2) then
               write(*,'(A,I4)') 'Error code from the case ', pattern_id
               stop 
-            end if
+            end if 
 
         case (0101) ! | s   px  s   px   ( 18) 
 
@@ -175,7 +176,6 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
            
-
             if (ier > 2) then
               write(*,'(A,I4)') 'Error code from the case ', pattern_id
               stop 
@@ -288,9 +288,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
               stop 
             end if
 
-      ! ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ! ! !!!!!!!!!!!!!!!!!!!!!!!!!!!! Y Y !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ! ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ! !!!!!!!!!!!!!!!!!!!!!!!!!!!! Y Y !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                       
         case (0022,0033) ! | s   s   py  py   ( 11)
 
@@ -668,6 +668,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
 
 
+
+
       double precision function f0001(theta) Result(f)
 
       double precision,intent(in) :: theta
@@ -853,6 +855,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       double precision function f0011(theta) Result(f)
 
       double precision,intent(in) :: theta
+      double precision            :: bmix1 , bmix2 
+      double precision,parameter  :: one_over_24 = 1.d0/24.d0
+
 
       ! - integral part - !
 
@@ -876,6 +881,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       bz3   = bessi_scaled(3,z)
       bz4   = bessi_scaled(4,z)
 
+      bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
+      bmix2  = 12.0d0*(bz0 - bz2)
+
       st  = dsin(theta)       ;    ct = dcos(theta)
       
       ccd  = dcos(xqc) *  dcos(xqd)
@@ -883,8 +891,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       cqcd = dcos(ax*(2.d0*xq-xc-xd))
 
       d1_T  = - 0.5d0 * A * B * st  * (bz0-bz2)
-      d2_BB = (3*A**2*bz0*ct**2 - 4*A**2*bz2*ct**2 + A**2*bz4*ct**2 + 6*A*B*bz0*ct - 8*A*B*bz2*ct + 2*A*B*bz4*ct + 3*B**2*bz0 - 4*B**2*bz2 + B**2*bz4 + 12*bz0 - 12*bz2)/24
-      d2_BT = -A*st*(3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 3*B**2*bz0 - 4*B**2*bz2 + B**2*bz4 + 12*bz0 - 12*bz2)/24
+      d2_BB =           one_over_24 * (     bmix1 * (A*ct + B)**2  + bmix2 ) 
+      d2_BT = -A * st * one_over_24 * ( B * bmix1 * (A*ct + B)     + bmix2 ) 
 
       integral_t  = int_xxxx
     
@@ -901,6 +909,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       double precision function f0101(theta) Result(f)
 
       double precision,intent(in) :: theta
+      double precision            :: bmix1 , bmix2 
+      double precision,parameter  :: one_over_24 = 1.d0/24.d0
+
 
       ! - integral part - !
 
@@ -918,28 +929,26 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! - derivative part - !
 
-      z2 = z  * z 
-      z3 = z2 * z
-      z4 = z3 * z  
-
       bz0   = bessi_scaled(0,z)
       bz1   = bessi_scaled(1,z)
       bz2   = bessi_scaled(2,z)
       bz3   = bessi_scaled(3,z)
       bz4   = bessi_scaled(4,z)
 
+      bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
+      bmix2  = 12.0d0*(bz0 - bz2)
+
       st  = dsin(theta)       ;    ct = dcos(theta)
-      st2 = st * st 
       
       spb = dsin(xpb)
       cpb = dcos(xpb)
       sqd = dsin(xqd)
       cqd = dcos(xqd)
 
-      d2_AB = (3*A**2*bz0*ct - 4*A**2*bz2*ct + A**2*bz4*ct + 3*A*B*bz0*ct**2 + 3*A*B*bz0 - 4*A*B*bz2*ct**2 - 4*A*B*bz2 + A*B*bz4*ct**2 + A*B*bz4 + 3*B**2*bz0*ct - 4*B**2*bz2*ct + B**2*bz4*ct + 12*bz0*ct - 12*bz2*ct)/24
-      d2_AT = -B*st*(3*A**2*bz0 - 4*A**2*bz2 + A**2*bz4 + 3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 12*bz0 - 12*bz2)/24
-      d2_BT = -A*st*(3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 3*B**2*bz0 - 4*B**2*bz2 + B**2*bz4 + 12*bz0 - 12*bz2)/24
-      d2_TT =  A*B*(3*A*B*bz0*st**2 - 4*A*B*bz2*st**2 + A*B*bz4*st**2 - 12*bz0*ct + 12*bz2*ct)/24
+      d2_AB =            one_over_24 * (     bmix1 * (A*ct + B) * (A + B*ct)  + bmix2 * ct          )
+      d2_AT = -B * st *  one_over_24 * ( A * bmix1 * (A + B*ct)               + bmix2               )
+      d2_BT = -A * st *  one_over_24 * ( B * bmix1 * (A*ct + B)               + bmix2               )
+      d2_TT =            one_over_24 * (     bmix1 * (A*B)**2   * st**2       - bmix2  * A * B * ct )
 
       integral_t  = int_xxxx
 
@@ -953,7 +962,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       endif
       
       else
-        der_t = d2_AB*spb*sqd/ax2 - cqd*d2_AT*spb/(B*ax2) + cpb*d2_BT*sqd/(A*ax2) - cpb*cqd*d2_TT/(A*B*ax2)
+        der_t = ( d2_AB*spb*sqd - cqd*d2_AT*spb/B + cpb*d2_BT*sqd/A - cpb*cqd*d2_TT/(A*B) )/ax2
       endif
 
       f           = der_t * integral_t
@@ -963,6 +972,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       double precision function f0110(theta) Result(f)
 
       double precision,intent(in) :: theta
+      double precision            :: bmix1 , bmix2 
+      double precision,parameter  :: one_over_24 = 1.d0/24.d0
 
       ! - integral part - !
 
@@ -980,13 +991,14 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! - derivative part - !
 
-      z2 = z  * z 
-
       bz0   = bessi_scaled(0,z)
       bz1   = bessi_scaled(1,z)
       bz2   = bessi_scaled(2,z)
       bz3   = bessi_scaled(3,z)
       bz4   = bessi_scaled(4,z)
+
+      bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
+      bmix2  = 12.0d0*(bz0 - bz2)
 
       st  = dsin(theta)       ;    ct = dcos(theta)
       
@@ -995,14 +1007,10 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       sqc = dsin(xqc)
       cqc = dcos(xqc)
 
-      ccd  = dcos(xqc) *  dcos(xqd)
-      sqcd = dsin(ax*(2.d0*xq-xc-xd))
-      cqcd = dcos(ax*(2.d0*xq-xc-xd))
-
-      d2_AB = (3*A**2*bz0*ct - 4*A**2*bz2*ct + A**2*bz4*ct + 3*A*B*bz0*ct**2 + 3*A*B*bz0 - 4*A*B*bz2*ct**2 - 4*A*B*bz2 + A*B*bz4*ct**2 + A*B*bz4 + 3*B**2*bz0*ct - 4*B**2*bz2*ct + B**2*bz4*ct + 12*bz0*ct - 12*bz2*ct)/24
-      d2_AT = -B*st*(3*A**2*bz0 - 4*A**2*bz2 + A**2*bz4 + 3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 12*bz0 - 12*bz2)/24
-      d2_BT = -A*st*(3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 3*B**2*bz0 - 4*B**2*bz2 + B**2*bz4 + 12*bz0 - 12*bz2)/24
-      d2_TT =  A*B*(3*A*B*bz0*st**2 - 4*A*B*bz2*st**2 + A*B*bz4*st**2 - 12*bz0*ct + 12*bz2*ct)/24
+      d2_AB =            one_over_24 * (     bmix1 * (A*ct + B) * (A + B*ct)  + bmix2 * ct          )
+      d2_AT = -B * st *  one_over_24 * ( A * bmix1 * (A + B*ct)               + bmix2               )
+      d2_BT = -A * st *  one_over_24 * ( B * bmix1 * (A*ct + B)               + bmix2               )
+      d2_TT =            one_over_24 * (     bmix1 * (A*B)**2   * st**2       - bmix2  * A * B * ct )
 
       integral_t  = int_xxxx
 
@@ -1022,10 +1030,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       end function f0110
 
-
       double precision function f1010(theta) Result(f)
 
       double precision,intent(in) :: theta
+      double precision            :: bmix1 , bmix2 
+      double precision,parameter  :: one_over_24 = 1.d0/24.d0
 
       ! - integral part - !
 
@@ -1043,28 +1052,26 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! - derivative part - !
 
-      z2 = z  * z 
-      z3 = z2 * z
-      z4 = z3 * z  
-
       bz0   = bessi_scaled(0,z)
       bz1   = bessi_scaled(1,z)
       bz2   = bessi_scaled(2,z)
       bz3   = bessi_scaled(3,z)
       bz4   = bessi_scaled(4,z)
 
+      bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
+      bmix2  = 12.0d0*(bz0 - bz2)
+
       st  = dsin(theta)       ;    ct = dcos(theta)
-      st2 = st * st 
       
       spa = dsin(xpa)
       cpa = dcos(xpa)
       sqc = dsin(xqc)
       cqc = dcos(xqc)
       
-      d2_AB = (3*A**2*bz0*ct - 4*A**2*bz2*ct + A**2*bz4*ct + 3*A*B*bz0*ct**2 + 3*A*B*bz0 - 4*A*B*bz2*ct**2 - 4*A*B*bz2 + A*B*bz4*ct**2 + A*B*bz4 + 3*B**2*bz0*ct - 4*B**2*bz2*ct + B**2*bz4*ct + 12*bz0*ct - 12*bz2*ct)/24
-      d2_AT = -B*st*(3*A**2*bz0 - 4*A**2*bz2 + A**2*bz4 + 3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 12*bz0 - 12*bz2)/24
-      d2_BT = -A*st*(3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 3*B**2*bz0 - 4*B**2*bz2 + B**2*bz4 + 12*bz0 - 12*bz2)/24
-      d2_TT =  A*B*(3*A*B*bz0*st**2 - 4*A*B*bz2*st**2 + A*B*bz4*st**2 - 12*bz0*ct + 12*bz2*ct)/24
+      d2_AB =            one_over_24 * (     bmix1 * (A*ct + B) * (A + B*ct)  + bmix2 * ct          )
+      d2_AT = -B * st *  one_over_24 * ( A * bmix1 * (A + B*ct)               + bmix2               )
+      d2_BT = -A * st *  one_over_24 * ( B * bmix1 * (A*ct + B)               + bmix2               )
+      d2_TT =            one_over_24 * (     bmix1 * (A*B)**2   * st**2       - bmix2  * A * B * ct )
 
       integral_t  = int_xxxx
 
@@ -1077,7 +1084,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
             der_t   = d2_AB*spa*sqc/ax2 + cpa*d2_BT*sqc/(A*ax2)
         endif
       else
-        der_t       = d2_AB*spa*sqc/ax2 - cqc*d2_AT*spa/(B*ax2) + cpa*d2_BT*sqc/(A*ax2) - cpa*cqc*d2_TT/(A*B*ax2)
+        der_t       = ( d2_AB*spa*sqc - cqc*d2_AT*spa/B + cpa*d2_BT*sqc/A - cpa*cqc*d2_TT/(A*B) ) /ax2
       end if
 
       f           = der_t * integral_t
@@ -1087,6 +1094,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       double precision function f1001(theta) Result(f)
 
       double precision,intent(in) :: theta
+      double precision            :: bmix1 , bmix2 
+      double precision,parameter  :: one_over_24 = 1.d0/24.d0
 
       ! - integral part - !
 
@@ -1104,28 +1113,26 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! - derivative part - !
 
-      z2 = z  * z 
-      z3 = z2 * z
-      z4 = z3 * z  
-
       bz0   = bessi_scaled(0,z)
       bz1   = bessi_scaled(1,z)
       bz2   = bessi_scaled(2,z)
       bz3   = bessi_scaled(3,z)
       bz4   = bessi_scaled(4,z)
 
+      bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
+      bmix2  = 12.0d0*(bz0 - bz2)
+
       st  = dsin(theta)       ;    ct = dcos(theta)
-      st2 = st * st 
       
       spa = dsin(xpa)
       cpa = dcos(xpa)
       sqd = dsin(xqd)
       cqd = dcos(xqd)
 
-      d2_AB = (3*A**2*bz0*ct - 4*A**2*bz2*ct + A**2*bz4*ct + 3*A*B*bz0*ct**2 + 3*A*B*bz0 - 4*A*B*bz2*ct**2 - 4*A*B*bz2 + A*B*bz4*ct**2 + A*B*bz4 + 3*B**2*bz0*ct - 4*B**2*bz2*ct + B**2*bz4*ct + 12*bz0*ct - 12*bz2*ct)/24
-      d2_AT = -B*st*(3*A**2*bz0 - 4*A**2*bz2 + A**2*bz4 + 3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 12*bz0 - 12*bz2)/24
-      d2_BT = -A*st*(3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 3*B**2*bz0 - 4*B**2*bz2 + B**2*bz4 + 12*bz0 - 12*bz2)/24
-      d2_TT =  A*B*(3*A*B*bz0*st**2 - 4*A*B*bz2*st**2 + A*B*bz4*st**2 - 12*bz0*ct + 12*bz2*ct)/24
+      d2_AB =            one_over_24 * (     bmix1 * (A*ct + B) * (A + B*ct)  + bmix2 * ct          )
+      d2_AT = -B * st *  one_over_24 * ( A * bmix1 * (A + B*ct)               + bmix2               )
+      d2_BT = -A * st *  one_over_24 * ( B * bmix1 * (A*ct + B)               + bmix2               )
+      d2_TT =            one_over_24 * (     bmix1 * (A*B)**2   * st**2       - bmix2  * A * B * ct )
 
       integral_t  = int_xxxx
 
@@ -1138,7 +1145,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
           der_t   = d2_AB*spa*sqd/ax2 + cpa*d2_BT*sqd/(A*ax2)
         endif
       else
-        der_t     = d2_AB*spa*sqd/ax2 - cqd*d2_AT*spa/(B*ax2) + cpa*d2_BT*sqd/(A*ax2) - cpa*cqd*d2_TT/(A*B*ax2)
+        der_t     = ( d2_AB*spa*sqd - cqd*d2_AT*spa/B + cpa*d2_BT*sqd/A - cpa*cqd*d2_TT/(A*B) ) /ax2
       end if 
 
       f    = der_t * integral_t
@@ -1149,6 +1156,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       double precision function f1100(theta) Result(f)
 
       double precision,intent(in) :: theta
+      double precision            :: bmix1 , bmix2 
+      double precision,parameter  :: one_over_24 = 1.d0/24.d0
 
       ! - integral part - !
 
@@ -1172,16 +1181,19 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       bz3   = bessi_scaled(3,z)
       bz4   = bessi_scaled(4,z)
 
+      bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
+      bmix2  = 12.0d0*(bz0 - bz2)
+
+
       st  = dsin(theta)       ;    ct = dcos(theta)
       
       cab  = dcos(xpa) *  dcos(xpb)
       spab = dsin(ax*(2.d0*xp-xa-xb))
       cpab = dcos(ax*(2.d0*xp-xa-xb))
 
-
-      d1_T  = - 0.5d0 * A * B * st  * (bz0-bz2)
-      d2_AA = (3*A**2*bz0 - 4*A**2*bz2 + A**2*bz4 + 6*A*B*bz0*ct - 8*A*B*bz2*ct + 2*A*B*bz4*ct + 3*B**2*bz0*ct**2 - 4*B**2*bz2*ct**2 + B**2*bz4*ct**2 + 12*bz0 - 12*bz2)/24
-      d2_AT = -B*st*(3*A**2*bz0 - 4*A**2*bz2 + A**2*bz4 + 3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 12*bz0 - 12*bz2)/24
+      d1_T  = - 0.5d0 * A * B * st   * (bz0-bz2)
+      d2_AA =            one_over_24 * (     bmix1 * (A + B*ct)**2   + bmix2 )
+      d2_AT = -B * st *  one_over_24 * ( A * bmix1 * (A + B*ct)      + bmix2 )
 
       integral_t  = int_xxxx
       
@@ -1195,9 +1207,24 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       end function f1100
 
+
+
+
+
+
+
+
+
+
+
+
+
+
       double precision function f0111(theta) Result(f)
 
       double precision,intent(in) :: theta
+      double precision            :: bmix1 , bmix2 
+      double precision,parameter  :: one_over_24 = 1.d0/24.d0
 
       ! - integral part - !
 
@@ -1233,9 +1260,10 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       bz5   = bessi_scaled(5,z)
       bz6   = bessi_scaled(6,z)
 
+      bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
+      bmix2  = 12.0d0*(bz0 - bz2)
 
       st  = dsin(theta)       ;    ct  = dcos(theta)
-      st2 = st * st           ;    ct2 = ct * ct  
       
       spb = dsin(xpb)
       cpb = dcos(xpb)
@@ -1253,8 +1281,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       d1_A   =  0.5d0 * (A + B * ct) * (bz0-bz2)
       d1_T   = -0.5d0 *  A * B * st  * (bz0-bz2)
-      d2_AT  = -B*st*(3*A**2*bz0 - 4*A**2*bz2 + A**2*bz4 + 3*A*B*bz0*ct - 4*A*B*bz2*ct + A*B*bz4*ct + 12*bz0 - 12*bz2)/24
-      d2_TT  =  A*B*(3*A*B*bz0*st**2 - 4*A*B*bz2*st**2 + A*B*bz4*st**2 - 12*bz0*ct + 12*bz2*ct)/24
+      d2_AT = -B * st *  one_over_24 * ( A * bmix1 * (A + B*ct)               + bmix2 )
+      d2_TT =            one_over_24 * (     bmix1 * (A*B)**2   * st**2       - bmix2  * A * B * ct )
+      
       d3_ABB =  (10*A**3*bz0*ct**2 - 15*A**3*bz2*ct**2 + 6*A**3*bz4*ct**2 - A**3*bz6*ct**2 + 10*A**2*B*bz0*ct**3 + 20*A**2*B*bz0*ct - 15*A**2*B*bz2*ct**3 - 30*A**2*B*bz2*ct + 6*A**2*B*bz4*ct**3 + 12*A**2*B*bz4*ct - A**2*B*bz6*ct**3 - 2*A**2*B*bz6*ct + 20*A*B**2*bz0*ct**2 + 10*A*B**2*bz0 - 30*A*B**2*bz2*ct**2 - 15*A*B**2*bz2 + 12*A*B**2*bz4*ct**2 + 6*A*B**2*bz4 - 2*A*B**2*bz6*ct**2 - A*B**2*bz6 + 120*A*bz0*ct**2 + 60*A*bz0 - 160*A*bz2*ct**2 - 80*A*bz2 + 40*A*bz4*ct**2 + 20*A*bz4 + 10*B**3*bz0*ct - 15*B**3*bz2*ct + 6*B**3*bz4*ct - B**3*bz6*ct + 180*B*bz0*ct - 240*B*bz2*ct + 60*B*bz4*ct)/480
       d3_ABT =  -st*(10*A**3*B*bz0*ct - 15*A**3*B*bz2*ct + 6*A**3*B*bz4*ct - A**3*B*bz6*ct + 10*A**2*B**2*bz0*ct**2 + 10*A**2*B**2*bz0 - 15*A**2*B**2*bz2*ct**2 - 15*A**2*B**2*bz2 + 6*A**2*B**2*bz4*ct**2 + 6*A**2*B**2*bz4 - A**2*B**2*bz6*ct**2 - A**2*B**2*bz6 + 60*A**2*bz0 - 80*A**2*bz2 + 20*A**2*bz4 + 10*A*B**3*bz0*ct - 15*A*B**3*bz2*ct + 6*A*B**3*bz4*ct - A*B**3*bz6*ct + 180*A*B*bz0*ct - 240*A*B*bz2*ct + 60*A*B*bz4*ct + 60*B**2*bz0 - 80*B**2*bz2 + 20*B**2*bz4 + 240*bz0 - 240*bz2)/480
       d3_BBT =  -A*st*(10*A**2*B*bz0*ct**2 - 15*A**2*B*bz2*ct**2 + 6*A**2*B*bz4*ct**2 - A**2*B*bz6*ct**2 + 20*A*B**2*bz0*ct - 30*A*B**2*bz2*ct + 12*A*B**2*bz4*ct - 2*A*B**2*bz6*ct + 120*A*bz0*ct - 160*A*bz2*ct + 40*A*bz4*ct + 10*B**3*bz0 - 15*B**3*bz2 + 6*B**3*bz4 - B**3*bz6 + 180*B*bz0 - 240*B*bz2 + 60*B*bz4)/480
@@ -1262,17 +1291,18 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       integral_t  = int_xxxx
 
+
       if (dabs(A*B) < 1.d-30 ) then 
-        if (dabs(A) < 1.d-15 .and. dabs(B) < 1.d-15 ) then 
-        der_t       = spb *  (ccd*d1_A - cqcd*d3_ABB)     /(ax3)   
-        else if (dabs(A) < 1.d-15) then 
-        der_t       = spb *  (ccd*d1_A - cqcd*d3_ABB)     /(ax3)      &
+       if (dabs(A) < 1.d-15 .and. dabs(B) < 1.d-15 ) then 
+       der_t       = spb *  (ccd*d1_A - cqcd*d3_ABB)     /(ax3)   
+       else if (dabs(A) < 1.d-15) then 
+       der_t       = spb *  (ccd*d1_A - cqcd*d3_ABB)     /(ax3)      &
       &             + spb *  d2_AT*sqcd                   /(B2*ax3)   & 
       &             - spb *  d3_ABT*sqcd                  /(B*ax3)    
-        else if (dabs(B) < 1.d-15) then 
-        der_t       = spb *  (ccd*d1_A - cqcd*d3_ABB)     /(ax3)      &
+       else if (dabs(B) < 1.d-15) then 
+       der_t       = spb *  (ccd*d1_A - cqcd*d3_ABB)     /(ax3)      &
       &             + cpb *  (ccd*d1_T - cqcd*d3_BBT)     /(A*ax3) 
-        end if 
+       end if 
       else 
       der_t       =   spb *  (ccd*d1_A - cqcd*d3_ABB)     /(ax3)      &
       &             + spb *  d2_AT*sqcd                   /(B2*ax3)   & 

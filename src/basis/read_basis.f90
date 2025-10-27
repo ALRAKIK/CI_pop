@@ -6,14 +6,18 @@ subroutine read_basis_class(atom_type)
 
       integer             :: i , j 
       type(atom)          :: atom_type
-      character(len=100)  :: lines 
-
-      character(len=10)    :: atom_type_charge
+      character(len=100)  :: lines
+      character(len=10)   :: atom_type_charge
+      logical             :: found_p
       
       write(atom_type_charge,'(A,I0)') "A ", atom_type%charge 
 
       atom_type%num_s_function = 0
       atom_type%num_p_function = 0
+      atom_type%num_exponent_s = 0
+      atom_type%num_exponent_p = 0
+
+      found_p                  = .false.
 
     
       open(1,file=trim(tmp_file_name)//"/Basis_normalized")
@@ -34,6 +38,7 @@ subroutine read_basis_class(atom_type)
                end do 
               end if 
               if (lines == "$ P-TYPE FUNCTIONS") then
+                found_p = .true.
                 read(1,*) atom_type%num_exponent_p , atom_type%num_p_function
                 allocate(atom_type%exponent_p(atom_type%num_exponent_p))
                 allocate(atom_type%coefficient_p(atom_type%num_exponent_p,atom_type%num_p_function))
@@ -43,6 +48,13 @@ subroutine read_basis_class(atom_type)
               end if 
               if (adjustl(lines(1:1))=="A" .or. adjustl(lines(1:1))=="a") exit
             end do 
+
+            if (.not. found_p) then
+              atom_type%num_exponent_p = 0
+              atom_type%num_p_function = 0
+            end if
+            exit
+
           end if 
 
         end do 
@@ -61,13 +73,17 @@ subroutine read_basis_class_tor(atom_type,num)
       integer             :: i , j , num 
       type(atom)          :: atom_type
       character(len=100)  :: lines 
-
-      character(len=10)    :: atom_type_charge
+      character(len=10)   :: atom_type_charge
+      logical             :: found_p
       
       write(atom_type_charge,'(A,I0)') "A ", atom_type%charge 
 
       atom_type%num_s_function = 0
       atom_type%num_p_function = 0
+      atom_type%num_exponent_s = 0
+      atom_type%num_exponent_p = 0
+
+      found_p                  = .false.
 
       if (num == 1) then 
         open(1,file=trim(tmp_file_name)//"/Basis_normalized")
@@ -90,15 +106,23 @@ subroutine read_basis_class_tor(atom_type,num)
                end do 
               end if 
               if (lines == "$ P-TYPE FUNCTIONS") then
+                found_p = .true.
                 read(1,*) atom_type%num_exponent_p , atom_type%num_p_function
                 allocate(atom_type%exponent_p(atom_type%num_exponent_p))
                 allocate(atom_type%coefficient_p(atom_type%num_exponent_p,atom_type%num_p_function))
                do i = 1 , atom_type%num_exponent_p
                  read(1,*) atom_type%exponent_p(i) , (atom_type%coefficient_p(i,j),j=1,atom_type%num_p_function)
-               end do 
+               end do
               end if 
               if (adjustl(lines(1:1))=="A" .or. adjustl(lines(1:1))=="a") exit
             end do 
+
+            if (.not. found_p) then
+              atom_type%num_exponent_p = 0
+              atom_type%num_p_function = 0
+            end if
+            exit 
+
           end if 
 
         end do 

@@ -20,8 +20,8 @@ subroutine hartree_potential(nBas,P,ERI,J)
 
       J(:,:) = 0d0
 
-      !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(si,nu,la,mu) &
-      !$OMP COLLAPSE(2) SCHEDULE(static)
+!      ! $OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(si,nu,la,mu) &
+!      ! $OMP COLLAPSE(2) SCHEDULE(static)
       do nu=1,nBas
         do mu=1,nBas
           do si=1,nBas
@@ -31,6 +31,6 @@ subroutine hartree_potential(nBas,P,ERI,J)
           end do
         end do
       end do
-      !$OMP END PARALLEL DO
+!      !$OMP END PARALLEL DO
 
 end subroutine hartree_potential

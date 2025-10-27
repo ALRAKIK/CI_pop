@@ -15,8 +15,6 @@ subroutine basis(number_of_atoms,charge,atoms)
 
       call normalize_basis()
 
-      !call system("python src/basis/clean_lines.py")
-
       do i = 1, number_of_atoms
         atoms(i)%charge = charge(i)
         call read_basis_class(atoms(i))

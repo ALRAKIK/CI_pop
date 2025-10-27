@@ -31,7 +31,6 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
       double precision               :: gamma_x , gamma_y , gamma_z
       double precision               :: NA
 
-
       !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
@@ -78,7 +77,7 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
               
                call integrate_NA_ss_Toroidal(gamma_x,xp-xc,gamma_y, NA)
 
-              S_ss_normal =  S_ss_normal +  c1 * c2 * charge_atom * kc * NA
+              S_ss_normal =  S_ss_normal +  c1 * c2 * charge_atom * kc * NA 
             
             end do 
             
@@ -124,7 +123,6 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
       double precision              :: gamma_x , gamma_y , gamma_z
       double precision              :: NA
       
-
       !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
@@ -220,7 +218,6 @@ subroutine nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atom
       double precision              :: gamma_x , gamma_y , gamma_z
       double precision              :: NA
       
-
       !-----------------------------------------------------------------!
 
       x1 = r1(1) ; x2 = r2(1) 
@@ -269,7 +266,7 @@ subroutine nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atom
   
                 call integrate_NA_pp_px_Toroidal(gamma_x,xp,alpha+beta,xc,x1,x2,NA)
               
-                S_pp_normal =  S_pp_normal +   charge_atom * kc * NA 
+                S_pp_normal =  S_pp_normal +   charge_atom * kc * NA
               
               end do
 
@@ -366,7 +363,7 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xAB,p, result)
 
         I_0_x = bessi_scaled(0, dx)
         
-        fx  = 1.d0/(p+x**2) * dexp(-2.d0*(x**2+p)/ax**2 + dx)  * I_0_x
+        fx  = 1.d0/(p+x**2) * dexp(-2.d0*(x**2+p)/ax**2 + dx )  * I_0_x
 
       end function f_decay
 
@@ -434,6 +431,7 @@ subroutine integrate_NA_pp_px_Toroidal(gamma_x,xP,p,xc,xa,xb,result)
       use torus_init
       use HeavisideModule
       use, intrinsic :: ieee_arithmetic
+      
     
       implicit none
     
