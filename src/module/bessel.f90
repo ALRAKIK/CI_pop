@@ -22,13 +22,23 @@ module gsl_bessel_mod
   end interface
 
 contains
-  ! Scaled Bessel function wrapper
-  function bessi_scaled(n, x) result(res)
-    use, intrinsic :: iso_c_binding
-    integer, intent(in)      :: n
-    real(c_double), intent(in) :: x
-    real(c_double)           :: res
-    res = gsl_sf_bessel_In_scaled(int(n, c_int), x)
+
+
+      ! Scaled Bessel function wrapper
+      function bessi_scaled(n, x) result(res)
+
+      use, intrinsic :: iso_c_binding
+      integer, intent(in)        :: n
+      real(c_double), intent(in) :: x
+      real(c_double)             :: res
+      real(c_double)             :: pi     = 3.14159265358979323846D00
+
+      ! if (x < 50.d0) then 
+        res = gsl_sf_bessel_In_scaled(int(n, c_int), x)
+      ! else 
+      !   res = 1.d0/(dsqrt(2.d0*pi*x)) * (1.d0 -  (4.d0*n*n-1)/(8.d0*x) + (4.d0*n*n-1)*(4.d0*n*n-9.d0)/(2.d0*(8.d0*x)**2) - (4.d0*n*n-1.d0)*(4.d0*n*n-9.d0)*(4.d0*n*n-25.d0)/(6.d0*(8.d0*x)**3) )
+      ! end if
+
   end function bessi_scaled
   
 end module gsl_bessel_mod

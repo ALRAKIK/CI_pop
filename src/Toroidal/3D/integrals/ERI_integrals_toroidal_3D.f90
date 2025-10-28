@@ -37,10 +37,14 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
       double precision                :: xpA , xpB , xqC , xqD , phix
       double precision                :: ypA , ypB , yqC , yqD , phiy
       double precision                :: zpA , zpB , zqC , zqD , phiz 
-      double precision                :: test 
+      double precision                :: const_x , const_y , const_z 
+      double precision                :: inv_ax2, inv_ay2, inv_az2
       integer                         :: pattern_id, encode_orbital_pattern
 
 
+      inv_ax2 = 1.0d0/(ax*ax)
+      inv_ay2 = 1.0d0/(ay*ay) 
+      inv_az2 = 1.0d0/(az*az)
 
       !-----------------------------------------------------------------!
 
@@ -97,9 +101,11 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
 
               const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi) * (Lx*Lx) * (Ly*Ly) * (Lz*Lz)  
 
-              !test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
+              const_x = dexp(2.d0*( mu_x + nu_x - mu - nu )*inv_ax2)
+              const_y = dexp(2.d0*( mu_y + nu_y - mu - nu )*inv_ay2)
+              const_z = dexp(2.d0*( mu_z + nu_z - mu - nu )*inv_az2)
 
-              !if (test < 1e-12) cycle
+              if ( (const_x*const_y*const_z < 1.d-15 )  ) cycle
 
               xpA     = ax*(xp - xa) ; ypA     = ay*(yp - ya) ; zpA     = az*(zp - za)
               xpB     = ax*(xp - xb) ; ypB     = ay*(yp - yb) ; zpB     = az*(zp - zb) 
@@ -109,9 +115,9 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
  
-              call integrate_ERI_3D(pattern_id,mu,nu,mu_x,nu_x,phix,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,&
-                                                     mu_y,nu_y,phiy,ypA,ypB,yqC,yqD,ya,yb,yc,yd,yp,yq,&
-                                                     mu_z,nu_z,phiz,zpA,zpB,zqC,zqD,za,zb,zc,zd,zp,zq,value_s)
+              call integrate_ERI_3D(pattern_id,mu,nu,mu_x,nu_x,phix,const_x,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,&
+                                                     mu_y,nu_y,phiy,const_y,ypA,ypB,yqC,yqD,ya,yb,yc,yd,yp,yq,&
+                                                     mu_z,nu_z,phiz,const_z,zpA,zpB,zqC,zqD,za,zb,zc,zd,zp,zq,value_s)
 
               value  = value    + const * value_s
 
@@ -122,9 +128,9 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
 
 end subroutine ERI_integral_4_function_toroidal_3D
 
-subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,&
-                                           p_y,q_y,phiy,ypA,ypB,yqC,yqD,ya,yb,yc,yd,yp,yq,&
-                                           p_z,q_z,phiz,zpA,zpB,zqC,zqD,za,zb,zc,zd,zp,zq,result)
+subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,&
+                                           p_y,q_y,phiy,const_y,ypA,ypB,yqC,yqD,ya,yb,yc,yd,yp,yq,&
+                                           p_z,q_z,phiz,const_z,zpA,zpB,zqC,zqD,za,zb,zc,zd,zp,zq,result)
       
       use quadpack , only : dqagi
       use iso_c_binding
@@ -146,7 +152,8 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,xpA,xpB,xqC,xqD,xa,xb,xc
       double precision, intent(in)       :: zpA , zpB , zqC , zqD
       double precision, intent(in)       :: xa , xb , xc ,xd ,xp ,xq 
       double precision, intent(in)       :: ya , yb , yc ,yd ,yp ,yq
-      double precision, intent(in)       :: za , zb , zc ,zd ,zp ,zq  
+      double precision, intent(in)       :: za , zb , zc ,zd ,zp ,zq
+      double precision, intent(in)       :: const_x , const_y , const_z
       integer         , intent(in)       :: pattern_id
       
 
@@ -163,7 +170,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,xpA,xpB,xqC,xqD,xa,xb,xc
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 150
+      integer,parameter                  :: Nmax = 100
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi
       
@@ -193,9 +200,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,xpA,xpB,xqC,xqD,xa,xb,xc
       double precision                     :: AAx,  BBx, CCx
       double precision                     :: AAy,  BBy, CCy
       double precision                     :: AAz,  BBz, CCz
-      double precision                     :: D, D2
-      double precision                     :: const 
-      double precision                     :: tol  = 1D-12
+      double precision                     :: tol  = 1D-16
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n  
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
@@ -215,7 +220,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,xpA,xpB,xqC,xqD,xa,xb,xc
       AAz   = 2.d0*p_z/(az*az)
       BBz   = 2.d0*q_z/(az*az)
       CCz   = 2.d0*t*t/(az*az)
-      
+
       select case(pattern_id)
         
       case (0000) ! | s   s   s   s    ( 1 ) 
@@ -226,54 +231,42 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,xpA,xpB,xqC,xqD,xa,xb,xc
         sum       = 0.d0
 
         n         = 0
-        const     = exp(AAx+BBx-2.d0*(p+q)/(ax*ax))
-        termAn    = bessi_scaled(n, AAx)
-        termBn    = bessi_scaled(n, BBx)
-        sum1      = const * bessi_scaled(n, CCx) * termAn * termBn 
+        sum1      = bessi_scaled(0, AAx) * bessi_scaled(0, BBx) * bessi_scaled(0, CCx)
         do n      = 1 , Nmax
           termAn  = bessi_scaled(n, AAx)
           termBn  = bessi_scaled(n, BBx)
-          termc   = bessi_scaled(n, CCx) 
+          termc   = bessi_scaled(n, CCx)
           term1   = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
           term2   = conjg(term1)
-          if (abs(term1) < tol) exit
-          if (abs(term2) < tol) exit
-          sum1 = sum1 + real(term1+term2) * const
+          if (abs(term1) < tol .and.  abs(term2) < tol ) exit
+          sum1 = sum1 + real(term1+term2)
         end do
         
         n         = 0
-        const     = exp(AAy+BBy-2.d0*(p+q)/(ay*ay))
-        termAn    = bessi_scaled(n, AAy)
-        termBn    = bessi_scaled(n, BBy)
-        sum2      = const * bessi_scaled(n, CCy) * termAn * termBn 
+        sum2      = bessi_scaled(0, AAy) * bessi_scaled(0, BBy) * bessi_scaled(0, CCy)
         do n      = 1 , Nmax
           termAn  = bessi_scaled(n, AAy)
           termBn  = bessi_scaled(n, BBy)
           termc   = bessi_scaled(n, CCy) 
           term1   = exp(I_dp*dble(n)*phiy) * termC * termAn * termBn
           term2   = conjg(term1)
-          if (abs(term1) < tol) exit
-          if (abs(term2) < tol) exit
-          sum2 = sum2 + real(term1+term2) * const
+          if (abs(term1) < tol .and.  abs(term2) < tol ) exit
+          sum2 = sum2 + real(term1+term2)
         end do
 
         n         = 0
-        const     = exp(AAz+BBz-2.d0*(p+q)/(az*az))
-        termAn    = bessi_scaled(n, AAz)
-        termBn    = bessi_scaled(n, BBz)
-        sum3      = const * bessi_scaled(n, CCz) * termAn * termBn 
+        sum3      = bessi_scaled(0, AAz) * bessi_scaled(0, BBz) * bessi_scaled(0, CCz)
         do n      = 1 , Nmax
           termAn  = bessi_scaled(n, AAz)
           termBn  = bessi_scaled(n, BBz)
           termc   = bessi_scaled(n, CCz) 
           term1   = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
           term2   = conjg(term1)
-          if (abs(term1) < tol) exit
-          if (abs(term2) < tol) exit
-          sum3 = sum3 + real(term1+term2) * const
+          if (abs(term1) < tol .and.  abs(term2) < tol ) exit
+          sum3 = sum3 + real(term1+term2)
         end do
 
-        sum = sum1 * sum2 * sum3 
+        sum = sum1 * sum2 * sum3 * const_x * const_y * const_z
 
       case default
         sum = 0.0d0

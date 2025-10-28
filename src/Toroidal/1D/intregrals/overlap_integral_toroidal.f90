@@ -12,16 +12,17 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       type(ERI_function),intent(in)    :: AO1 , AO2
       double precision  ,intent(out)   :: S_ss_normal
 
-      integer                      :: i , j 
-      double precision,parameter   :: pi = 3.14159265358979323846D00
-      double precision             :: alpha , beta
-      double precision             :: c1    , c2 
-      double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
-      double precision             :: X , Y , Z
-      double precision             :: const 
-      double precision             :: overlap_x , overlap_y , overlap_z 
-      double precision             :: gamma_x    
-      double precision             :: I_0_gamma_x
+      integer                          :: i , j 
+      double precision,parameter       :: pi = 3.14159265358979323846D00
+      double precision                 :: alpha , beta
+      double precision                 :: c1    , c2 
+      double precision                 :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision                 :: X , Y , Z
+      double precision                 :: const 
+      double precision                 :: overlap_x , overlap_y , overlap_z 
+      double precision                 :: gamma_x    
+      double precision                 :: I_0_gamma_x
+      double precision                 :: ax2 
 
 
       x1 = r1(1) ; x2 = r2(1) 
@@ -31,6 +32,8 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       X        = (x1 - x2)
       Y        = (y1 - y2)
       Z        = (z1 - z2)
+
+      ax2      = ax * ax 
 
       !-----------------------------------------------------------------!
  
@@ -48,9 +51,9 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
               gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
 
-              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax*ax))
+              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/ax2)
               
-              overlap_x   = const * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/(ax*ax)) * I_0_gamma_x
+              overlap_x   = const * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * I_0_gamma_x
               overlap_y   = const * dsqrt(pi/(alpha+beta))
               overlap_z   = const * dsqrt(pi/(alpha+beta))
 

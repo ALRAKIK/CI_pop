@@ -30,7 +30,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       
       double precision,intent(out)   :: two_electron_integrals(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
 
-      ! New variables for manual collapse
+      
       integer                        :: total_ij_pairs, ij_index
       integer, allocatable           :: i_index(:), j_index(:)
       integer                        :: num_threads, optimal_chunk_size

@@ -330,12 +330,15 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xAB,p, result)
       implicit none
     
       ! Input parameters
+
       double precision, intent(in)  :: gamma_x , XAB , p 
       
       ! Output parameters
+
       double precision, intent(out) :: result
     
       ! Local variables
+      
       double precision,parameter    :: epsabs = 1.0e-8 , epsrel = 1.0e-6
       integer,parameter             :: inf = 1 
       double precision,parameter    :: bound = 0.0d0

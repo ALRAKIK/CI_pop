@@ -121,9 +121,7 @@ subroutine kinetic_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
         do j = i , number_of_functions
           kinetic(j,i) = kinetic(i,j)
         end do 
-      end do 
-
-
+      end do
 
 
 end subroutine kinetic_matrix_toroidal

@@ -12,7 +12,8 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
       double precision,parameter     :: pi  = acos(-1.d0)
 
-      double precision               :: distance_between_unitcells, L
+      double precision               :: distance_between_unitcells
+      double precision               :: Lx , Ly , Lz
       double precision               :: rx, theta
 
       double precision,allocatable   ::  geometry_unitcell(:,:)
@@ -39,7 +40,7 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
       open(1,file="unitcell.mol")
 
       read(1,*) type_of_calculation, number_of_unitcell,                &
-              & distance_between_unitcells, L
+              & distance_between_unitcells, Lx , Ly , Lz 
 
       if (type_of_calculation == "Ring") then
         write(*,'(a)') "Type of calculation: Ring"
@@ -172,9 +173,9 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
       open(3,file="torus_parameters.inp")
         if (keyword(4) == 'Angstrom') then 
-          write(3,*) L * 1.8897261249935897D00
+          write(3,*) Lx * 1.8897261249935897D00 , Ly * 1.8897261249935897D00 , Lz * 1.8897261249935897D00 
         else
-          write(3,*) L
+          write(3,*) Lx , Ly , Lz
         end if
         write(3,*) num_atoms
       close(3)
@@ -183,7 +184,7 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
       if (type_of_calculation == "Ring") then 
 
         atom_index = 0
-        rx         = L / (2.d0*pi) 
+        rx         = Lx / (2.d0*pi) 
 
         do i = 0, number_of_unitcell-1
           do j = 1, num_atoms
@@ -206,9 +207,9 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
         open(3,file="torus_parameters.inp")
           if (keyword(4) == 'Angstrom') then 
-            write(3,*) L * 1.8897261249935897D00
+            write(3,*) Lx * 1.8897261249935897D00 , Ly * 1.8897261249935897D00 , Lz * 1.8897261249935897D00
           else
-            write(3,*) L
+            write(3,*) Lx , Ly , Lz
           end if
           write(3,*) num_atoms
         close(3)

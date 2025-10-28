@@ -91,7 +91,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ax3 = ax2 * ax
       ax4 = ax3 * ax
 
-      sf  = 30.d0
+      sf  = 0.d0
 
       select case (pattern_id)
         

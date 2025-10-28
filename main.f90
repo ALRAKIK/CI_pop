@@ -80,7 +80,7 @@ program CI
 
       call read_geometry(n_atoms,charge_tmp,geometry_tmp,               &
       &                  calculation_type,label_tmp)
-
+      
       ! --------------------------------------------------------------- !
       !           prepare the folder to write the output files          !
       ! --------------------------------------------------------------- !
@@ -96,6 +96,9 @@ program CI
       &   calculation_type == "Tori2D" .or.                             & 
       &   calculation_type == "Tori3D")                                 &
       &   call Torus_def()
+
+
+      print*, Lx , Ly , Lz 
 
       ! --------------------------------------------------------------- !
 
@@ -139,17 +142,14 @@ program CI
       if (calculation_type == "Tori1D" .or. &
       &   calculation_type == "Tori2D" .or. &
           calculation_type == "Tori3D" ) then 
+
         call basis_tor(n_atoms,charge,atoms,norm_helper,calculation_type)
+
       else
+
         call basis(n_atoms,charge,atoms)
+
       end if 
-
-
-
-
-
-
-
 
       n_electron = 0 
       do i = 1 , n_atoms
@@ -194,8 +194,6 @@ program CI
 
       ! --------------------------------------------------------------- !
 
-      
-
       if (calculation_type == "Tori1D" .or.                             &
       &   calculation_type == "Tori2D" .or.                             & 
       &   calculation_type == "Tori3D") then 
@@ -214,10 +212,16 @@ program CI
 
       write(outfile,'(A,I10)')'The number of AO functions            :',&
       &                        number_of_functions 
-      !write(outfile,'(A,I10)')'The number of the Gaussian primitives :',&
-      !&                        number_of_primitives
-      !write(outfile,'(A,I10)')'The number of shells                  :',&
-      !&                        number_of_shells
+
+      write(outfile,'(A)')
+
+      write(outfile,'(A,I10)')'The number of the Gaussian primitives :',&
+      &                        number_of_primitives
+
+      write(outfile,'(A)')
+
+      write(outfile,'(A,I10)')'The number of shells                  :',&
+      &                        number_of_shells
 
       write(outfile,'(A)')
 
@@ -268,7 +272,7 @@ program CI
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       if (c_plot) then 
-        call plot(n_atoms,geometry,calculation_type)
+        call plot(n_atoms,geometry,atoms)
       end if 
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -291,7 +295,7 @@ program CI
           case ("Tori2D")
             call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)                    ! Real Toroidal 2D Gaussian
           case ("Tori3D")
-            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry)                    ! Real Toroidal 3D Gaussian  
+            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)                    ! Real Toroidal 3D Gaussian  
           case default
             write(outfile,'(A)') 'Unknown calculation type: ',          &
             &                     trim(calculation_type)
@@ -344,7 +348,7 @@ program CI
       !call matout(nBas,nBas,S)
 
 
-      if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) then 
+      if (calculation_type == "Tori2D" ) then 
         call get_X_from_overlap_2D(nBAS,S,X)
       else 
         call get_X_from_overlap(nBAS,S,X)
@@ -356,7 +360,7 @@ program CI
       !                                                                  !
       ! ---------------------------------------------------------------- ! 
  
-      if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) E_nuc = 0.d0 
+      !if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) E_nuc = 0.d0 
       
         call cpu_time(start)
           call RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
@@ -378,32 +382,32 @@ program CI
       !-----------------------------------------------------------------!
 
 
-      if (calculation_type == "Tori2D" .or. calculation_type == "OBC2D" .or. calculation_type == "Tori3D" ) then
+      !if (calculation_type == "Tori2D" .or. calculation_type == "OBC2D" .or. calculation_type == "Tori3D" ) then
 
-        Hc(:,:) = T(:,:)
+      !  Hc(:,:) = T(:,:)
 
       !-----------------------------------------------------------------!
       ! AO to MO transformation
       !-----------------------------------------------------------------!
 
-        allocate(ERI_MO(nBas,nBas,nBas,nBas))
-        allocate(Hc_MO(nBas,nBas))
-        call cpu_time(start)
-        call AO_to_MO_HC (nBas,c,HC,HC_MO)
-        call AO_to_MO_ERI(nBas,c,ERI,ERI_MO)
-        call cpu_time(end)
+      !  allocate(ERI_MO(nBas,nBas,nBas,nBas))
+      !  allocate(Hc_MO(nBas,nBas))
+      !  call cpu_time(start)
+      !  call AO_to_MO_HC (nBas,c,HC,HC_MO)
+      !  call AO_to_MO_ERI(nBas,c,ERI,ERI_MO)
+      !  call cpu_time(end)
     
-        time = end - start
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',time,' seconds'
-        write(outfile,*)
+      !  time = end - start
+      !  write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',time,' seconds'
+      !  write(outfile,*)
     
       !-----------------------------------------------------------------!
       ! FCI Energy calculation
       !-----------------------------------------------------------------!
 
-      call FCI(Hc_MO,ERI_MO,nBAS,E_nuc)
+      !call FCI(Hc_MO,ERI_MO,nBAS,E_nuc)
         
-      end if
+      !end if
 
       ! ---------------------------------------------------------------- !
       ! ---------------------------------------------------------------- !

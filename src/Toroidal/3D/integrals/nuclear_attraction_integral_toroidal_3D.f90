@@ -104,14 +104,17 @@ subroutine integrate_NA_ss_Toroidal_3D(xpC,ypC,zpC, &
       implicit none
     
       ! Input parameters
+
       double precision, intent(in)  ::     XpC ,     YpC ,     ZpC 
       double precision, intent(in)  :: gamma_x , gamma_y , gamma_z 
       double precision, intent(in)  :: albe
       
       ! Output parameters
+
       double precision, intent(out) :: result
     
       ! Local variables
+      
       double precision,parameter    :: epsabs = 1.0e-8 , epsrel = 1.0e-6
       integer,parameter             :: inf = 1 
       double precision,parameter    :: bound = 0.0d0

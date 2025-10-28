@@ -1,4 +1,4 @@
-subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_functions,geometry,atoms,AO)
+subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_functions,geometry,atoms,AO,NA)
 
       use files
       use torus_init
@@ -21,16 +21,17 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
 
       double precision               :: geometry(number_of_atoms,3)
 
-      double precision,allocatable   :: NA(:,:)
       double precision               :: r1(3) , r2(3)
 
       double precision,parameter     :: pi = dacos(-1.d0)
 
+      ! output ! 
+
+      double precision,intent(out)   :: NA(number_of_functions,number_of_functions)
+
       !-----------------------------------------------------------------!
 
       
-      allocate(NA(number_of_functions,number_of_functions))
-
       NA(:,:) = 0.d0 
     
       index_atom1 = atoms(1)%num_s_function + 3*atoms(1)%num_p_function
@@ -71,7 +72,7 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
 
       do i = 1 , index_unitcell
         do j = 1 , number_of_functions
-          if (abs(NA(i,j)) < 1e-10) NA(i,j) = 0.d0 
+          if (abs(NA(i,j)) < 1e-15) NA(i,j) = 0.d0 
         end do 
       end do 
 
@@ -85,26 +86,7 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
         do j = i , number_of_functions
           NA(j,i) = NA(i,j)
         end do 
-      end do 
-
-      !open(1,file="./tmp/NA.dat")
-      open(1,file=trim(tmp_file_name)//"/NA.dat ")
-        do i = 1 , size(NA,1)
-          do j = i , size(NA,1)
-            if (abs(NA(i,j)) > 1e-8 ) write(1,*) i , j ,  NA(i,j)
-          end do 
-        end do 
-      close(1)
-
-      !open(1,file="./tmp/NA_matrix.dat")
-      open(1,file=trim(tmp_file_name)//"/NA_matrix.dat ")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(NA,1))
-      do i = 1 , size(NA,1)
-        write(1,'(i3,6x,1000(f16.12,2x))') i , (NA(i,j),j=1,size(NA,1))
-      end do 
-      close(1)
-
-      deallocate(NA)
+      end do
 
 
 end subroutine nuclear_attraction_matrix_toroidal_3D

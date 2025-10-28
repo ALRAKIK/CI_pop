@@ -1,4 +1,4 @@
-subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,AO)
+subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,AO,overlap)
 
       use files
       use atom_basis
@@ -20,15 +20,16 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       type(ERI_function)           :: AO (number_of_functions)
       type(ERI_function)           :: AO1 , AO2
 
-      double precision,allocatable :: overlap(:,:)
       double precision             :: r1(3) , r2(3)
 
 
       double precision,parameter   :: pi = 3.14159265358979323846D00
 
-      !-----------------------------------------------------------------!
+      ! output !
 
-      allocate(overlap(number_of_functions,number_of_functions))
+      double precision,intent(out) :: overlap(number_of_functions,number_of_functions)
+
+      !-----------------------------------------------------------------!
 
       overlap(:,:) = 0.d0
 
@@ -75,6 +76,12 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
+      do i = 1 , index_unitcell
+        do j = 1 , number_of_functions
+          if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
+        end do 
+      end do 
+
       do i = index_unitcell + 1   , number_of_functions
         do j = index_unitcell + 1 , number_of_functions
           overlap(i,j) = overlap(i-index_unitcell,j-index_unitcell)
@@ -85,26 +92,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
         do j = i , number_of_functions
           overlap(j,i) = overlap(i,j)
         end do 
-      end do 
-
-      !open(1,file="./tmp/OV.dat")
-      open(1,file=trim(tmp_file_name)//"/OV.dat ")
-        do i = 1 , size(overlap,1)
-          do j = i , size(overlap,1)
-            if (abs(overlap(i,j)) > 1e-8 ) write(1,*) i , j , overlap(i,j)
-          end do 
-        end do 
-      close(1)
-
-      !open(1,file="./tmp/OV_matrix.dat")
-      open(1,file=trim(tmp_file_name)//"/OV_matrix.dat")
-      write(1,'(15x,1000(i3,15x))') (i,i=1,size(overlap,1))
-      do i = 1 , size(overlap,1)
-        write(1,'(i3,6x,1000(f16.12,2x))') i ,  (overlap(i,j),j=1,size(overlap,1))
-      end do 
-      close(1)
-
-      deallocate(overlap)
+      end do
 
 end subroutine overlap_matrix_toroidal_3D
 

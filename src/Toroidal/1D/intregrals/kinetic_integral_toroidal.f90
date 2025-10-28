@@ -25,6 +25,7 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       double precision               :: I_1_gamma_x
       double precision               :: I_2_gamma_x
       double precision               :: X_k , Y_k , z_k
+      double precision               :: ax2
       
       !-----------------------------------------------------------------!
 
@@ -35,6 +36,8 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       X            = (x1 - x2)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
+
+      ax2         = ax * ax 
 
       !-----------------------------------------------------------------!
 
@@ -49,15 +52,15 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
           gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
 
-          I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
-          I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
-          I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
+          I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax2))
+          I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax2))
+          I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax2))
 
-          xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
+          xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2))
 
-          X_k =  beta * (pi/(alpha+beta)) * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * Lx * (cos(ax*(xp-x2)) * I_1_gamma_x + (beta/ax**2) * ( cos(2*ax*(xp-x2)) * I_2_gamma_x - I_0_gamma_x ) )
-          Y_k =  beta * (pi/(alpha+beta)) * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * Lx * (1-beta/(alpha+beta)) * I_0_gamma_x
-          Z_k =  beta * (pi/(alpha+beta)) * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * Lx * (1-beta/(alpha+beta)) * I_0_gamma_x
+          X_k =  beta * (pi/(alpha+beta)) * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * Lx * (dcos(ax*(xp-x2)) * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+          Y_k =  beta * (pi/(alpha+beta)) * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * Lx * (1-beta/(alpha+beta)) * I_0_gamma_x
+          Z_k =  beta * (pi/(alpha+beta)) * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * Lx * (1-beta/(alpha+beta)) * I_0_gamma_x
 
           S_ss_normal =  S_ss_normal + c1 * c2 * (X_k+Y_k+Z_k)
 

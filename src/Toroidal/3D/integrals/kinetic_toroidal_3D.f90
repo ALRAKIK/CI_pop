@@ -1,4 +1,4 @@
-subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,AO)
+subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,AO,kinetic)
 
       use files 
       use torus_init
@@ -20,12 +20,13 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       type(ERI_function)           :: AO1 , AO2
 
 
-      double precision,allocatable :: kinetic(:,:)
       double precision             :: r1(3) , r2(3)
 
-      !-----------------------------------------------------------------!
+      ! output ! 
 
-      allocate(kinetic(number_of_functions,number_of_functions))
+      double precision,intent(out) :: kinetic(number_of_functions,number_of_functions)
+
+      !-----------------------------------------------------------------!
 
       kinetic(:,:) = 0.d0 
 
@@ -73,6 +74,13 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
+      do i = 1 , index_unitcell
+        do j = 1 , number_of_functions
+          if (abs(kinetic(i,j)) < 1e-15) kinetic(i,j) = 0.d0 
+        end do 
+      end do
+
+      
       do i = index_unitcell + 1   , number_of_functions
         do j = index_unitcell + 1 , number_of_functions
           kinetic(i,j) = kinetic(i-index_unitcell,j-index_unitcell)
@@ -83,25 +91,6 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
         do j = i , number_of_functions
           kinetic(j,i) = kinetic(i,j)
         end do 
-      end do 
-
-      !open(1,file="./tmp/KI.dat")
-      open(1,file=trim(tmp_file_name)//"/KI.dat ")
-      do i = 1 , size(kinetic,1)
-        do j = i , size(kinetic,1)
-          if (abs(kinetic(i,j)) > 1e-8 ) write(1,*) i, j , kinetic(i,j)
-        end do 
-      end do 
-      close(1)
-
-      !open(1,file="./tmp/KI_matrix.dat")
-      open(1,file=trim(tmp_file_name)//"/KI_matrix.dat")
-        write(1,'(15x,1000(i3,15x))') (i,i=1,size(kinetic,1))
-        do i = 1 , size(kinetic,1)
-          write(1,'(i3,6x,1000(f16.12,2x))') i ,   (kinetic(i,j),j=1,size(kinetic,1))
-        end do 
-      close(1)
-
-      deallocate(kinetic)
+      end do
 
 end subroutine kinetic_matrix_toroidal_3D

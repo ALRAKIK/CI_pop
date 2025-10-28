@@ -19,12 +19,27 @@ subroutine NRE(calculation_type,number_of_atoms,geometry,atoms,E)
 
         do i = 1 , number_of_atoms-1 
           do j = i+1 , number_of_atoms
+            
             x  = geometry(i,1) - geometry(j,1)
-            if (calculation_type == "Tori1D" )  x  = (dsqrt(2.d0 * (1.d0 - dcos(ax*x)) / (ax * ax)))
             y  = geometry(i,2) - geometry(j,2)
-            if (calculation_type == "Tori2D")   y  = (dsqrt(2.d0 * (1.d0 - dcos(ay*y)) / (ay * ay)))
             z  = geometry(i,3) - geometry(j,3)
-            if (calculation_type == "Tori3D")   z  = (dsqrt(2.d0 * (1.d0 - dcos(az*z)) / (az * az)))
+
+            if (calculation_type == "Tori1D" ) then 
+              x  = (dsqrt(2.d0 * (1.d0 - dcos(ax*x)) / (ax * ax)))
+            end if 
+            
+            if (calculation_type == "Tori2D") then
+              x  = (dsqrt(2.d0 * (1.d0 - dcos(ax*x)) / (ax * ax)))  
+              y  = (dsqrt(2.d0 * (1.d0 - dcos(ay*y)) / (ay * ay)))
+            end if 
+
+            if (calculation_type == "Tori3D") then 
+              x  = (dsqrt(2.d0 * (1.d0 - dcos(ax*x)) / (ax * ax)))
+              y  = (dsqrt(2.d0 * (1.d0 - dcos(ay*y)) / (ay * ay)))
+              z  = (dsqrt(2.d0 * (1.d0 - dcos(az*z)) / (az * az)))
+            end if 
+
+
             dist =  x*x+y*y+z*z
             dist = dsqrt(dist)
             E = E + atoms(i)%charge*atoms(j)%charge/dist
