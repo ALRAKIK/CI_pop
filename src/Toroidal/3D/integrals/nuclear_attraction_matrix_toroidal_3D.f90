@@ -10,7 +10,6 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
       !-----------------------------------------------------------------!
 
       integer                        :: i , j , k , l
-      integer                        :: index_atom1 , index_unitcell 
       integer                        :: number_of_atoms
       integer                        :: number_of_functions 
 
@@ -33,16 +32,8 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
 
       
       NA(:,:) = 0.d0 
-    
-      index_atom1 = atoms(1)%num_s_function + 3*atoms(1)%num_p_function
-
-      index_unitcell = 0 
-
-      do i = 1 , number_of_atom_in_unitcell
-        index_unitcell = index_unitcell  + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
-      end do 
-
-      do i = 1 , index_unitcell 
+  
+      do i = 1 , number_of_functions
         do j = 1 , number_of_functions
         
           AO1 = AO(i)
@@ -65,25 +56,14 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
         end do 
       end do 
 
-      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
-      !                    symmetry of the integrals                    !
-      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+!      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+!      !                    symmetry of the integrals                    !
+!      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
       
 
-      do i = 1 , index_unitcell
+      do i = 1 , number_of_functions - 1
         do j = 1 , number_of_functions
           if (abs(NA(i,j)) < 1e-15) NA(i,j) = 0.d0 
-        end do 
-      end do 
-
-      do i = index_unitcell + 1   , number_of_functions
-        do j = index_unitcell + 1 , number_of_functions
-          NA(i,j) = NA(i-index_unitcell,j-index_unitcell)
-        end do 
-      end do 
-
-      do i = 1 , number_of_functions - 1 
-        do j = i , number_of_functions
           NA(j,i) = NA(i,j)
         end do 
       end do

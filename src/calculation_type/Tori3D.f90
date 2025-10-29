@@ -17,6 +17,8 @@ subroutine Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       ! - local - !
 
       double precision               :: start,end,time
+      integer                        :: i 
+      integer                        :: functions_per_atom
 
       ! - output - ! 
 
@@ -35,14 +37,13 @@ subroutine Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       write(outfile,'(a,f16.8,a,f16.8,a,f16.8,a)') "The length of the box:  Lx , Ly , Lz  = (", Lx ," , ", Ly ," , ",Lz, " )"  
       write(outfile,*) ""
 
-
       call cpu_time(start)
 
-        call overlap_matrix_toroidal_3D(n_atoms,number_of_functions,atoms,AO,OV)
-        call check_the_overlap(number_of_functions,OV)
-        call kinetic_matrix_toroidal_3D(n_atoms,number_of_functions,atoms,AO,K)
-        call nuclear_attraction_matrix_toroidal_3D(n_atoms,number_of_functions,geometry,atoms,AO,NA)
-        call ERI_integral_toroidal_3D(n_atoms,geometry,number_of_functions,atoms,ERI)
+      call overlap_matrix_toroidal_3D(n_atoms,number_of_functions,atoms,AO,OV)
+      call check_the_overlap(number_of_functions,OV)
+      call kinetic_matrix_toroidal_3D(n_atoms,number_of_functions,atoms,AO,K)
+      call nuclear_attraction_matrix_toroidal_3D(n_atoms,number_of_functions,geometry,atoms,AO,NA)
+      call ERI_integral_toroidal_3D(n_atoms,geometry,number_of_functions,atoms,ERI)
                 
       call cpu_time(end)
 

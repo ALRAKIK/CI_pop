@@ -9,9 +9,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 
       !-----------------------------------------------------------------!
 
-      integer                      :: i , j , k , l 
-      integer                      :: index_atom1 , index_sym
-      integer                      :: index_unitcell
+      integer                      :: i , j , k , l
       integer                      :: number_of_atoms
       integer                      :: number_of_functions
 
@@ -33,23 +31,9 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 
       overlap(:,:) = 0.d0
 
-      index_atom1 = atoms(1)%num_s_function + 3*atoms(1)%num_p_function
-      
-      index_unitcell = 0
-
-      do i = 1 , number_of_atom_in_unitcell
-        index_unitcell = index_unitcell  + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
-      end do
-
-      index_sym   = 0
-
-      do i = 1 , number_of_atoms/2 + 1
-        index_sym = index_sym + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
-      end do
-
       ! --------------------------------------------------------------- !
 
-      do i = 1 , index_unitcell
+      do i = 1 , number_of_functions
         do j = i , number_of_functions
 
           AO1 = AO(i)
@@ -72,28 +56,25 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
         end do 
       end do 
 
-      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
-      !                    symmetry of the integrals                    !
-      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+!      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+!      !                    symmetry of the integrals                    !
+!      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      do i = 1 , index_unitcell
+      do i = 1 , number_of_functions - 1 
         do j = 1 , number_of_functions
           if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
-        end do 
-      end do 
-
-      do i = index_unitcell + 1   , number_of_functions
-        do j = index_unitcell + 1 , number_of_functions
-          overlap(i,j) = overlap(i-index_unitcell,j-index_unitcell)
+          overlap(j,i) = overlap(i,j)
         end do 
       end do 
  
-      do i = 1 , number_of_functions - 1 
-        do j = i , number_of_functions
-          overlap(j,i) = overlap(i,j)
-        end do 
-      end do
 
 end subroutine overlap_matrix_toroidal_3D
 
       !-----------------------------------------------------------------!
+
+
+
+
+
+
+

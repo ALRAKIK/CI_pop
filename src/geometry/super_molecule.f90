@@ -99,7 +99,7 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
       end do
 
-      max_atoms = 100
+      max_atoms = 5000
 
       allocate(atom_names(max_atoms))
       allocate(geometry_unitcell(max_atoms,3))

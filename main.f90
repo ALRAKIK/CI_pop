@@ -295,7 +295,7 @@ program CI
           case ("Tori2D")
             call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)                    ! Real Toroidal 2D Gaussian
           case ("Tori3D")
-            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)                    ! Real Toroidal 3D Gaussian  
+            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)          ! Real Toroidal 3D Gaussian  
           case default
             write(outfile,'(A)') 'Unknown calculation type: ',          &
             &                     trim(calculation_type)

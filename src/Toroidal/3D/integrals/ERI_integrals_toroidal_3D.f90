@@ -105,7 +105,7 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
               const_y = dexp(2.d0*( mu_y + nu_y - mu - nu )*inv_ay2)
               const_z = dexp(2.d0*( mu_z + nu_z - mu - nu )*inv_az2)
 
-              if ( (const_x*const_y*const_z < 1.d-15 )  ) cycle
+              if ( (const_x*const_y*const_z < 1.d-30 )  ) cycle
 
               xpA     = ax*(xp - xa) ; ypA     = ay*(yp - ya) ; zpA     = az*(zp - za)
               xpB     = ax*(xp - xb) ; ypB     = ay*(yp - yb) ; zpB     = az*(zp - zb) 
