@@ -5,10 +5,10 @@ subroutine read_geometry(number_of_atoms,charge,geometry,calculation_type,type)
 
       integer                       :: i 
       integer                       :: number_of_atoms
-      double precision              :: geometry(100,3)
-      integer                       :: charge(100)
+      double precision              :: geometry(5000,3)
+      integer                       :: charge(5000)
       character(len=10),intent(out) :: calculation_type
-      character(len=2)              :: type(100)
+      character(len=2)              :: type(5000)
       
       
       open(1,file="supermolecule.mol")
