@@ -12,6 +12,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       integer                      :: i , j , k , l
       integer                      :: number_of_atoms
       integer                      :: number_of_functions
+      integer                      :: fpuc
 
       type(atom)                   :: atoms(number_of_atoms)
 
@@ -19,13 +20,22 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       type(ERI_function)           :: AO1 , AO2
 
       double precision             :: r1(3) , r2(3)
-
-
-      double precision,parameter   :: pi = 3.14159265358979323846D00
+      
 
       ! output !
 
+      double precision             :: overlap_tmp(number_of_functions,number_of_functions)
       double precision,intent(out) :: overlap(number_of_functions,number_of_functions)
+
+      !-----------------------------------------------------------------!
+
+      ! functions_per_unitcell ! 
+
+      fpuc = 0 
+
+      do i = 1 , number_of_atom_in_unitcell 
+        fpuc = fpuc + atoms(i)%num_s_function + atoms(i)%num_p_function
+      end do 
 
       !-----------------------------------------------------------------!
 
@@ -33,8 +43,9 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 
       ! --------------------------------------------------------------- !
 
-      do i = 1 , number_of_functions
-        do j = i , number_of_functions
+      !do i = 1 , number_of_functions
+      do i = 1 , fpuc 
+        do j = 1 , number_of_functions
 
           AO1 = AO(i)
           AO2 = AO(j)
@@ -47,7 +58,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call overlap_integral_ss_toroidal_3D(r1,r2,AO1,AO2,overlap(i,j))
+                call overlap_integral_ss_toroidal_3D(r1,r2,AO1,AO2,overlap_tmp(i,j))
               end do 
             end do 
 
@@ -56,25 +67,17 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
         end do 
       end do 
 
-!      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
-!      !                    symmetry of the integrals                    !
-!      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+      !                    symmetry of the integrals                    !
+      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      do i = 1 , number_of_functions - 1 
-        do j = 1 , number_of_functions
-          if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
-          overlap(j,i) = overlap(i,j)
-        end do 
-      end do 
- 
+        call symmetry_of_integrals(number_of_functions,fpuc,overlap_tmp,overlap)
+
+      ! do i = 1 , number_of_functions - 1 
+      !   do j = 1 , number_of_functions
+      !     if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
+      !     overlap(j,i) = overlap(i,j)
+      !   end do 
+      ! end do 
 
 end subroutine overlap_matrix_toroidal_3D
-
-      !-----------------------------------------------------------------!
-
-
-
-
-
-
-

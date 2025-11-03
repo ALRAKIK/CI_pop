@@ -11,7 +11,8 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
 
       integer                        :: i , j , k , l
       integer                        :: number_of_atoms
-      integer                        :: number_of_functions 
+      integer                        :: number_of_functions
+      integer                        :: fpuc
 
       type(atom)                     :: atoms(number_of_atoms)
 
@@ -25,15 +26,26 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
       double precision,parameter     :: pi = dacos(-1.d0)
 
       ! output ! 
-
+      double precision               :: NA_tmp(number_of_functions,number_of_functions)
       double precision,intent(out)   :: NA(number_of_functions,number_of_functions)
 
       !-----------------------------------------------------------------!
-
       
+      ! functions_per_unitcell ! 
+
+      fpuc = 0 
+
+      do i = 1 , number_of_atom_in_unitcell 
+        fpuc = fpuc + atoms(i)%num_s_function + atoms(i)%num_p_function
+      end do 
+
+      !-----------------------------------------------------------------!
+
       NA(:,:) = 0.d0 
   
-      do i = 1 , number_of_functions
+      !do i = 1 , number_of_functions
+
+      do i = 1 , fpuc
         do j = 1 , number_of_functions
         
           AO1 = AO(i)
@@ -47,7 +59,7 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call nuclear_attraction_integral_ss_toroidal_3D(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
+                call nuclear_attraction_integral_ss_toroidal_3D(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA_tmp(i,j))
               end do 
             end do 
 
@@ -59,14 +71,15 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
 !      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 !      !                    symmetry of the integrals                    !
 !      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
-      
 
-      do i = 1 , number_of_functions - 1
-        do j = 1 , number_of_functions
-          if (abs(NA(i,j)) < 1e-15) NA(i,j) = 0.d0 
-          NA(j,i) = NA(i,j)
-        end do 
-      end do
+        call symmetry_of_integrals(number_of_functions,fpuc,NA_tmp,NA)
+
+      ! do i = 1 , number_of_functions - 1
+      !   do j = 1 , number_of_functions
+      !     if (abs(NA(i,j)) < 1e-15) NA(i,j) = 0.d0 
+      !     NA(j,i) = NA(i,j)
+      !   end do 
+      ! end do
 
 
 end subroutine nuclear_attraction_matrix_toroidal_3D

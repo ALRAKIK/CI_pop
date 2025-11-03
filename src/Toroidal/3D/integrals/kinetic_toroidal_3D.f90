@@ -12,6 +12,7 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       integer                      :: i , j , k , l 
       integer                      :: number_of_atoms
       integer                      :: number_of_functions
+      integer                      :: fpuc
 
       type(atom)                   :: atoms(number_of_atoms)
 
@@ -23,13 +24,26 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 
       ! output ! 
 
+      double precision             :: kinetic_tmp(number_of_functions,number_of_functions)
       double precision,intent(out) :: kinetic(number_of_functions,number_of_functions)
 
       !-----------------------------------------------------------------!
+      
+      ! functions_per_unitcell ! 
+
+      fpuc = 0 
+
+      do i = 1 , number_of_atom_in_unitcell 
+        fpuc = fpuc + atoms(i)%num_s_function + atoms(i)%num_p_function
+      end do 
+
+      !-----------------------------------------------------------------!
+
 
       kinetic(:,:) = 0.d0 
 
-      do i = 1 , number_of_functions
+      do i = 1 , fpuc
+      !do i = 1 , number_of_functions
         do j = 1 , number_of_functions
 
           AO1 = AO(i)
@@ -43,7 +57,7 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
         
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call kinetic_integral_ss_toroidal_3D(r1,r2,AO1,AO2,kinetic(i,j))
+                call kinetic_integral_ss_toroidal_3D(r1,r2,AO1,AO2,kinetic_tmp(i,j))
               end do 
             end do 
 
@@ -56,11 +70,14 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 !      !                    symmetry of the integrals                    !
 !      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      do i = 1 , number_of_functions - 1 
-        do j = 1 , number_of_functions
-          if (abs(kinetic(i,j)) < 1e-15) kinetic(i,j) = 0.d0 
-          kinetic(j,i) = kinetic(i,j)
-        end do 
-      end do
+
+       call symmetry_of_integrals(number_of_functions,fpuc,kinetic_tmp,kinetic)
+
+      ! do i = 1 , number_of_functions - 1 
+      !   do j = 1 , number_of_functions
+      !     if (abs(kinetic(i,j)) < 1e-15) kinetic(i,j) = 0.d0 
+      !     kinetic(j,i) = kinetic(i,j)
+      !   end do 
+      ! end do
 
 end subroutine kinetic_matrix_toroidal_3D

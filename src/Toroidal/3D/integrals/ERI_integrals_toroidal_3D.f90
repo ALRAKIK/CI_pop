@@ -170,7 +170,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 100
+      integer,parameter                  :: Nmax = 10000
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi
       

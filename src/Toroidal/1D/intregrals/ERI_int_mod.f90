@@ -33,7 +33,6 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       integer                            :: ier,last, neval , iwork(limit)
       double precision                   :: abserr, work(lenw)
       integer, parameter                 :: key  = 6
-      double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi
 
       ! ------------------------- local ------------------------------- !
@@ -103,11 +102,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
                   abserr, neval, ier, limit, lenw, last, &
                   iwork, work)
 
-
          if (ier > 2) then
            write(*,'(A,I4)') 'Error code from the case ', pattern_id
            stop 
          end if
+
         
       ! --------------------- one  p function ------------------------- !
 
@@ -665,10 +664,6 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       f           = der_t * integral_t
        
       end function f0000
-
-
-
-
 
       double precision function f0001(theta) Result(f)
 

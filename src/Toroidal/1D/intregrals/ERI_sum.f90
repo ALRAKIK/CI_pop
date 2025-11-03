@@ -25,7 +25,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-14 , epsrel = 1.0e-12
+      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
@@ -69,8 +69,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
       double precision                     :: termC
       COMPLEX(KIND=KIND(1.0D0))            :: term1  , term2 
-      double precision,parameter           :: eta = 1e-40
-
 
 
       A   = 2.d0*p_x/(ax*ax)

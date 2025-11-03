@@ -17,8 +17,6 @@ subroutine Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       ! - local - !
 
       double precision               :: start,end,time
-      integer                        :: i 
-      integer                        :: functions_per_atom
 
       ! - output - ! 
 

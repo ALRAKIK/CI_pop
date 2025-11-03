@@ -22,8 +22,8 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       double precision,allocatable   :: two_eri(:,:,:,:)
       double precision               :: value
       double precision               :: start_time, end_time
-      integer                        :: number_of_functions_per_unitcell 
       integer                        :: index_sym
+      integer                        :: fpuc
 
       integer                        :: days, hours, minutes, seconds , t 
 
@@ -35,13 +35,20 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
       !-----------------------------------------------------------------!
 
+      !-----------------------------------------------------------------!
+
+      ! functions_per_unitcell ! 
+
+      fpuc = 0 
+
+      do i = 1 , number_of_atom_in_unitcell 
+        fpuc = fpuc + atoms(i)%num_s_function + atoms(i)%num_p_function
+      end do 
+
+      !-----------------------------------------------------------------!
+
       call omp_set_dynamic(.false.)
       call omp_set_num_threads(omp_get_max_threads())
-
-      number_of_functions_per_unitcell = 0 
-      do i = 1 , number_of_atom_in_unitcell
-        number_of_functions_per_unitcell = number_of_functions_per_unitcell + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do 
 
       allocate(ERI(number_of_functions))
       allocate(two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
@@ -84,8 +91,8 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
 
       total_ij_pairs = 0
-      !do i = 1, number_of_functions_per_unitcell
-      do i = 1, number_of_functions
+      do i = 1, fpuc
+      !do i = 1, number_of_functions
         do j = i, number_of_functions
           total_ij_pairs = total_ij_pairs + 1
         end do
@@ -96,8 +103,8 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
 
       total_ij_pairs = 0
-      !do i = 1, number_of_functions_per_unitcell
-      do i = 1, number_of_functions
+      do i = 1, fpuc
+      !do i = 1, number_of_functions
         do j = i, number_of_functions
           total_ij_pairs = total_ij_pairs + 1
           i_index(total_ij_pairs) = i
@@ -138,14 +145,14 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
            call ERI_integral_4_function_toroidal_3D(ERI(i),ERI(j),ERI(k),ERI(l), value)
                
-           two_electron(i,j,k,l) = value
-           two_electron(i,j,l,k) = value
-           two_electron(j,i,k,l) = value
-           two_electron(j,i,l,k) = value
-           two_electron(k,l,i,j) = value
-           two_electron(k,l,j,i) = value  
-           two_electron(l,k,i,j) = value
-           two_electron(l,k,j,i) = value
+            two_electron(i,j,k,l) = value
+            two_electron(i,j,l,k) = value
+            two_electron(j,i,k,l) = value
+            two_electron(j,i,l,k) = value
+            two_electron(k,l,i,j) = value
+            two_electron(k,l,j,i) = value  
+            two_electron(l,k,i,j) = value
+            two_electron(l,k,j,i) = value
 
          end if 
        end do
@@ -178,20 +185,20 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      !call shift_integrals(two_electron,two_eri,number_of_functions,number_of_functions_per_unitcell)
+      call symmetry_of_integrals_ERI(number_of_functions,fpuc,two_electron,two_electron_integrals)
 
-      two_electron_integrals = 0.d0
+      ! two_electron_integrals = 0.d0
 
-      !do i = 1, number_of_functions_per_unitcell
-      do i = 1, number_of_functions
-        do j = 1 , number_of_functions
-          do k = 1 , number_of_functions
-            do l = 1 , number_of_functions
-              if (abs(two_electron(i,j,k,l)) > 1e-30 )  two_electron_integrals(i,j,k,l) = two_electron(i,j,k,l) 
-            end do 
-          end do 
-        end do 
-      end do
+      ! !do i = 1, fpuc
+      ! do i = 1, number_of_functions
+      !   do j = 1 , number_of_functions
+      !     do k = 1 , number_of_functions
+      !       do l = 1 , number_of_functions
+      !         if (abs(two_electron(i,j,k,l)) > 1e-30 )  two_electron_integrals(i,j,k,l) = two_electron(i,j,k,l) 
+      !       end do 
+      !     end do 
+      !   end do 
+      ! end do
 
       deallocate(ERI)
       deallocate(two_electron)

@@ -1,6 +1,7 @@
 program CI 
 
       use files
+      use constants_module
       use torus_init
       use atom_basis
       use classification_ERI
@@ -17,9 +18,9 @@ program CI
       integer                         ::            n_atoms , nBAS
       integer                         ::           nO , n_electron 
 
-      double precision                ::       geometry_tmp(100,3)
-      integer                         ::           charge_tmp(100)
-      character*(2)                   ::            label_tmp(100)
+      double precision                ::  geometry_tmp(max_atom,3)
+      integer                         ::      charge_tmp(max_atom)
+      character*(2)                   ::       label_tmp(max_atom)
       integer                         ::           n_atom_unitcell 
       integer                         ::       number_of_functions
       integer                         ::      number_of_primitives
@@ -80,7 +81,7 @@ program CI
 
       call read_geometry(n_atoms,charge_tmp,geometry_tmp,               &
       &                  calculation_type,label_tmp)
-      
+            
       ! --------------------------------------------------------------- !
       !           prepare the folder to write the output files          !
       ! --------------------------------------------------------------- !
@@ -96,9 +97,6 @@ program CI
       &   calculation_type == "Tori2D" .or.                             & 
       &   calculation_type == "Tori3D")                                 &
       &   call Torus_def()
-
-
-      print*, Lx , Ly , Lz 
 
       ! --------------------------------------------------------------- !
 
@@ -415,7 +413,9 @@ program CI
       close(outfile)
 
       call system("rm torus_parameters.inp")
-      call system("rm -r " // trim(tmp_file_name))
+      if ( .not. c_details) then 
+        call system("rm -r " // trim(tmp_file_name))
+      end if 
 
 
       ! --------------------------------------------------------------- !
