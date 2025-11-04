@@ -64,6 +64,37 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 
           end if
 
+          if (AO1%orbital =="s" .and. AO2%orbital == "p") then
+            
+            do k = 1 , size  (AO1%exponent)
+              do l = 1 , size  (AO2%exponent)
+                call overlap_integral_sp_toroidal_3D(r1,r2,AO1,AO2,overlap_tmp(i,j))
+              end do 
+            end do 
+
+          end if
+
+          if (AO1%orbital(:1) == "p" .and. AO2%orbital == "s") then
+                
+            do k = 1, size(AO1%exponent)
+              do l = 1, size(AO2%exponent)
+                call overlap_integral_sp_toroidal_3D(r2, r1, AO2, AO1, overlap(i,j))
+              end do 
+            end do
+
+          end if
+
+          if (AO1%orbital(:1) == "p" .and. AO2%orbital(:1) == "p") then
+                
+            do k = 1, size(AO1%exponent)
+              do l = 1, size(AO2%exponent)
+                call overlap_integral_pp_toroidal_3D(r1, r2, AO1, AO2, overlap(i,j))
+              end do 
+            end do
+
+          end if
+          
+
         end do 
       end do 
 

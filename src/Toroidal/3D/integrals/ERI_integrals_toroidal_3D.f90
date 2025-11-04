@@ -170,7 +170,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
-      integer,parameter                  :: Nmax = 10000
+      integer                            :: Nmax
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi
       
@@ -232,6 +232,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
 
         n         = 0
         sum1      = bessi_scaled(0, AAx) * bessi_scaled(0, BBx) * bessi_scaled(0, CCx)
+        Nmax      = floor(max(AAx,BBx,CCx)) + 20
         do n      = 1 , Nmax
           termAn  = bessi_scaled(n, AAx)
           termBn  = bessi_scaled(n, BBx)
@@ -244,6 +245,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
         
         n         = 0
         sum2      = bessi_scaled(0, AAy) * bessi_scaled(0, BBy) * bessi_scaled(0, CCy)
+        Nmax      = floor(max(AAy,BBy,CCy)) + 20
         do n      = 1 , Nmax
           termAn  = bessi_scaled(n, AAy)
           termBn  = bessi_scaled(n, BBy)
@@ -256,6 +258,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
 
         n         = 0
         sum3      = bessi_scaled(0, AAz) * bessi_scaled(0, BBz) * bessi_scaled(0, CCz)
+        Nmax      = floor(max(AAz,BBz,CCz)) + 20
         do n      = 1 , Nmax
           termAn  = bessi_scaled(n, AAz)
           termBn  = bessi_scaled(n, BBz)
