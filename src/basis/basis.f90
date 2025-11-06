@@ -22,7 +22,7 @@ subroutine basis(number_of_atoms,charge,atoms)
 
 end subroutine basis 
 
-subroutine basis_tor(number_of_atoms,charge,atoms,norm_helper,calculation_type)
+subroutine basis_tor(number_of_atoms,charge,atoms,norm_helper_px,norm_helper_py,norm_helper_pz,calculation_type)
 
       use files
       use atom_basis
@@ -33,7 +33,9 @@ subroutine basis_tor(number_of_atoms,charge,atoms,norm_helper,calculation_type)
       integer          ,intent(in)   :: charge(number_of_atoms)
       character(len=10),intent(in)   :: calculation_type
       type(atom)       ,intent(out)  :: atoms(number_of_atoms)
-      type(atom)       ,intent(out)  :: norm_helper(number_of_atoms)
+      type(atom)       ,intent(out)  :: norm_helper_px(number_of_atoms)
+      type(atom)       ,intent(out)  :: norm_helper_py(number_of_atoms)
+      type(atom)       ,intent(out)  :: norm_helper_pz(number_of_atoms)
 
       integer                        :: i 
 
@@ -54,8 +56,12 @@ subroutine basis_tor(number_of_atoms,charge,atoms,norm_helper,calculation_type)
       do i = 1, number_of_atoms
         atoms(i)%charge = charge(i)
         call read_basis_class_tor(atoms(i),1)
-        norm_helper(i)%charge = charge(i)
-        call read_basis_class_tor(norm_helper(i),2)
+        norm_helper_px(i)%charge = charge(i)
+        norm_helper_py(i)%charge = charge(i)
+        norm_helper_pz(i)%charge = charge(i)
+        call read_basis_class_tor(norm_helper_px(i),2)
+        call read_basis_class_tor(norm_helper_py(i),3)
+        call read_basis_class_tor(norm_helper_pz(i),4)
       end do
 
 end subroutine basis_tor

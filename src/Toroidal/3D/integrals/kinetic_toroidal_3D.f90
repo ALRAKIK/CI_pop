@@ -34,7 +34,7 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       fpuc = 0 
 
       do i = 1 , number_of_atom_in_unitcell 
-        fpuc = fpuc + atoms(i)%num_s_function + atoms(i)%num_p_function
+        fpuc = fpuc + atoms(i)%num_s_function +  3 * atoms(i)%num_p_function
       end do 
 
       !-----------------------------------------------------------------!
@@ -62,6 +62,37 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
             end do 
 
           end if        
+
+          if (AO1%orbital =="s" .and. AO2%orbital(:1) == "p") then
+            
+            do k = 1 , size  (AO1%exponent)
+              do l = 1 , size  (AO2%exponent)
+                call kinetic_integral_sp_toroidal_3D(r1,r2,AO1,AO2,kinetic_tmp(i,j))
+              end do 
+            end do
+
+          end if
+
+          if (AO1%orbital(:1) == "p" .and. AO2%orbital == "s") then
+                
+            do k = 1, size(AO1%exponent)
+              do l = 1, size(AO2%exponent)
+                call kinetic_integral_sp_toroidal_3D(r2, r1, AO2, AO1, kinetic_tmp(i,j))
+              end do 
+            end do
+
+          end if
+
+          if (AO1%orbital(:1) == "p" .and. AO2%orbital(:1) == "p") then
+                
+            do k = 1, size(AO1%exponent)
+              do l = 1, size(AO2%exponent)
+                call kinetic_integral_pp_toroidal_3D(r1, r2, AO1, AO2, kinetic_tmp(i,j))
+              end do 
+            end do
+
+          end if
+
         
         end do 
       end do 
@@ -71,7 +102,7 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 !      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
 
-       call symmetry_of_integrals(number_of_functions,fpuc,kinetic_tmp,kinetic)
+      call symmetry_of_integrals(number_of_functions,fpuc,kinetic_tmp,kinetic)
 
       ! do i = 1 , number_of_functions - 1 
       !   do j = 1 , number_of_functions
@@ -79,5 +110,6 @@ subroutine kinetic_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       !     kinetic(j,i) = kinetic(i,j)
       !   end do 
       ! end do
+
 
 end subroutine kinetic_matrix_toroidal_3D

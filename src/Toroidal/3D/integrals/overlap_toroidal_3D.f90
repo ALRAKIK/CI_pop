@@ -34,7 +34,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       fpuc = 0 
 
       do i = 1 , number_of_atom_in_unitcell 
-        fpuc = fpuc + atoms(i)%num_s_function + atoms(i)%num_p_function
+        fpuc = fpuc + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
       end do 
 
       !-----------------------------------------------------------------!
@@ -64,7 +64,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 
           end if
 
-          if (AO1%orbital =="s" .and. AO2%orbital == "p") then
+          if (AO1%orbital =="s" .and. AO2%orbital(:1) == "p") then
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
@@ -78,7 +78,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
                 
             do k = 1, size(AO1%exponent)
               do l = 1, size(AO2%exponent)
-                call overlap_integral_sp_toroidal_3D(r2, r1, AO2, AO1, overlap(i,j))
+                call overlap_integral_sp_toroidal_3D(r2,r1,AO2,AO1,overlap_tmp(i,j))
               end do 
             end do
 
@@ -88,7 +88,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
                 
             do k = 1, size(AO1%exponent)
               do l = 1, size(AO2%exponent)
-                call overlap_integral_pp_toroidal_3D(r1, r2, AO1, AO2, overlap(i,j))
+                call overlap_integral_pp_toroidal_3D(r1, r2, AO1, AO2, overlap_tmp(i,j))
               end do 
             end do
 
@@ -102,7 +102,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-        call symmetry_of_integrals(number_of_functions,fpuc,overlap_tmp,overlap)
+      call symmetry_of_integrals(number_of_functions,fpuc,overlap_tmp,overlap)
 
       ! do i = 1 , number_of_functions - 1 
       !   do j = 1 , number_of_functions

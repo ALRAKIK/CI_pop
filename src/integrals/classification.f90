@@ -192,10 +192,9 @@ subroutine classification_orbital(number_of_atoms,number_of_functions,geometry,a
   
         end do 
   
-  
 end subroutine classification_orbital
 
-subroutine classification_orbital_tor(number_of_atoms,number_of_functions,geometry,atoms,norm_helper,AO)
+subroutine classification_orbital_tor(number_of_atoms,number_of_functions,geometry,atoms,norm_helper_px,norm_helper_py,norm_helper_pz,AO)
     
         use atom_basis
         use classification_ERI
@@ -203,12 +202,13 @@ subroutine classification_orbital_tor(number_of_atoms,number_of_functions,geomet
   
         implicit none 
   
-
         integer           ,intent(in)   :: number_of_functions
         integer           ,intent(in)   :: number_of_atoms 
         double precision  ,intent(in)   :: geometry(number_of_atoms,3)
         type(atom)        ,intent(in)   :: atoms(number_of_atoms)
-        type(atom)        ,intent(in)   :: norm_helper(number_of_atoms)
+        type(atom)        ,intent(in)   :: norm_helper_px(number_of_atoms)
+        type(atom)        ,intent(in)   :: norm_helper_py(number_of_atoms)
+        type(atom)        ,intent(in)   :: norm_helper_pz(number_of_atoms)
         type(ERI_function),intent(out)  :: AO  (number_of_functions)
 
         integer                         :: i , j , k
@@ -248,7 +248,7 @@ subroutine classification_orbital_tor(number_of_atoms,number_of_functions,geomet
   
             AO(j)%orbital     = "px"
   
-            call filter(atoms(k)%coefficient_p(:,i),atoms(k)%exponent_p,f_array_coef,f_array_expo)
+            call filter(norm_helper_px(k)%coefficient_p(:,i),norm_helper_px(k)%exponent_p,f_array_coef,f_array_expo)
   
             AO(j)%exponent    = f_array_expo
             AO(j)%coefficient = f_array_coef
@@ -263,8 +263,8 @@ subroutine classification_orbital_tor(number_of_atoms,number_of_functions,geomet
             AO(j)%z = geometry(k,3)
   
             AO(j)%orbital     = "py"
-  
-            call filter(norm_helper(k)%coefficient_p(:,i),norm_helper(k)%exponent_p,f_array_coef,f_array_expo)
+
+            call filter(norm_helper_py(k)%coefficient_p(:,i),norm_helper_py(k)%exponent_p,f_array_coef,f_array_expo)
   
             AO(j)%exponent    = f_array_expo
             AO(j)%coefficient = f_array_coef
@@ -280,7 +280,7 @@ subroutine classification_orbital_tor(number_of_atoms,number_of_functions,geomet
   
             AO(j)%orbital     = "pz"
   
-            call filter(norm_helper(k)%coefficient_p(:,i),norm_helper(k)%exponent_p,f_array_coef,f_array_expo)
+            call filter(norm_helper_pz(k)%coefficient_p(:,i),norm_helper_pz(k)%exponent_p,f_array_coef,f_array_expo)
   
             AO(j)%exponent    = f_array_expo
             AO(j)%coefficient = f_array_coef

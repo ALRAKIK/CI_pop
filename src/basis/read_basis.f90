@@ -85,10 +85,14 @@ subroutine read_basis_class_tor(atom_type,num)
 
       found_p                  = .false.
 
-      if (num == 1) then 
-        open(1,file=trim(tmp_file_name)//"/Basis_normalized")
+      if      (num == 2) then 
+        open(1,file=trim(tmp_file_name)//"/Basis_normalized_px")
+      else if (num == 3) then
+        open(1,file=trim(tmp_file_name)//"/Basis_normalized_py")
+      else if (num == 4) then
+        open(1,file=trim(tmp_file_name)//"/Basis_normalized_pz")
       else 
-        open(1,file=trim(tmp_file_name)//"/Basis_normalized_p")
+        open(1,file=trim(tmp_file_name)//"/Basis_normalized")
       end if 
         do 
 

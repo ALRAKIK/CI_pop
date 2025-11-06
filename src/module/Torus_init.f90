@@ -22,9 +22,9 @@ module torus_init
         
         Torus = .TRUE. 
 
-        ax    = 2*pi/Lx
-        ay    = 2*pi/Ly
-        az    = 2*pi/Lz
+        ax    = 2.d0*pi/Lx
+        ay    = 2.d0*pi/Ly
+        az    = 2.d0*pi/Lz
 
       end subroutine Torus_def 
       

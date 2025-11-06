@@ -75,7 +75,6 @@ subroutine overlap_integral_ss_toroidal_3D(r1,r2,AO1,AO2,S_ss_normal)
 end subroutine overlap_integral_ss_toroidal_3D
 
 
-
 subroutine overlap_integral_sp_toroidal_3D(r1,r2,AO1,AO2,S_sp_normal)
 
       use gsl_bessel_mod
@@ -126,15 +125,14 @@ subroutine overlap_integral_sp_toroidal_3D(r1,r2,AO1,AO2,S_sp_normal)
               const       = c1*c2
               const       = sign(dabs(const)**(1.0D0/3.0D0),const)
         
-              gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
-              gamma_y     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(Y)))
-              gamma_z     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(Z)))
+              gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(ax*(X)))
+              gamma_y     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(ay*(Y)))
+              gamma_z     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(az*(Z)))
 
-              xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
-              yp          = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5*Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))  
-              zp          = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5*Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))  
+              xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
+              yp          = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5d0 * Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))  
+              zp          = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5d0 * Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))  
 
-              
               
               I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
               I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
@@ -152,8 +150,6 @@ subroutine overlap_integral_sp_toroidal_3D(r1,r2,AO1,AO2,S_sp_normal)
                 overlap_y   = const * Ly * dexp(-2.d0*(alpha+beta-gamma_y)/ay**2) * I_0_gamma_y
                 overlap_z   = const * Lz * dexp(-2.d0*(alpha+beta-gamma_z)/az**2) * I_0_gamma_z  
                 
-                S_sp_normal =  S_sp_normal + overlap_x * overlap_y * overlap_z  
-
               end if 
 
               
@@ -162,8 +158,6 @@ subroutine overlap_integral_sp_toroidal_3D(r1,r2,AO1,AO2,S_sp_normal)
                 overlap_x   = const * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x
                 overlap_y   = const * Ly * dexp(-2.d0*(alpha+beta-gamma_y)/ay**2) * (dsin(ay*(yp-y2))/ay) * I_1_gamma_y
                 overlap_z   = const * Lz * dexp(-2.d0*(alpha+beta-gamma_z)/az**2) * I_0_gamma_z
-            
-                S_sp_normal =  S_sp_normal + overlap_x * overlap_y * overlap_z
 
               end if
 
@@ -173,10 +167,10 @@ subroutine overlap_integral_sp_toroidal_3D(r1,r2,AO1,AO2,S_sp_normal)
                 overlap_x   = const * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x
                 overlap_y   = const * Ly * dexp(-2.d0*(alpha+beta-gamma_y)/ay**2) * I_0_gamma_y
                 overlap_z   = const * Lz * dexp(-2.d0*(alpha+beta-gamma_z)/az**2) * (dsin(az*(zp-z2))/az) * I_1_gamma_z
-                
-                S_sp_normal =  S_sp_normal + overlap_x * overlap_y * overlap_z
 
               end if 
+
+              S_sp_normal =  S_sp_normal + overlap_x * overlap_y * overlap_z
 
         end do 
       end do
