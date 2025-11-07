@@ -22,7 +22,6 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       double precision,allocatable   :: two_eri(:,:,:,:)
       double precision               :: value
       double precision               :: start_time, end_time
-      integer                        :: index_sym
       integer                        :: fpuc
 
       integer                        :: days, hours, minutes, seconds , t 
@@ -42,7 +41,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       fpuc = 0 
 
       do i = 1 , number_of_atom_in_unitcell 
-        fpuc = fpuc + atoms(i)%num_s_function + atoms(i)%num_p_function
+        fpuc = fpuc + atoms(i)%num_s_function + 3 *  atoms(i)%num_p_function
       end do 
 
       !-----------------------------------------------------------------!
@@ -55,12 +54,6 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       allocate(two_eri(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
 
       call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
-
-      index_sym   = 0 
-    
-      do i = 1 , number_of_atoms/2 + 1 
-        index_sym = index_sym + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
-      end do 
 
       !$omp parallel
       if (omp_get_thread_num() == 0) then

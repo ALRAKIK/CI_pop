@@ -41,7 +41,7 @@ subroutine Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       call check_the_overlap(number_of_functions,OV)
       call kinetic_matrix_toroidal_3D(n_atoms,number_of_functions,atoms,AO,K)
       call nuclear_attraction_matrix_toroidal_3D(n_atoms,number_of_functions,geometry,atoms,AO,NA)
-      !call ERI_integral_toroidal_3D(n_atoms,geometry,number_of_functions,atoms,ERI)
+      call ERI_integral_toroidal_3D(n_atoms,geometry,number_of_functions,atoms,ERI)
                 
       call cpu_time(end)
 
