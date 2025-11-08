@@ -216,7 +216,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
       double precision                     :: AAx,  BBx, CCx
       double precision                     :: AAy,  BBy, CCy
       double precision                     :: AAz,  BBz, CCz
-      double precision                     :: tol  = 1D-12
+      double precision                     :: tol  = 1D-30
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n  
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
@@ -254,21 +254,19 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
 
       AAx   = inv_ax2 * 2.d0 * p_x
       BBx   = inv_ax2 * 2.d0 * q_x
-      !CCx   = inv_ax2 * 2.d0 * t*t
-      CCx   = inv_ax2 * 2.d0 * t
+      CCx   = inv_ax2 * 2.d0 * t*t
+      
 
       AAy   = inv_ay2 * 2.d0 * p_y
       BBy   = inv_ay2 * 2.d0 * q_y
-      !CCy   = inv_ay2 * 2.d0 * t*t
-      CCy   = inv_ay2 * 2.d0 * t
+      CCy   = inv_ay2 * 2.d0 * t*t
 
       AAz   = inv_az2 * 2.d0 * p_z 
       BBz   = inv_az2 * 2.d0 * q_z 
-      !CCz   = inv_az2 * 2.d0 * t*t 
-      CCz   = inv_az2 * 2.d0 * t
+      CCz   = inv_az2 * 2.d0 * t*t 
 
 
-      if (max(CCx, CCy, CCz) > 500.0d0) then
+      if (max(CCx, CCy, CCz) > 1000.0d0) then
         sum = 0.0d0
         return
       end if
@@ -11617,7 +11615,7 @@ end do
       end select
 
 
-      sum = sum1 * sum2 * sum3 * const_x * const_y * const_z / (2.d0*sqrt(t))
+      sum = sum1 * sum2 * sum3 * const_x * const_y * const_z
 
       end function S
 
