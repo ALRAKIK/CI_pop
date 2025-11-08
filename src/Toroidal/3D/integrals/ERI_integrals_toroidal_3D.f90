@@ -105,7 +105,7 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
               const_y = dexp(2.d0*( mu_y + nu_y - mu - nu )*inv_ay2)
               const_z = dexp(2.d0*( mu_z + nu_z - mu - nu )*inv_az2)
 
-              if ( (const_x*const_y*const_z < 1.d-16 )  ) cycle
+              if ( (const_x*const_y*const_z < 1.d-30 )  ) cycle
 
               xpA     = ax*(xp - xa) ; ypA     = ay*(yp - ya) ; zpA     = az*(zp - za)
               xpB     = ax*(xp - xb) ; ypB     = ay*(yp - yb) ; zpB     = az*(zp - zb) 
@@ -163,7 +163,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      double precision,parameter         :: epsabs = 1.0e-12 , epsrel = 1.0e-10
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
@@ -254,22 +254,16 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
 
       AAx   = inv_ax2 * 2.d0 * p_x
       BBx   = inv_ax2 * 2.d0 * q_x
-      CCx   = inv_ax2 * 2.d0 * t*t
+      CCx   = inv_ax2 * 2.d0 * t * t 
       
 
       AAy   = inv_ay2 * 2.d0 * p_y
       BBy   = inv_ay2 * 2.d0 * q_y
-      CCy   = inv_ay2 * 2.d0 * t*t
+      CCy   = inv_ay2 * 2.d0 * t * t 
 
       AAz   = inv_az2 * 2.d0 * p_z 
       BBz   = inv_az2 * 2.d0 * q_z 
-      CCz   = inv_az2 * 2.d0 * t*t 
-
-
-      if (max(CCx, CCy, CCz) > 1000.0d0) then
-        sum = 0.0d0
-        return
-      end if
+      CCz   = inv_az2 * 2.d0 * t * t
 
       AAx   = max(AAx, 1.0d-30)
       BBx   = max(BBx, 1.0d-30)
