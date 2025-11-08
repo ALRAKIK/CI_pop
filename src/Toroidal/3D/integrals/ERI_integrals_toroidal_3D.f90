@@ -362,7 +362,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -406,7 +406,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -450,7 +450,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -494,7 +494,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -510,11 +510,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -538,7 +538,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -582,7 +582,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -626,7 +626,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -670,7 +670,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -686,11 +686,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -714,7 +714,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -758,7 +758,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -802,7 +802,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -846,7 +846,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -862,11 +862,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -890,7 +890,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -906,11 +906,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -934,7 +934,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -950,11 +950,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -978,7 +978,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -994,11 +994,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1022,7 +1022,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1038,11 +1038,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1066,7 +1066,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1110,7 +1110,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1154,7 +1154,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1198,7 +1198,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1214,11 +1214,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1242,7 +1242,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1286,7 +1286,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1330,7 +1330,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1374,7 +1374,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1390,11 +1390,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1418,7 +1418,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1462,7 +1462,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1506,7 +1506,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1550,7 +1550,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1566,11 +1566,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1594,7 +1594,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1610,11 +1610,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1638,7 +1638,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1654,11 +1654,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1682,7 +1682,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1698,11 +1698,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1726,7 +1726,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1742,11 +1742,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1770,7 +1770,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1814,7 +1814,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1858,7 +1858,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1902,7 +1902,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1918,11 +1918,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -1946,7 +1946,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -1990,7 +1990,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2034,7 +2034,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2078,7 +2078,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2094,11 +2094,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -2122,7 +2122,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2166,7 +2166,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2210,7 +2210,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2254,7 +2254,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2270,11 +2270,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -2298,7 +2298,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2314,11 +2314,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -2342,7 +2342,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2358,11 +2358,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -2386,7 +2386,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2402,11 +2402,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -2430,7 +2430,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2446,11 +2446,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -2474,7 +2474,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2518,7 +2518,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2562,7 +2562,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2606,7 +2606,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2622,11 +2622,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -2650,7 +2650,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2694,7 +2694,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2738,7 +2738,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2782,7 +2782,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2798,11 +2798,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -2826,7 +2826,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2870,7 +2870,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2914,7 +2914,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2958,7 +2958,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -2974,11 +2974,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3002,7 +3002,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3018,11 +3018,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3046,7 +3046,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3062,11 +3062,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3090,7 +3090,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3106,11 +3106,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3134,7 +3134,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3150,11 +3150,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3178,7 +3178,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3222,7 +3222,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3266,7 +3266,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3310,7 +3310,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3326,11 +3326,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3354,7 +3354,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3398,7 +3398,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3442,7 +3442,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3486,7 +3486,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3502,11 +3502,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3530,7 +3530,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3574,7 +3574,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3618,7 +3618,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3662,7 +3662,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3678,11 +3678,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3706,7 +3706,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3722,11 +3722,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3750,7 +3750,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3766,11 +3766,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3794,7 +3794,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3810,11 +3810,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3838,7 +3838,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3854,11 +3854,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -3882,7 +3882,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3926,7 +3926,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -3970,7 +3970,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4014,7 +4014,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4030,11 +4030,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4058,7 +4058,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4102,7 +4102,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4146,7 +4146,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4190,7 +4190,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4206,11 +4206,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4234,7 +4234,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4278,7 +4278,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4322,7 +4322,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4366,7 +4366,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4382,11 +4382,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4410,7 +4410,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4426,11 +4426,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4454,7 +4454,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4470,11 +4470,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4498,7 +4498,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4514,11 +4514,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4542,7 +4542,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4558,11 +4558,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4586,7 +4586,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4630,7 +4630,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4674,7 +4674,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4718,7 +4718,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4734,11 +4734,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4762,7 +4762,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4806,7 +4806,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4850,7 +4850,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4894,7 +4894,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4910,11 +4910,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -4938,7 +4938,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -4982,7 +4982,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5026,7 +5026,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5070,7 +5070,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5086,11 +5086,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5114,7 +5114,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5130,11 +5130,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5158,7 +5158,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5174,11 +5174,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5202,7 +5202,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5218,11 +5218,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5246,7 +5246,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5262,11 +5262,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5290,7 +5290,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5334,7 +5334,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5378,7 +5378,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5422,7 +5422,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5438,11 +5438,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5466,7 +5466,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5510,7 +5510,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5554,7 +5554,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5598,7 +5598,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5614,11 +5614,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5642,7 +5642,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5686,7 +5686,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5730,7 +5730,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5774,7 +5774,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5790,11 +5790,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5818,7 +5818,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5834,11 +5834,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5862,7 +5862,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5878,11 +5878,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5906,7 +5906,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5922,11 +5922,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5950,7 +5950,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -5966,11 +5966,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -5994,7 +5994,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6038,7 +6038,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6082,7 +6082,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6126,7 +6126,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6142,11 +6142,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -6170,7 +6170,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6214,7 +6214,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6258,7 +6258,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6302,7 +6302,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6318,11 +6318,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -6346,7 +6346,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6390,7 +6390,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6434,7 +6434,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6478,7 +6478,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6494,11 +6494,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -6522,7 +6522,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6538,11 +6538,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -6566,7 +6566,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6582,11 +6582,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -6610,7 +6610,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6626,11 +6626,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -6654,7 +6654,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6670,11 +6670,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -6698,7 +6698,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6742,7 +6742,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6786,7 +6786,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6830,7 +6830,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6846,11 +6846,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -6874,7 +6874,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6918,7 +6918,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -6962,7 +6962,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7006,7 +7006,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7022,11 +7022,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7050,7 +7050,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7094,7 +7094,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7138,7 +7138,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7182,7 +7182,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7198,11 +7198,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7226,7 +7226,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7242,11 +7242,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7270,7 +7270,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7286,11 +7286,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7314,7 +7314,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7330,11 +7330,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7358,7 +7358,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7374,11 +7374,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7402,7 +7402,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7446,7 +7446,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7490,7 +7490,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7534,7 +7534,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7550,11 +7550,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7578,7 +7578,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7622,7 +7622,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7666,7 +7666,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7710,7 +7710,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7726,11 +7726,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7754,7 +7754,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7798,7 +7798,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7842,7 +7842,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7886,7 +7886,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7902,11 +7902,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7930,7 +7930,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7946,11 +7946,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -7974,7 +7974,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -7990,11 +7990,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8018,7 +8018,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8034,11 +8034,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8062,7 +8062,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8078,11 +8078,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = bessi_scaled(n, AAz) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = bessi_scaled(n, AAz) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = bessi_scaled(n, AAz)
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8106,7 +8106,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8150,7 +8150,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8194,7 +8194,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8238,7 +8238,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8254,11 +8254,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8282,7 +8282,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8326,7 +8326,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8370,7 +8370,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8414,7 +8414,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8430,11 +8430,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8458,7 +8458,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8502,7 +8502,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8546,7 +8546,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8590,7 +8590,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8606,11 +8606,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8634,7 +8634,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8650,11 +8650,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8678,7 +8678,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8694,11 +8694,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8722,7 +8722,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8738,11 +8738,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8766,7 +8766,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8782,11 +8782,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpb *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpb * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8810,7 +8810,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8854,7 +8854,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8898,7 +8898,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8942,7 +8942,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -8958,11 +8958,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -8986,7 +8986,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9030,7 +9030,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9074,7 +9074,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9118,7 +9118,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9134,11 +9134,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -9162,7 +9162,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9206,7 +9206,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9250,7 +9250,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9294,7 +9294,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9310,11 +9310,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -9338,7 +9338,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9354,11 +9354,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -9382,7 +9382,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9398,11 +9398,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -9426,7 +9426,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9442,11 +9442,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -9470,7 +9470,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9486,11 +9486,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -9514,7 +9514,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9558,7 +9558,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9602,7 +9602,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9646,7 +9646,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9662,11 +9662,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -9690,7 +9690,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9734,7 +9734,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9778,7 +9778,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9822,7 +9822,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9838,11 +9838,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -9866,7 +9866,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9910,7 +9910,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9954,7 +9954,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -9998,7 +9998,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10014,11 +10014,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10042,7 +10042,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10058,11 +10058,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10086,7 +10086,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10102,11 +10102,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10130,7 +10130,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10146,11 +10146,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10174,7 +10174,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10190,11 +10190,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10218,7 +10218,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10262,7 +10262,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10306,7 +10306,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10350,7 +10350,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10366,11 +10366,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10394,7 +10394,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10438,7 +10438,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10482,7 +10482,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10526,7 +10526,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10542,11 +10542,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10570,7 +10570,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10614,7 +10614,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10658,7 +10658,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10702,7 +10702,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10718,11 +10718,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10746,7 +10746,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10762,11 +10762,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10790,7 +10790,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10806,11 +10806,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10834,7 +10834,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10850,11 +10850,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10878,7 +10878,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10894,11 +10894,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az * 0.5d0 * (I_dp * czpa *(bessi_scaled(n-1,AAz)-bessi_scaled(n+1,AAz))+ szpa * (bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -10922,7 +10922,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -10966,7 +10966,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11010,7 +11010,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11054,7 +11054,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11070,11 +11070,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -11098,7 +11098,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11142,7 +11142,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11186,7 +11186,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11230,7 +11230,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11246,11 +11246,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -11274,7 +11274,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11318,7 +11318,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11362,7 +11362,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11406,7 +11406,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11422,11 +11422,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))))
-  termBn  = 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqd * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -11450,7 +11450,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11466,11 +11466,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -11494,7 +11494,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11510,11 +11510,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -11538,7 +11538,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11554,11 +11554,11 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))))
-  termBn  = 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))/az
+  termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (bessi_scaled(n-1,BBz)-bessi_scaled(n+1,BBz)) + szqc * (bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
@@ -11582,7 +11582,7 @@ do n      = 1 , Nmax
   termc   = bessi_scaled(n, CCX) 
   term    = exp(I_dp*dble(n)*phix) * termC * termAn * termBn
   if (abs(term) < tol ) exit
-    sum2 = sum2 + 2.d0 * real(term)
+    sum1 = sum1 + 2.d0 * real(term)
 end do
 
 n         = 0
@@ -11598,18 +11598,16 @@ do n      = 1 , Nmax
 end do
 
 n         = 0
-sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az * bessi_scaled(n, CCZ) 
+sum3      = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz)))) * inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz)))) * bessi_scaled(n, CCZ) 
 Nmax      = floor(max(AAz,BBz,CCz)) + 50 
 do n      = 1 , Nmax
   termAn  = inv_az2 * (czpa*czpb*bessi_scaled(n,AAz)-c2zpab*(0.25d0*(bessi_scaled(n-2,AAz)+2.d0*bessi_scaled(n,AAz)+bessi_scaled(n+2,AAz)))+I_dp/AAz*n * s2zpab * (0.5d0*(bessi_scaled(n-1,AAz)+bessi_scaled(n+1,AAz))))
-  termBn  = (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))/az/az
+  termBn  = inv_az2 * (czqc*czqd*bessi_scaled(n,BBz)-c2zqcd*(0.25d0*(bessi_scaled(n-2,BBz)+2.d0*bessi_scaled(n,BBz)+bessi_scaled(n+2,BBz)))-I_dp/BBz*n*s2zqcd*(0.5d0*(bessi_scaled(n-1,BBz)+bessi_scaled(n+1,BBz))))
   termc   = bessi_scaled(n, CCZ) 
   term    = exp(I_dp*dble(n)*phiz) * termC * termAn * termBn
   if (abs(term) < tol ) exit
     sum3 = sum3 + 2.d0 * real(term)
 end do
-
-      
 
 
 
