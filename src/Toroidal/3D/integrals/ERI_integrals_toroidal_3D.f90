@@ -39,6 +39,7 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
       double precision                :: zpA , zpB , zqC , zqD , phiz 
       double precision                :: const_x , const_y , const_z 
       double precision                :: inv_ax2, inv_ay2, inv_az2
+      double precision, parameter     :: machine_eps = 1.0d-16
       integer                         :: pattern_id, encode_orbital_pattern
 
 
@@ -105,7 +106,7 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
               const_y = dexp(2.d0*( mu_y + nu_y - mu - nu )*inv_ay2)
               const_z = dexp(2.d0*( mu_z + nu_z - mu - nu )*inv_az2)
 
-              if ( (const_x*const_y*const_z < 1.d-30 )  ) cycle
+              if ( const_x * const_y * const_z * const < machine_eps ) cycle
 
               xpA     = ax*(xp - xa) ; ypA     = ay*(yp - ya) ; zpA     = az*(zp - za)
               xpB     = ax*(xp - xb) ; ypB     = ay*(yp - yb) ; zpB     = az*(zp - zb) 
@@ -163,7 +164,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-12 , epsrel = 1.0e-10
+      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
@@ -216,7 +217,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
       double precision                     :: AAx,  BBx, CCx
       double precision                     :: AAy,  BBy, CCy
       double precision                     :: AAz,  BBz, CCz
-      double precision                     :: tol  = 1D-30
+      double precision                     :: tol  = 1.0d-16
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n  
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
