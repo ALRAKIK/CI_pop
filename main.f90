@@ -17,6 +17,7 @@ program CI
       integer                         ::                  i ,    j
       integer                         ::            n_atoms , nBAS
       integer                         ::           nO , n_electron 
+      integer                         ::                  non_zero
 
       double precision                ::  geometry_tmp(max_atom,3)
       integer                         ::      charge_tmp(max_atom)
@@ -39,13 +40,12 @@ program CI
       double precision,allocatable    ::                    T(:,:)
       double precision,allocatable    ::                    V(:,:)
       double precision,allocatable    ::                   Hc(:,:)
-      double precision,allocatable    ::                Hc_MO(:,:)
       double precision,allocatable    ::                    X(:,:)
       double precision,allocatable    ::              ERI(:,:,:,:)
-      double precision,allocatable    ::            ERI_p(:,:,:,:)
-      double precision,allocatable    ::           ERI_MO(:,:,:,:)
       double precision,allocatable    ::                      e(:)
       double precision,allocatable    ::                    c(:,:)
+      double precision,allocatable    ::              ERI_spare(:)
+      integer           ,allocatable  ::            ERI_index(:,:)
 
       double precision                ::               E_nuc , EHF
       double precision                ::            start,end,time
@@ -55,6 +55,7 @@ program CI
 
       logical                         :: c_read, c_Integral, c_trexio
       logical                         :: c_Angstrom, c_plot, c_details
+      logical                         :: c_ERI_a 
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
@@ -76,6 +77,7 @@ program CI
       c_Angstrom = any(keyword == 'Angstrom')
       c_plot     = any(keyword == 'Plot')
       c_details  = any(keyword == 'Details')
+      c_ERI_a    = any(keyword == 'ERI_a')
       
       ! --------------------------------------------------------------- !
       !               Read the Geometry, Label and the Charge           !
@@ -260,11 +262,10 @@ program CI
       !               ---------------------------------                 !
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas)) 
+      allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas))
       
-      allocate(ERI  (nBas,nBas,nBas,nBas))
-      allocate(ERI_p(nBas,nBas,nBas,nBas))
-
+      if (.not. c_ERI_a) allocate(ERI  (nBas,nBas,nBas,nBas))
+      
       allocate(X(nBas,nBas),e(nBas),c(nBas,nBas))
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -289,22 +290,54 @@ program CI
         write(outfile,'(A)') 'The integrals will be calculated'
         select case (trim(calculation_type))
           case ("OBC", "Ring", "OBC2D")
-            call molecule(n_atoms,number_of_functions,atoms,geometry,S,T,V,ERI)           ! Molecule 
+            call molecule(n_atoms,number_of_functions,atoms,geometry,S,T,V,ERI)            ! Molecule 
           case ("Torus")
-            call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)                 ! Torus with PBC 
+            call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)                  ! Torus with PBC 
           case ("Tori1D")
-            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)          ! Toroidal 1D Gaussian TRR
+            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)           ! Toroidal 1D Gaussian TRR
           case ("Tori2D")
-            call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)                    ! Real Toroidal 2D Gaussian
+            call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)                     ! Real Toroidal 2D Gaussian
           case ("Tori3D")
-            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)          ! Real Toroidal 3D Gaussian  
+            if (c_ERI_a) then 
+              call Tori3D_sparse(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V)         ! Real Toroidal 3D Gaussian
+            else 
+              call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI,c_ERI_a)   ! Real Toroidal 3D Gaussian
+            end if 
+            
+
+            ! spare ERI test !
+
+            if (c_ERI_a) then 
+            
+              open(1,file=trim(tmp_file_name)//"/ERI_spare.dat")
+                non_zero = 0
+                do 
+                  read(1,*,end=11) i
+                  if (i == 0 ) go to 11 
+                  non_zero = non_zero + 1 
+                enddo
+                11 close(1)
+
+              allocate(ERI_spare(non_zero))
+              allocate(ERI_index(4,non_zero))
+
+              open(1,file=trim(tmp_file_name)//"/ERI_spare.dat")
+                do i = 1 , non_zero 
+                  read(1,*) ERI_index(1,i),ERI_index(2,i),ERI_index(3,i),ERI_index(4,i), ERI_spare(i)
+                enddo
+              close(1)
+
+            end if 
+
+            ! end test ! 
+
           case default
             write(outfile,'(A)') 'Unknown calculation type: ',          &
             &                     trim(calculation_type)
             stop
         end select          
       end if
-        
+
 
       ! --------------------------------------------------------------- !
       !            Read the one and the two electron integrals     
@@ -364,9 +397,15 @@ program CI
  
       !if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) E_nuc = 0.d0 
       
+        if (c_ERI_a) then 
         call cpu_time(start)
-          call RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+          call RHF_sparse(nBas,c_details,c_ERI_a,nO,S,T,V,Hc,non_zero,ERI_spare,ERI_index,X,E_nuc,EHF,e,c)
         call cpu_time(end)
+        else 
+        call cpu_time(start)
+          call RHF(nBas,c_details,c_ERI_a,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+        call cpu_time(end)
+        end if 
 
         time = end - start
 

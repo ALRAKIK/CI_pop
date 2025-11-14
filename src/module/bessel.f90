@@ -33,12 +33,20 @@ contains
       real(c_double)             :: res
       real(c_double)             :: pi     = 3.14159265358979323846D00
 
-      ! if (x < 50.d0) then 
-        res = gsl_sf_bessel_In_scaled(int(n, c_int), x)
-      ! else 
-      !   res = 1.d0/(dsqrt(2.d0*pi*x)) * (1.d0 -  (4.d0*n*n-1)/(8.d0*x) + (4.d0*n*n-1)*(4.d0*n*n-9.d0)/(2.d0*(8.d0*x)**2) - (4.d0*n*n-1.d0)*(4.d0*n*n-9.d0)*(4.d0*n*n-25.d0)/(6.d0*(8.d0*x)**3) )
-      ! end if
+      res = gsl_sf_bessel_In_scaled(int(n, c_int), x)
 
-  end function bessi_scaled
+      end function bessi_scaled
+
+      function bessi(n, x) result(res)
+
+      use, intrinsic :: iso_c_binding
+      integer, intent(in)        :: n
+      real(c_double), intent(in) :: x
+      real(c_double)             :: res
+      real(c_double)             :: pi     = 3.14159265358979323846D00
+
+      res = gsl_sf_bessel_In(int(n, c_int), x)
+
+      end function bessi
   
 end module gsl_bessel_mod

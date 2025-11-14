@@ -336,10 +336,10 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
         call exit(-1)
       end if
 
-      do i = 1 , nBas
-        do j = 1 , nBas
-          do k = 1 , nBas
-            do l = 1 , nBas
+      do l = 1 , nBas
+        do k = 1 , nBas
+          do j = 1 , nBas
+            do i = 1 , nBas
               Eri_p(i,j,k,l) = ERI(i,k,j,l)
             end do 
           end do

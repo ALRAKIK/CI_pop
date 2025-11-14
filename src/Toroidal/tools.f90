@@ -122,7 +122,7 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
       integer                      :: equiv_j, equiv_k, equiv_l
 
       double precision             :: eri_tmp(nf, nf, nf, nf)
-      double precision,intent(out) :: eri(nf, nf, nf, nf)
+      double precision,intent(out) ::     eri(nf, nf, nf, nf)
 
 
       !-----------------------------------------------------------------!
@@ -201,9 +201,6 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
 
 end subroutine symmetry_of_integrals_ERI
 
-
-
-
 subroutine find_cell_and_function(index, fpuc, i_cell, j_cell, k_cell, func_index)
 
       use unitcell_module
@@ -227,3 +224,116 @@ subroutine find_cell_and_function(index, fpuc, i_cell, j_cell, k_cell, func_inde
       i_cell = temp / ny
   
 end subroutine
+
+
+
+subroutine symmetry_of_integrals_ERI_sparse(nf, fpuc, eri_tmp_sparse, eri_index_tmp, non_zero_count, &
+                                           eri_sparse, eri_index)
+
+      use unitcell_module
+
+      implicit none 
+
+      integer                      :: i, j, k, l, idx
+      integer                      :: i_cell, j_cell, k_cell
+      integer                      :: i_shift, j_shift, k_shift
+      integer                      :: m, n, p
+      integer                      :: nf
+      integer                      :: fpuc
+      integer                      :: func_i, func_j, func_k, func_l
+      integer                      :: equiv_j, equiv_k, equiv_l
+      integer                      :: non_zero_count, total_non_zero
+
+      double precision             :: eri_tmp_sparse(non_zero_count)
+      integer                      :: eri_index_tmp(4, non_zero_count)
+      double precision,intent(out) :: eri_sparse(*)
+      integer,intent(out)          :: eri_index(4, *)
+
+      !-----------------------------------------------------------------!
+
+      total_non_zero = 0
+    
+      ! First, copy what you already computed (first index up to fpuc)
+      do idx = 1, non_zero_count
+        i = eri_index_tmp(1, idx)
+        j = eri_index_tmp(2, idx) 
+        k = eri_index_tmp(3, idx)
+        l = eri_index_tmp(4, idx)
+        
+        ! Only keep integrals where first index is in first unit cell
+        if (i <= fpuc) then
+          total_non_zero = total_non_zero + 1
+          eri_index(1, total_non_zero) = i
+          eri_index(2, total_non_zero) = j
+          eri_index(3, total_non_zero) = k
+          eri_index(4, total_non_zero) = l
+          eri_sparse(total_non_zero) = eri_tmp_sparse(idx)
+        end if
+      end do
+
+      ! Now generate the rest using symmetry
+      do i = fpuc + 1, nf
+        ! Find which unit cell and function i corresponds to
+        call find_cell_and_function(i, fpuc, i_cell, j_cell, k_cell, func_i)
+        
+        do j = 1, nf
+          ! Find which unit cell and function j corresponds to  
+          call find_cell_and_function(j, fpuc, i_shift, j_shift, k_shift, func_j)
+          
+          ! Calculate relative shift for j
+          m = modulo(i_shift - i_cell, nx)
+          n = modulo(j_shift - j_cell, ny)  
+          p = modulo(k_shift - k_cell, nz)
+          
+          ! Find equivalent j in reference frame
+          equiv_j = m * ny * nz * fpuc + n * nz * fpuc + p * fpuc + func_j
+          
+          do k = 1, nf
+            ! Find which unit cell and function k corresponds to  
+            call find_cell_and_function(k, fpuc, i_shift, j_shift, k_shift, func_k)
+            
+            ! Calculate relative shift for k
+            m = modulo(i_shift - i_cell, nx)
+            n = modulo(j_shift - j_cell, ny)  
+            p = modulo(k_shift - k_cell, nz)
+            
+            ! Find equivalent k in reference frame
+            equiv_k = m * ny * nz * fpuc + n * nz * fpuc + p * fpuc + func_k
+            
+            do l = 1, nf
+              ! Find which unit cell and function l corresponds to  
+              call find_cell_and_function(l, fpuc, i_shift, j_shift, k_shift, func_l)
+              
+              ! Calculate relative shift for l
+              m = modulo(i_shift - i_cell, nx)
+              n = modulo(j_shift - j_cell, ny)  
+              p = modulo(k_shift - k_cell, nz)
+              
+              ! Find equivalent l in reference frame
+              equiv_l = m * ny * nz * fpuc + n * nz * fpuc + p * fpuc + func_l
+              
+              ! Use the symmetry: (i,j,k,l) = (func_i, equiv_j, equiv_k, equiv_l)
+              if (equiv_j <= nf .and. equiv_k <= nf .and. equiv_l <= nf) then
+                ! Search for this integral in the original sparse storage
+                do idx = 1, non_zero_count
+                  if (eri_index_tmp(1,idx) == func_i .and. &
+                      eri_index_tmp(2,idx) == equiv_j .and. &
+                      eri_index_tmp(3,idx) == equiv_k .and. &
+                      eri_index_tmp(4,idx) == equiv_l) then
+                    
+                    total_non_zero = total_non_zero + 1
+                    eri_index(1, total_non_zero) = i
+                    eri_index(2, total_non_zero) = j
+                    eri_index(3, total_non_zero) = k
+                    eri_index(4, total_non_zero) = l
+                    eri_sparse(total_non_zero) = eri_tmp_sparse(idx)
+                    exit
+                  end if
+                end do
+              end if
+            end do
+          end do
+        end do
+      end do
+
+end subroutine symmetry_of_integrals_ERI_sparse

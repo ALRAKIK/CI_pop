@@ -372,6 +372,8 @@ subroutine read_keywords(keyword)
 
         if (trim(line) == 'Details'  )   keyword(6) = 'Details'
 
+        if (trim(line) == 'ERI_a'  )     keyword(7) = 'ERI_a'
+
       end do
 
 end subroutine
