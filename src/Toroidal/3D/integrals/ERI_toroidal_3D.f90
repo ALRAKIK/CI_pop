@@ -20,19 +20,18 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       double precision               :: geometry(number_of_atoms,3)
       double precision,allocatable   :: two_electron(:,:,:,:)
       double precision               :: value
-      double precision               :: start_time, end_time
       integer                        :: fpuc
-
-      integer                        :: days, hours, minutes, seconds , t 
 
       double precision,intent(out)   :: two_electron_integrals(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
 
+      ! ----------------------    Time     ---------------------------- !
+      integer                        :: days, hours, minutes, seconds , t , time 
+      double precision               :: start,end
+      double precision               :: start_time, end_time
+      !-----------------------------------------------------------------!
       integer                        :: total_ij_pairs, ij_index
       integer, allocatable           :: i_index(:), j_index(:)
       integer                        :: num_threads, optimal_chunk_size
-
-      !-----------------------------------------------------------------!
-
       !-----------------------------------------------------------------!
 
       ! functions_per_unitcell ! 
@@ -50,7 +49,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       call omp_set_num_threads(omp_get_max_threads())
 
       allocate(ERI(number_of_functions))
-      allocate(two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
+      allocate(two_electron(fpuc,number_of_functions,number_of_functions,number_of_functions))
 
       call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
 
@@ -118,6 +117,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       end do
 
       write(outfile,*) 'Need to  compute ', num_total_int, ' unique integrals (Two electron Integrals)'
+      write(*,*)       'Need to  compute ', num_total_int, ' unique integrals (Two electron Integrals)'
       write(outfile,*) ''
       flush(outfile)
 
@@ -136,13 +136,13 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
               call ERI_integral_4_function_toroidal_3D(ERI(i),ERI(j),ERI(k),ERI(l), value)
 
                 two_electron(i,j,k,l) = value
-                two_electron(i,j,l,k) = value
-                two_electron(j,i,k,l) = value
-                two_electron(j,i,l,k) = value
-                two_electron(k,l,i,j) = value
-                two_electron(k,l,j,i) = value
-                two_electron(l,k,i,j) = value
-                two_electron(l,k,j,i) = value
+                !two_electron(i,j,l,k) = value
+                !two_electron(j,i,k,l) = value
+                !two_electron(j,i,l,k) = value
+                !two_electron(k,l,i,j) = value
+                !two_electron(k,l,j,i) = value
+                !two_electron(l,k,i,j) = value
+                !two_electron(l,k,j,i) = value
 
             end if
           end do
@@ -154,11 +154,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       deallocate(i_index, j_index)
 
       end_time = omp_get_wtime()
-      
-      write(outfile,"(a)") ""
-      write(outfile,"(a)") "8-fold symmetry with translation applied to integrals"
-      write(outfile,"(a)") "" 
-
+    
       t = int(end_time - start_time)
       days= (t/86400)
       hours=mod(t,86400)/3600
@@ -173,7 +169,21 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      call symmetry_of_integrals_ERI(number_of_functions,fpuc,two_electron,two_electron_integrals)
+
+      call cpu_time(start)
+        call symmetry_of_integrals_ERI(number_of_functions,fpuc,two_electron,two_electron_integrals)
+      call cpu_time(end)
+
+      time = int(end - start)
+      days = (time/86400)
+      hours=mod(time,86400)/3600
+      minutes=mod(mod(time,86400),3600)/60
+      seconds=mod(mod(mod(time,86400),3600),60)
+
+      write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'CPU time for Translational and 8 fold symmetry = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
+      write(outfile,"(a)") ""
+      write(outfile,"(a)") "8-fold symmetry with translation applied to integrals"
+      write(outfile,"(a)") "" 
 
       ! two_electron_integrals = 0.d0
 
@@ -192,265 +202,3 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       deallocate(two_electron)
 
 end subroutine ERI_integral_toroidal_3D
-
-
-subroutine ERI_integral_toroidal_3D_sparse(number_of_atoms,geometry,number_of_functions,atoms)
-
-      use files
-      use omp_lib
-      use files
-      use torus_init
-      use atom_basis
-      use classification_ERI
-
-      implicit none 
-
-      !-----------------------------------------------------------------!
-
-      integer                        :: i , j , k , l , num_total_int
-      integer                        :: number_of_atoms
-      integer                        :: number_of_functions
-      type(atom)                     :: atoms(number_of_atoms)
-      type(ERI_function),allocatable :: ERI  (:)
-
-      double precision               :: geometry(number_of_atoms,3)
-      double precision,allocatable   :: two_electron(:,:,:,:)
-      double precision               :: value
-      double precision               :: start_time, end_time
-      integer                        :: fpuc
-
-      integer                        :: days, hours, minutes, seconds , t 
-
-      integer                        :: total_ij_pairs, ij_index
-      integer, allocatable           :: i_index(:), j_index(:)
-      integer                        :: num_threads, optimal_chunk_size
-
-
-      double precision,allocatable   :: ERI_spare(:)
-      integer         ,allocatable   :: ERI_index(:,:)
-
-      double precision,allocatable   :: ERI_spare_sym(:)
-      integer         ,allocatable   :: ERI_index_sym(:,:)
-      
-      integer                        :: non_zero_count , total_non_zero_sym
-      integer                        :: percentage
-
-      !-----------------------------------------------------------------!
-
-      !-----------------------------------------------------------------!
-
-      ! functions_per_unitcell ! 
-
-      fpuc = 0 
-
-      do i = 1 , number_of_atom_in_unitcell 
-        fpuc = fpuc + atoms(i)%num_s_function + 3 *  atoms(i)%num_p_function
-      end do 
-
-      total_non_zero_sym = 0 
-
-      do i = fpuc + 1, number_of_functions
-        do j = 1, number_of_functions
-          do k = 1, number_of_functions
-            do l = 1, number_of_functions
-                total_non_zero_sym = total_non_zero_sym + 1
-            end do
-          end do
-        end do
-      end do
-
-      !-----------------------------------------------------------------!
-
-
-      call omp_set_dynamic(.false.)
-      call omp_set_num_threads(omp_get_max_threads())
-
-      allocate(ERI(number_of_functions))
-      allocate(two_electron(number_of_functions,number_of_functions,number_of_functions,number_of_functions))
-
-      call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
-
-      !$omp parallel
-      if (omp_get_thread_num() == 0) then
-        print *, "Running with", omp_get_num_threads(), "threads"
-      endif
-      !$omp end parallel
-
-
-      !$omp parallel
-        !$omp single
-          num_threads = omp_get_num_threads()
-        !$omp end single
-      !$omp end parallel
-
-
-      ! Calculate optimal chunk size based on available threads
-      if (num_threads <= 16) then
-        optimal_chunk_size = 16    ! Good for laptops (8-16 cores)
-      else if (num_threads <= 64) then
-        optimal_chunk_size = 8     ! Good for medium clusters
-      else 
-        optimal_chunk_size = 1     ! Good for large clusters (128+ cores)
-      end if
-
-      start_time = omp_get_wtime()
-
-      ! Precompute all i-j pairs for manual collapse
-
-      total_ij_pairs = 0
-      do i = 1, fpuc
-      !do i = 1, number_of_functions
-        do j = i, number_of_functions
-          total_ij_pairs = total_ij_pairs + 1
-        end do
-      end do
-
-
-      allocate(i_index(total_ij_pairs), j_index(total_ij_pairs))
-
-
-      total_ij_pairs = 0
-      do i = 1, fpuc
-      !do i = 1, number_of_functions
-        do j = i, number_of_functions
-          total_ij_pairs = total_ij_pairs + 1
-          i_index(total_ij_pairs) = i
-          j_index(total_ij_pairs) = j
-        end do
-      end do
-
-      num_total_int = 0
-      do ij_index = 1, total_ij_pairs
-        i = i_index(ij_index)
-        j = j_index(ij_index)
-        do k = 1, number_of_functions
-          do l = k, number_of_functions    
-            if (i <= k .or. (i == k .and. j <= l)) then
-              num_total_int = num_total_int + 1
-            end if
-          end do
-        end do
-      end do
-
-      write(outfile,*) 'Need to  compute ', num_total_int, ' unique integrals (Two electron Integrals)'
-      write(outfile,*) ''
-      flush(outfile)
-
-      !$omp parallel do private(ij_index,i,j,k,l,value) &
-      !$omp shared(two_electron, ERI, i_index, j_index) &
-      !$omp schedule(dynamic,optimal_chunk_size)
-
-      do ij_index = 1, total_ij_pairs
-          i = i_index(ij_index)
-          j = j_index(ij_index)
-        do k = 1, number_of_functions
-          do l = k, number_of_functions
-
-            if (i <= k .or. (i == k .and. j <= l)) then
-
-              call ERI_integral_4_function_toroidal_3D(ERI(i),ERI(j),ERI(k),ERI(l), value)
-
-                two_electron(i,j,k,l) = value
-                two_electron(i,j,l,k) = value
-                two_electron(j,i,k,l) = value
-                two_electron(j,i,l,k) = value
-                two_electron(k,l,i,j) = value
-                two_electron(k,l,j,i) = value
-                two_electron(l,k,i,j) = value
-                two_electron(l,k,j,i) = value
-
-            end if
-          end do
-        end do
-      end do
-      
-      !$omp end parallel do
-
-      deallocate(i_index, j_index)
-
-      end_time = omp_get_wtime()
-      
-      write(outfile,"(a)") ""
-      write(outfile,"(a)") "8-fold symmetry with translation applied to integrals"
-      write(outfile,"(a)") "" 
-
-      t = int(end_time - start_time)
-      days= (t/86400)
-      hours=mod(t,86400)/3600
-      minutes=mod(mod(t,86400),3600)/60
-      seconds=mod(mod(mod(t,86400),3600),60)
-
-      write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') '2 el-integrals calculation time = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
-      write(outfile,"(a)") "" 
-      FLUSH(outfile)
-
-      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
-      !                    Convert to sparse storage                    !
-      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
-
-      ! Count non-zero integrals
-      non_zero_count = 0
-      do i = 1, number_of_functions
-        do j = 1, number_of_functions
-          do k = 1, number_of_functions
-            do l = 1, number_of_functions
-              if (abs(two_electron(i,j,k,l)) > 1.d-12) then
-                non_zero_count = non_zero_count + 1
-              end if
-            end do
-          end do
-        end do
-      end do
-
-      ! Allocate sparse arrays
-      allocate(ERI_spare(non_zero_count))
-      allocate(ERI_index(4,non_zero_count))
-
-      non_zero_count = 0
-      do i = 1, number_of_functions
-        do j = 1, number_of_functions
-          do k = 1, number_of_functions
-            do l = 1, number_of_functions
-              if (abs(two_electron(i,j,k,l)) > 1.d-12) then
-                non_zero_count = non_zero_count + 1
-                ERI_index(1,non_zero_count) = i
-                ERI_index(2,non_zero_count) = j
-                ERI_index(3,non_zero_count) = k
-                ERI_index(4,non_zero_count) = l
-                ERI_spare(non_zero_count) = two_electron(i,j,k,l)
-              end if
-            end do
-          end do
-        end do
-      end do
-
-      write(outfile,*) 'Sparse storage completed successfully'
-      flush(outfile)
-
-
-
-
-      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
-      !                    symmetry of the integrals                    !
-      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
-
-      percentage = ceiling(dble(0.125d0*number_of_functions*number_of_functions*number_of_functions*number_of_functions/num_total_int))
-      allocate(ERI_spare_sym(non_zero_count * percentage ))  ! Conservative estimate
-      allocate(ERI_index_sym(4, non_zero_count * percentage ))
-      call symmetry_of_integrals_ERI_sparse(number_of_functions, fpuc, &
-                                            ERI_spare, ERI_index, non_zero_count, &
-                                            ERI_spare_sym, ERI_index_sym)
-
-      open(1,file=trim(tmp_file_name)//"/ERI_spare.dat")
-      do i = 1, size(ERI_spare_sym)
-        write(1,*) ERI_index_sym(1,i), ERI_index_sym(2,i), &
-                   ERI_index_sym(3,i), ERI_index_sym(4,i), ERI_spare_sym(i)
-      end do
-      close(1)
-
-      deallocate(ERI)
-      deallocate(two_electron)
-      deallocate(ERI_spare, ERI_index)
-
-
-end subroutine ERI_integral_toroidal_3D_sparse

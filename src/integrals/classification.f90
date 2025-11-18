@@ -222,8 +222,8 @@ subroutine classification_orbital_tor(number_of_atoms,number_of_functions,geomet
                 
             j = j + 1
   
-            AO(j)%x = geometry(k,1) 
-            AO(j)%y = geometry(k,2) 
+            AO(j)%x = geometry(k,1)
+            AO(j)%y = geometry(k,2)
             AO(j)%z = geometry(k,3)
   
             AO(j)%orbital     = "s"

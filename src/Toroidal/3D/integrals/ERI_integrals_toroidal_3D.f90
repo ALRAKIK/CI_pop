@@ -101,9 +101,9 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
 
               const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi) * (Lx*Lx) * (Ly*Ly) * (Lz*Lz)  
 
-              const_x = dexp(2.d0*( mu_x + nu_x - mu - nu )*inv_ax2)
-              const_y = dexp(2.d0*( mu_y + nu_y - mu - nu )*inv_ay2)
-              const_z = dexp(2.d0*( mu_z + nu_z - mu - nu )*inv_az2)
+              const_x = dexp(2.d0 * ( mu_x + nu_x - mu - nu )* inv_ax2 )
+              const_y = dexp(2.d0 * ( mu_y + nu_y - mu - nu )* inv_ay2 )
+              const_z = dexp(2.d0 * ( mu_z + nu_z - mu - nu )* inv_az2 )
 
               if ( const_x * const_y * const_z * const < machine_eps ) cycle
 
@@ -163,7 +163,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      double precision,parameter         :: epsabs = 1.0e-12 , epsrel = 1.0e-10
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50

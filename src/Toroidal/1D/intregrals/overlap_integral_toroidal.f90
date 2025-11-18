@@ -47,17 +47,18 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           c2   = AO2%coefficient(j)
 
               const       = c1*c2
-              const       = sign(dabs(const)**(1.0D0/3.0D0),const)
 
-              gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
+              gamma_x     = dsqrt(abs(alpha * alpha  + beta * beta + 2.d0 * alpha * beta * dcos(ax*(X))))
 
+              if ( gamma_x >  alpha+beta  ) gamma_x  =  alpha + beta 
+               
               I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/ax2)
               
-              overlap_x   = const * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * I_0_gamma_x
-              overlap_y   = const * dsqrt(pi/(alpha+beta))
-              overlap_z   = const * dsqrt(pi/(alpha+beta))
+              overlap_x   =      Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * I_0_gamma_x
+              overlap_y   = dsqrt(pi/(alpha+beta))
+              overlap_z   = dsqrt(pi/(alpha+beta))
 
-              S_ss_normal =  S_ss_normal + overlap_x * overlap_y * overlap_z
+              S_ss_normal =  S_ss_normal + const * overlap_x * overlap_y * overlap_z
 
         end do 
       end do

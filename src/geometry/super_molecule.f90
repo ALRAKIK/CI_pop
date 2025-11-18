@@ -114,7 +114,7 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
             super_atoms(atom_index) = a_names(j)
             ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
             super_geometry(atom_index, 1) = unitcell(j, 1)              &
-          &                           + i * distance_between_unitcells
+          &                           + real(i, kind(1.0d0)) * distance_between_unitcells
             ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
             super_geometry(atom_index, 2) = unitcell(j, 2)
             super_geometry(atom_index, 3) = unitcell(j, 3) 
@@ -123,8 +123,8 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
       open(2,file="supermolecule.mol")
         do i = 1, num_atoms * number_of_unitcell
-          write(2, *)       super_atoms(i), super_geometry(i, 1),       &
-          &           super_geometry(i, 2), super_geometry(i, 3)
+          write(2,*)        super_atoms(i), super_geometry(i, 1),       &
+          &                 super_geometry(i, 2), super_geometry(i, 3)
         end do
       close(2)
 
@@ -301,6 +301,8 @@ subroutine read_2nd_line(type_of_calculation, number_of_unitcell,     &
 
         write(*,'(a)') "Type of calculation: OBC"
 
+        read(1,*) number_of_unitcell , distance_between_unitcells, Lx
+
       else if (type_of_calculation == "Tori1D") then 
 
         write(*,'(a)') "Type of calculation: Toroidal"
@@ -330,6 +332,11 @@ subroutine read_2nd_line(type_of_calculation, number_of_unitcell,     &
         write(*,'(a)') ""
         stop
       end if
+
+
+      Lx = dble(Lx)
+      Ly = dble(Ly)
+      Lz = dble(Lz)
 
 end subroutine
 
@@ -371,8 +378,6 @@ subroutine read_keywords(keyword)
         if (trim(line) == 'Plot'     )   keyword(5) = 'Plot'
 
         if (trim(line) == 'Details'  )   keyword(6) = 'Details'
-
-        if (trim(line) == 'ERI_a'  )     keyword(7) = 'ERI_a'
 
       end do
 
