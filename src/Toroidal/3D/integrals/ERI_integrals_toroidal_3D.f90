@@ -163,7 +163,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-12 , epsrel = 1.0e-10
+      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
@@ -273,7 +273,7 @@ subroutine integrate_ERI_3D(pattern_id,p,q,p_x,q_x,phix,const_x,xpA,xpB,xqC,xqD,
 
       implicit none
       double precision, intent(in)         :: t
-      double precision                     :: tol  = 1.0d-8
+      double precision                     :: tol  = 1.0d-16
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n  
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
