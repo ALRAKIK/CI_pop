@@ -130,6 +130,7 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
       eri(:,:,:,:) = 0.d0
     
       ! First, copy what you already computed (first index up to fpuc)
+      
       do i = 1, fpuc
         do j = 1, nf
           do k = 1, nf
@@ -142,6 +143,23 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
               eri(k,l,j,i) = eri_tmp(i,j,k,l)
               eri(l,k,i,j) = eri_tmp(i,j,k,l)
               eri(l,k,j,i) = eri_tmp(i,j,k,l)
+            end do
+          end do
+        end do
+      end do
+
+      do i = 1, nf
+        do j = 1, nf
+          do k = 1, nf
+            do l = 1, nf
+              eri(i,j,k,l) = eri(i,j,k,l)
+              eri(i,j,l,k) = eri(i,j,k,l)
+              eri(j,i,k,l) = eri(i,j,k,l)
+              eri(j,i,l,k) = eri(i,j,k,l)
+              eri(k,l,i,j) = eri(i,j,k,l)
+              eri(k,l,j,i) = eri(i,j,k,l)
+              eri(l,k,i,j) = eri(i,j,k,l)
+              eri(l,k,j,i) = eri(i,j,k,l)
             end do
           end do
         end do
@@ -197,14 +215,14 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
               if (equiv_j <= nf .and. &
                   equiv_k <= nf .and. &
                   equiv_l <= nf) then
-                  eri(i,j,k,l) = eri_tmp(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(i,j,l,k) = eri_tmp(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(j,i,k,l) = eri_tmp(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(j,i,l,k) = eri_tmp(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(k,l,i,j) = eri_tmp(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(k,l,j,i) = eri_tmp(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(l,k,i,j) = eri_tmp(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(l,k,j,i) = eri_tmp(func_i, equiv_j, equiv_k, equiv_l)
+                  eri(i,j,k,l) = eri(func_i, equiv_j, equiv_k, equiv_l)
+                  eri(i,j,l,k) = eri(func_i, equiv_j, equiv_k, equiv_l)
+                  eri(j,i,k,l) = eri(func_i, equiv_j, equiv_k, equiv_l)
+                  eri(j,i,l,k) = eri(func_i, equiv_j, equiv_k, equiv_l)
+                  eri(k,l,i,j) = eri(func_i, equiv_j, equiv_k, equiv_l)
+                  eri(k,l,j,i) = eri(func_i, equiv_j, equiv_k, equiv_l)
+                  eri(l,k,i,j) = eri(func_i, equiv_j, equiv_k, equiv_l)
+                  eri(l,k,j,i) = eri(func_i, equiv_j, equiv_k, equiv_l)
 
               endif
             end do

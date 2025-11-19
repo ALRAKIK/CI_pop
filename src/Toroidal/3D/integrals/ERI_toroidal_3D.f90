@@ -183,20 +183,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'CPU time for Translational and 8 fold symmetry = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
       write(outfile,"(a)") ""
       write(outfile,"(a)") "8-fold symmetry with translation applied to integrals"
-      write(outfile,"(a)") "" 
-
-      ! two_electron_integrals = 0.d0
-
-      ! !do i = 1, fpuc
-      ! do i = 1, number_of_functions
-      !   do j = 1 , number_of_functions
-      !     do k = 1 , number_of_functions
-      !       do l = 1 , number_of_functions
-      !         if (abs(two_electron(i,j,k,l)) > 1e-30 )  two_electron_integrals(i,j,k,l) = two_electron(i,j,k,l) 
-      !       end do 
-      !     end do 
-      !   end do 
-      ! end do
+      write(outfile,"(a)") ""
 
       deallocate(ERI)
       deallocate(two_electron)

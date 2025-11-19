@@ -20,9 +20,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       double precision               :: geometry(number_of_atoms,3)
       double precision,allocatable   :: two_electron(:,:,:,:)
       double precision,allocatable   :: two_eri(:,:,:,:)
-      double precision               :: value
-      double precision               :: start_time, end_time
-      
+      double precision               :: value      
       integer                        :: number_of_functions_per_unitcell 
       integer                        :: index_sym
 
@@ -31,19 +29,15 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       integer                        :: total_ijkl_combinations , ijkl_index
       integer,allocatable            :: i_index(:) , j_index(:) , k_index(:) , l_index(:)
       ! --------------------------------------------------------------- !
-
-
-
-
-      integer                        :: days, hours, minutes, seconds , t 
       
       double precision,intent(out)   :: two_electron_integrals(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
 
-      
-      integer                        :: total_ij_pairs, ij_index
+      ! ----------------------    Time     ---------------------------- !
+      integer                        :: days, hours, minutes, seconds , t , time 
+      double precision               :: start,end
+      double precision               :: start_time, end_time
+      !-----------------------------------------------------------------!
       integer                        :: num_threads, optimal_chunk_size
-
-
       !-----------------------------------------------------------------!
 
       call omp_set_dynamic(.false.)
@@ -255,7 +249,10 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       end do
 
       num_total_int = total_ijkl_combinations
-      write(*,*) 'Will compute ', num_total_int, 'unique integrals with 8-fold and translational symmetry'
+      write(outfile,*) 'Need to  compute ', num_total_int, ' unique integrals (Two electron Integrals)'
+      write(*,*)       'Need to  compute ', num_total_int, ' unique integrals (Two electron Integrals)'
+      write(outfile,*) ''
+      flush(outfile)
 
       ! OpenMP parallel computation with proper variable declarations
 
@@ -282,16 +279,8 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       !$omp end parallel do
 
       deallocate(i_index, j_index, k_index, l_index)
+
       end_time = omp_get_wtime()
-      write(outfile,"(a)") ""
-      write(outfile,"(a)") "8-fold symmetry with translation applied to integrals"
-      write(outfile,"(a)") "" 
-
-
-      ! --------------------------------------------------------------- !
-      ! --------------------------------------------------------------- !
-      ! --------------------------------------------------------------- !
-      ! --------------------------------------------------------------- !
 
       t = int(end_time - start_time)
       days= (t/86400)
@@ -307,11 +296,23 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
-      call shift_integrals(two_electron,two_eri,number_of_functions,number_of_functions_per_unitcell)
+      call cpu_time(start)
+        call shift_integrals(two_electron,two_eri,number_of_functions,number_of_functions_per_unitcell)
+      call cpu_time(end)
+
+      time = int(end - start)
+      days = (time/86400)
+      hours=mod(time,86400)/3600
+      minutes=mod(mod(time,86400),3600)/60
+      seconds=mod(mod(mod(time,86400),3600),60)
+
+      write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'CPU time for Translational symmetry = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
+      write(outfile,"(a)") ""
+      write(outfile,"(a)") "Translation symmetry applied to integrals"
+      write(outfile,"(a)") "" 
 
       two_electron_integrals = 0.d0 
 
-      !do i = 1, number_of_functions_per_unitcell
       do i = 1, number_of_functions
         do j = 1 , number_of_functions
           do k = 1 , number_of_functions
@@ -322,8 +323,6 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
         end do 
       end do
       
-
-
       deallocate(ERI)
       deallocate(two_electron)
       deallocate(two_eri)

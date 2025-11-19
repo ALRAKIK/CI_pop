@@ -332,12 +332,13 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
    
       write(outfile,"(1x,a1,i2,1x,a1,f16.8,1x,a1,f10.6,1x,a1,f10.6,1x,a1,f16.8,4x,a1,f16.8,4x,a1,f16.8,4x,a1)")      & 
       "|",nSCF,"|",EHF+ENuc,"|",Conv,"|",Gap,"|",ET,"|",EV,"|",Ej+EK,"|"
-      
-      enddo
-
       write(outfile,*) repeat('-', 110)
         write(outfile,'(1x,a1,a7,5X,a6,2X,I0,4x,a,4X,a6,2X,I0,4x,a)') '|','Time = ','Diag ',seconds2, "sec", 'trans ',seconds1, "sec"
       write(outfile,*) repeat('-', 110)
+      
+      enddo
+
+
 
       if (c_details) then 
         close(HFfile)
