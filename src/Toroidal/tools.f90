@@ -141,11 +141,10 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
         end do
       end do
 
-      do l = 1, nf
-        do k = 1, nf
-          do j = 1, nf
-            do i = 1, nf
-              eri(i,j,k,l) = eri(i,j,k,l)
+      do i = 1, nf
+        do j = 1, nf
+          do k = 1, nf
+            do l = 1, nf
               eri(i,j,l,k) = eri(i,j,k,l)
               eri(j,i,k,l) = eri(i,j,k,l)
               eri(j,i,l,k) = eri(i,j,k,l)
