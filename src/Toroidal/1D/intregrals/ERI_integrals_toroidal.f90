@@ -67,7 +67,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
           kc1   = dexp(-(alpha+beta)*(Lx**2)/(2.d0*pi**2))
 
-          mu_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(XAB)))
+          mu_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(XAB))))
           mu_y  = alpha + beta
           mu_z  = alpha + beta
 
@@ -88,7 +88,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               kc2   = dexp(-(gamma+delta)*(Lx**2)/(2.d0*pi**2))
 
-              nu_x  = dsqrt(gamma**2+delta**2+2.d0*gamma*delta*dcos(ax*(XCD)))
+              nu_x  = dsqrt(dabs(gamma**2+delta**2+2.d0*gamma*delta*dcos(ax*(XCD))))
               nu_y  =  gamma+delta
               nu_z  =  gamma+delta
 

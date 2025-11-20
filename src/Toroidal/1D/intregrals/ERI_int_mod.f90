@@ -620,23 +620,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       result = result * dexp(-sf)
 
 
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      
       contains 
 
       double precision function f0000(theta) Result(f)
