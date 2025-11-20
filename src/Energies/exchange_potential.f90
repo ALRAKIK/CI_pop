@@ -20,11 +20,10 @@ subroutine exchange_potential(nBas,P,ERI,K)
       
       K(:,:) = 0d0
 
-
       do nu=1,nBas
-        do mu=1,nBas
-          do si=1,nBas
-            do la=1,nBas
+        do si=1,nBas
+          do la=1,nBas
+            do mu=1,nBas
               K(mu,nu) = K(mu,nu) - 0.5d0 * P(la,si)*ERI(mu,la,si,nu) 
             end do
           end do
