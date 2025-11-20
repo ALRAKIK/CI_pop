@@ -130,20 +130,21 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
       eri(:,:,:,:) = 0.d0
     
       ! First, copy what you already computed (first index up to fpuc)
-      do i = 1, fpuc
-        do j = 1, nf
-          do k = 1, nf
-            do l = 1, nf
+
+      do l = 1, nf
+        do k = 1, nf
+          do j = 1, nf
+            do i = 1, fpuc
               eri(i,j,k,l) = eri_tmp(i,j,k,l)
             end do
           end do
         end do
       end do
 
-      do i = 1, nf
-        do j = 1, nf
-          do k = 1, nf
-            do l = 1, nf
+      do l = 1, nf
+        do k = 1, nf
+          do j = 1, nf
+            do i = 1, nf
               eri(i,j,k,l) = eri(i,j,k,l)
               eri(i,j,l,k) = eri(i,j,k,l)
               eri(j,i,k,l) = eri(i,j,k,l)
