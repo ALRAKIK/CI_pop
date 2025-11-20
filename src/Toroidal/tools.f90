@@ -131,10 +131,10 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
     
       ! First, copy what you already computed (first index up to fpuc)
 
-      do l = 1, nf
-        do k = 1, nf
-          do j = 1, nf
-            do i = 1, fpuc
+      do i = 1, fpuc
+        do j = 1, nf
+          do k = 1, nf
+            do l = 1, nf
               eri(i,j,k,l) = eri_tmp(i,j,k,l)
             end do
           end do
