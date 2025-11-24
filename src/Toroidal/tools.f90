@@ -208,13 +208,6 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
                   equiv_k <= nf .and. &
                   equiv_l <= nf) then
                   eri(i,j,k,l) = eri(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(i,j,l,k) = eri(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(j,i,k,l) = eri(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(j,i,l,k) = eri(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(k,l,i,j) = eri(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(k,l,j,i) = eri(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(l,k,i,j) = eri(func_i, equiv_j, equiv_k, equiv_l)
-                  eri(l,k,j,i) = eri(func_i, equiv_j, equiv_k, equiv_l)
               endif
             end do
           end do

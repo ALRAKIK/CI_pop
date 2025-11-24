@@ -1,6 +1,6 @@
 subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
       
-      use quadpack , only : dqagi , dqags
+      use quadpack , only : dqagi , dqags , dqag
       use iso_c_binding
       use torus_init
       use gsl_bessel_mod
@@ -25,7 +25,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
@@ -33,7 +33,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       integer                            :: ier, iwork(limit), last, neval
       double precision                   :: abserr, work(lenw)
       
-      !integer,parameter                  :: Nmax = 400
       integer                            :: Nmax
       double precision,parameter         :: pi   = 3.14159265358979323846D00
       double precision,parameter         :: pi2  = pi * pi      
@@ -47,6 +46,8 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       double precision                   :: cxqd   , sxqd
       double precision                   :: c2xpab , s2xpab
       double precision                   :: c2xqcd , s2xqcd
+
+      double precision                   :: A , B , C
 
 
       inv_ax  = 1.d0/ax 
@@ -69,7 +70,8 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
       c2xqcd = dcos(ax*(2.d0*xq-xC-xD))
       s2xqcd = dsin(ax*(2.d0*xq-xC-xD))
-      
+
+
       call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr,   &
       &          neval, ier,Limit,Lenw,Last,Iwork,Work)
 
@@ -79,14 +81,11 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
       contains
 
-      function f_decay(t) result(ft)
-
-        double precision, intent(in) :: t
-        double precision             :: ft
-
-         ft =  S(t)
-
-      end function f_decay
+       function f_decay(t) result(ft)
+         double precision, intent(in) :: t
+         double precision             :: ft
+          ft =  S(t)
+       end function f_decay
 
       double precision function S(t) result(sum)
 
@@ -94,7 +93,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
       implicit none
       double precision, intent(in)         :: t
-      double precision                     :: A,  B, C 
       double precision                     :: D, D2
       double precision                     :: const 
       double precision                     :: tol  = 1D-40
@@ -103,20 +101,21 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
       double precision                     :: termC
       double precision                     :: term
-      double precision                     :: t2 , t3 , t4
+      double precision                     :: t2 , t3 , t4 
 
       t2 = t  * t 
       t3 = t2 * t 
       t4 = t3 * t 
 
-      A   = 2.d0*p_x*inv_ax2
-      B   = 2.d0*q_x*inv_ax2
-      C   = 2.d0*t*t*inv_ax2
+      A   = 2.d0  * p_x * inv_ax2
+      B   = 2.d0  * q_x * inv_ax2
+      C   = 2.d0  * t*t * inv_ax2
 
       A   = max(A, 1.0d-30)
       B   = max(B, 1.0d-30)
 
-      D   = 1.d0/(dsqrt(p*q+(p+q)*t*t))
+      D   = 1.d0/(dsqrt(p*q+(p+q)*t2))
+
       D2  = D * D 
       
       select case(pattern_id)
@@ -1347,6 +1346,10 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       !   end do
 
 
+
+
+      
+
       case (0000) ! | s   s   s   s    ( 1 ) 
       n           = 0
       const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
@@ -1355,11 +1358,17 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n = 1 , Nmax
         termAn  = bessi_scaled(n, A)
         termBn  = bessi_scaled(n, B)
-        termc   = bessi_scaled(n, C) 
+        termC   = bessi_scaled(n, C)
         term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
         if (abs(term) < tol) exit
         sum     = sum + 2.d0 * real(term) * const
       end do
+
+
+
+
+
+
 
       case (0001) ! | s   s   s   px   ( 2 ) 
       n           = 0

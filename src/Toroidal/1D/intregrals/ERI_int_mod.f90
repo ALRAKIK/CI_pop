@@ -27,7 +27,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! integration parameter ! 
 
-      double precision,parameter         :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
       integer, parameter                 :: limit = 50
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier,last, neval , iwork(limit)
