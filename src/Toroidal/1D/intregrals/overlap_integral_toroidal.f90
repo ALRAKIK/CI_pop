@@ -1,8 +1,10 @@
 subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
+
       use gsl_bessel_mod
       use torus_init
       use classification_ERI
+      use bessel_functions
 
       implicit none 
 
@@ -54,7 +56,8 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
               if ( gamma_x >  alpha+beta  ) gamma_x  =  alpha + beta 
                
-              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/ax2)
+              !I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/ax2)
+              I_0_gamma_x = iv_scaled(0.d0,2.d0*gamma_x/ax2)
 
               exp_arg     = dexp(-2.d0*(alpha+beta-gamma_x)/ax2)
               
@@ -78,6 +81,7 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       use torus_init
       use classification_ERI
       use HeavisideModule
+      use bessel_functions
 
       implicit none 
 
@@ -85,17 +89,17 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       type(ERI_function),intent(in)    :: AO1 , AO2
       double precision  ,intent(out)   :: S_sp_normal
 
-      integer                      :: i , j 
-      double precision,parameter   :: pi = 3.14159265358979323846D00
-      double precision             :: alpha , beta
-      double precision             :: c1    , c2 
-      double precision             :: x1 , x2 , y1 , y2 , z1 , z2 
-      double precision             :: X , Y , Z
-      double precision             :: const 
-      double precision             :: overlap_x  ,overlap_y  ,overlap_z 
-      double precision             :: gamma_x    
-      double precision             :: xp        
-      double precision             :: I_0_gamma_x
+      integer                          :: i , j 
+      double precision,parameter       :: pi = 3.14159265358979323846D00
+      double precision                 :: alpha , beta
+      double precision                 :: c1    , c2 
+      double precision                 :: x1 , x2 , y1 , y2 , z1 , z2 
+      double precision                 :: X , Y , Z
+      double precision                 :: const 
+      double precision                 :: overlap_x  ,overlap_y  ,overlap_z 
+      double precision                 :: gamma_x    
+      double precision                 :: xp        
+      double precision                 :: I_0_gamma_x
 
 
       x1 = r1(1) ; x2 = r2(1) 
@@ -124,7 +128,8 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
               xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
         
-              I_0_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
+              !I_0_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax*ax))
+              I_0_gamma_x = iv_scaled(1.d0,2.d0*gamma_x/(ax*ax))
         
               overlap_x   = const * Lx * exp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (dsin(ax*(xp-x2))/ax) * I_0_gamma_x
               overlap_y   = const * dsqrt(pi/(alpha+beta)) 
@@ -149,6 +154,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
       use atom_basis
       use classification_ERI
       use HeavisideModule
+      use bessel_functions
 
       implicit none 
  
@@ -200,17 +206,29 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
               yp          = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5*Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))
               zp          = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5*Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))
         
-              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
-              I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
-              I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
+              ! I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
+              ! I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
+              ! I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
 
-              I_0_gamma_y = bessi_scaled(0, 2.d0*gamma_y/(ay**2))
-              I_1_gamma_y = bessi_scaled(1, 2.d0*gamma_y/(ay**2))
-              I_2_gamma_y = bessi_scaled(2, 2.d0*gamma_y/(ay**2))
+              I_0_gamma_x = iv_scaled(0.d0, 2.d0*gamma_x/(ax**2))
+              I_1_gamma_x = iv_scaled(1.d0, 2.d0*gamma_x/(ax**2))
+              I_2_gamma_x = iv_scaled(2.d0, 2.d0*gamma_x/(ax**2))
 
-              I_0_gamma_z = bessi_scaled(0, 2.d0*gamma_z/(az**2))
-              I_1_gamma_z = bessi_scaled(1, 2.d0*gamma_z/(az**2))
-              I_2_gamma_z = bessi_scaled(2, 2.d0*gamma_z/(az**2))
+              ! I_0_gamma_y = bessi_scaled(0, 2.d0*gamma_y/(ay**2))
+              ! I_1_gamma_y = bessi_scaled(1, 2.d0*gamma_y/(ay**2))
+              ! I_2_gamma_y = bessi_scaled(2, 2.d0*gamma_y/(ay**2))
+
+              I_0_gamma_y = iv_scaled(0.d0, 2.d0*gamma_y/(ay**2))
+              I_1_gamma_y = iv_scaled(1.d0, 2.d0*gamma_y/(ay**2))
+              I_2_gamma_y = iv_scaled(2.d0, 2.d0*gamma_y/(ay**2))
+
+              ! I_0_gamma_z = bessi_scaled(0, 2.d0*gamma_z/(az**2))
+              ! I_1_gamma_z = bessi_scaled(1, 2.d0*gamma_z/(az**2))
+              ! I_2_gamma_z = bessi_scaled(2, 2.d0*gamma_z/(az**2))
+
+              I_0_gamma_z = iv_scaled(0.d0, 2.d0*gamma_z/(az**2))
+              I_1_gamma_z = iv_scaled(1.d0, 2.d0*gamma_z/(az**2))
+              I_2_gamma_z = iv_scaled(2.d0, 2.d0*gamma_z/(az**2))
 
               term        = ( (dsin(ax*(xp-x2))) * (dsin(ax*(xp-x1))) * I_0_gamma_x +  0.5d0 * dcos(ax*(2*xp-x1-x2))* (I_0_gamma_x - I_2_gamma_x)  ) /ax**2              
 

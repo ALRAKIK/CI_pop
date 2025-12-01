@@ -4,6 +4,7 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       use torus_init
       use classification_ERI
       use HeavisideModule
+      use bessel_functions
 
       implicit none 
 
@@ -50,11 +51,15 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
 
-          gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
+          gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
 
-          I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax2))
-          I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax2))
-          I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax2))
+          !I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax2))
+          !I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax2))
+          !I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax2))
+
+          I_0_gamma_x = iv_scaled(0.d0, 2.d0*gamma_x/(ax2))
+          I_1_gamma_x = iv_scaled(1.d0, 2.d0*gamma_x/(ax2))
+          I_2_gamma_x = iv_scaled(2.d0, 2.d0*gamma_x/(ax2))
 
           xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2))
 
@@ -77,6 +82,7 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       use gsl_bessel_mod
       use classification_ERI
       use HeavisideModule
+      use bessel_functions
 
       implicit none 
 
@@ -122,14 +128,19 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
           c2   =   AO2%coefficient(j)
 
             
-              gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
+              gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
 
               xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
             
-              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
-              I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
-              I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
-              I_3_gamma_X = bessi_scaled(3, 2.d0*gamma_x/(ax**2))
+              !I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
+              !I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
+              !I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
+              !I_3_gamma_X = bessi_scaled(3, 2.d0*gamma_x/(ax**2))
+
+              I_0_gamma_x = iv_scaled(0.d0, 2.d0*gamma_x/(ax**2))
+              I_1_gamma_x = iv_scaled(1.d0, 2.d0*gamma_x/(ax**2))
+              I_2_gamma_x = iv_scaled(2.d0, 2.d0*gamma_x/(ax**2))
+              I_3_gamma_X = iv_scaled(3.d0, 2.d0*gamma_x/(ax**2))
 
               const       =  c1*c2
 
@@ -161,6 +172,7 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
       use torus_init
       use classification_ERI
       use HeavisideModule
+      use bessel_functions
 
       implicit none 
 
@@ -213,12 +225,17 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
               xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2)) 
 
-            
-              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
-              I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
-              I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
-              I_3_gamma_X = bessi_scaled(3, 2.d0*gamma_x/(ax**2))
-              I_4_gamma_X = bessi_scaled(4, 2.d0*gamma_x/(ax**2))
+              ! I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax**2))
+              ! I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax**2))
+              ! I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax**2))
+              ! I_3_gamma_X = bessi_scaled(3, 2.d0*gamma_x/(ax**2))
+              ! I_4_gamma_X = bessi_scaled(4, 2.d0*gamma_x/(ax**2))
+
+              I_0_gamma_x = iv_scaled(0.d0, 2.d0*gamma_x/(ax**2))
+              I_1_gamma_x = iv_scaled(1.d0, 2.d0*gamma_x/(ax**2))
+              I_2_gamma_x = iv_scaled(2.d0, 2.d0*gamma_x/(ax**2))
+              I_3_gamma_X = iv_scaled(3.d0, 2.d0*gamma_x/(ax**2))
+              I_4_gamma_X = iv_scaled(4.d0, 2.d0*gamma_x/(ax**2))
 
               X_K = 0.d0 
 

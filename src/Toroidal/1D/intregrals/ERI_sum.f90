@@ -4,6 +4,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       use iso_c_binding
       use torus_init
       use gsl_bessel_mod
+      use bessel_functions
 
       use, intrinsic :: ieee_arithmetic
 
@@ -95,7 +96,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       double precision, intent(in)         :: t
       double precision                     :: D, D2
       double precision                     :: const 
-      double precision                     :: tol  = 1D-40
+      double precision                     :: tol  = 1D-30
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n 
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
@@ -1353,15 +1354,19 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       case (0000) ! | s   s   s   s    ( 1 ) 
       n           = 0
       const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-      sum         = bessi_scaled(n, A) * bessi_scaled(n, B) * bessi_scaled(n, C) * const
+      !sum         = bessi_scaled(n, A) * bessi_scaled(n, B) * bessi_scaled(n, C) * const
+      sum         = iv_scaled(dble(n), A) * iv_scaled(dble(n), B) * iv_scaled(dble(n), C) * const
       Nmax        = floor(max(A,B,C)) + 50
-      do n = 1 , Nmax
-        termAn  = bessi_scaled(n, A)
-        termBn  = bessi_scaled(n, B)
-        termC   = bessi_scaled(n, C)
-        term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
-        if (abs(term) < tol) exit
-        sum     = sum + 2.d0 * real(term) * const
+      do n        =  1 , Nmax
+        !termAn    = bessi_scaled(n, A)
+        !termBn    = bessi_scaled(n, B)
+        !termC     = bessi_scaled(n, C)
+        termAn    = iv_scaled(dble(n), A)
+        termBn    = iv_scaled(dble(n), B)
+        termC     = iv_scaled(dble(n), C)
+        term      = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
+        if (abs(term) * const < tol) exit
+        sum       = sum + 2.d0 * real(term) * const
       end do
 
 

@@ -1,4 +1,4 @@
-subroutine exchange_potential(nBas,P,ERI,K)
+subroutine exchange_potential_UHF(nBas,P,ERI,K)
 
       ! Compute exchange matrix in the AO basis
 
@@ -24,10 +24,10 @@ subroutine exchange_potential(nBas,P,ERI,K)
         do si=1,nBas
           do la=1,nBas
             do mu=1,nBas
-              K(mu,nu) = K(mu,nu) - 0.5d0 * P(la,si)*ERI(mu,la,si,nu)
+              K(mu,nu) = K(mu,nu) + P(la,si)*ERI(mu,la,si,nu)
             end do
           end do
         end do
       end do
 
-end subroutine exchange_potential
+end subroutine exchange_potential_UHF

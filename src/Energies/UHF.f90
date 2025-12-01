@@ -1,4 +1,4 @@
-subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
+subroutine UHF(nBas,c_details,n_alpha,n_beta,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       ! Perform a restricted Hartree-Fock calculation
 
@@ -9,7 +9,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       integer,intent(in)            :: nBas
   
-      integer,intent(in)            :: nO
+      integer,intent(in)            :: n_alpha , n_beta
       double precision,intent(in)   :: S(nBas,nBas)
       double precision,intent(in)   :: T(nBas,nBas)
       double precision,intent(in)   :: V(nBas,nBas)
@@ -28,18 +28,28 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       integer                       :: nSCF
       double precision              :: Conv
       double precision              :: Gap
-      double precision              :: ET,EV,EJ , EHF_old
-      double precision              :: EK
-      double precision,allocatable  :: cp(:,:)
-      double precision,allocatable  :: P(:,:)
-      double precision,allocatable  :: J(:,:)
-      double precision,allocatable  :: K(:,:)
-      double precision,allocatable  :: F(:,:),Fp(:,:)
-      double precision,allocatable  :: error(:,:)
+      double precision              :: Gap_alpha , Gap_beta
+      double precision              :: ET,EV , EHF_old
+      double precision              :: EK,EJ
+      double precision              :: EK_alpha
+      double precision              :: EK_beta
+
+      double precision,allocatable  ::    cp_alpha(:,:) ,    cp_beta(:,:)
+      double precision,allocatable  ::     P_alpha(:,:) ,     P_beta(:,:)
+      double precision,allocatable  ::           J(:,:)
+      double precision,allocatable  ::     K_alpha(:,:) ,     K_beta(:,:)
+      double precision,allocatable  ::     F_alpha(:,:) ,     F_beta(:,:) 
+      double precision,allocatable  ::    Fp_alpha(:,:) ,    Fp_beta(:,:)
+      double precision,allocatable  :: error_alpha(:,:) , error_beta(:,:)
+
+
+      double precision,allocatable  ::     P_total(:,:)
+
       double precision,external     :: trace_matrix
 
       integer                       :: max_diis = 0
-      integer                       :: n_diis
+      integer                       :: n_diis_alpha
+      integer                       ::  n_diis_beta 
       integer                       :: i  , o
       integer                       :: mu , nu 
       double precision              :: sum 
@@ -60,6 +70,15 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision              :: start_time, end_time
       !-----------------------------------------------------------------!
 
+      !--------------------------  UHF      ----------------------------!
+
+      double precision              :: e_alpha(nBas)      , e_beta(nBas)
+      double precision              :: c_alpha(nBas,nBas) , c_beta(nBas,nBas)
+      character(len=10)             :: type_calc
+      double precision              :: ET1, EV1, ET2, EV2
+
+      !-----------------------------------------------------------------!
+
       
       if (c_details) then 
         open(HFfile,file=trim(tmp_file_name)//"/RHF.out")
@@ -67,21 +86,42 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
-      write(outfile,*)'|                          Restricted Hartree-Fock calculation                           |'
+      write(outfile,*)'|                         Un-Restricted Hartree-Fock calculation                          |'
       write(outfile,*)'******************************************************************************************'
       write(outfile,*)
   
       ! Memory allocation
   
-      allocate(cp(nBas,nBas), P(nBas,nBas) ,error(nBas,nBas))
-      allocate(J(nBas,nBas) , K(nBas,nBas))
-      allocate(F(nBas,nBas) ,Fp(nBas,nBas))
+      allocate(cp_alpha(nBas,nBas), P_alpha(nBas,nBas) ,error_alpha(nBas,nBas))
+      allocate(K_alpha(nBas,nBas))
+      allocate(F_alpha(nBas,nBas) ,Fp_alpha(nBas,nBas))
+
+
+      allocate(cp_beta(nBas,nBas), P_beta(nBas,nBas) ,error_beta(nBas,nBas))
+      allocate(K_beta(nBas,nBas))
+      allocate(F_beta(nBas,nBas) ,Fp_beta(nBas,nBas))
+
+
+      allocate(P_total(nBas,nBas))
+      allocate(J(nBas,nBas))
+
 
       allocate(err_diis(nBas*nBas,max_diis))
       allocate(F_diis(nBas*nBas,max_diis))
        
-      call    guess_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
+      type_calc = "alpha"
+      call    guess_UHF(nBas,c_details,n_alpha,HC,X,ENuc,T,V,P_alpha,type_calc,ET1,EV1,ET2,EV2)
+      type_calc = "beta"
+      call    guess_UHF(nBas,c_details,n_beta ,HC,X,ENuc,T,V,P_beta,type_calc,ET1,EV1,ET2,EV2)
          
+      write(outfile,'(a)') ""
+      write(outfile,'(a,f16.10)')   "      The Kinetic   Energy            = ", ET1+ET2
+      write(outfile,'(a,f16.10)')   "      The Potential Energy            = ", EV1+EV2
+      write(outfile,'(a,f16.10,a)') "      The Nuclear   Energy            = ", ENuc , "  +"
+      write(outfile,'(a,f16.10)')   "      -----------------------------------------"
+      write(outfile,'(a,f16.10)')   "      The guess Energy                = ", ET1+ET2+EV1+EV2+ENuc
+      write(outfile,'(a)') ""
+
       ! --------------------------------------------------------------- !
       !              check that P_{mu nu} S_{mu nu} = N 
       ! --------------------------------------------------------------- !
@@ -89,7 +129,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       sum = 0.d0 
       do mu = 1 , nbas 
         do nu = 1 , nbas 
-          sum = sum + P(mu,nu)*S(mu,nu)
+          sum = sum + P_alpha(mu,nu)*S(mu,nu) + P_beta(mu,nu)*S(mu,nu)
         end do 
       end do 
 
@@ -108,7 +148,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       do o = 1 , nbas
         do mu = 1 , nbas 
           do nu = 1 , nbas 
-            sum_o(o) = sum_o(o) + P(mu,nu)*S(mu,o)*S(nu,o)
+            sum_o(o) = sum_o(o) + P_alpha(mu,nu)*S(mu,o)*S(nu,o) + P_beta(mu,nu)*S(mu,o)*S(nu,o)
           end do 
         end do 
       end do 
@@ -127,7 +167,8 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       nSCF = 0
       Conv = 1d0
 
-      n_diis        = 0
+      n_diis_alpha  = 0
+      n_diis_beta   = 0
       F_diis(:,:)   = 0d0
       err_diis(:,:) = 0d0
       rcond         = 0d0
@@ -158,79 +199,61 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       !   Compute the Hartree potential J
 
       call cpu_time(start)
-        call hartree_potential(nBas,P,ERI,J)
+        call hartree_potential(nBas,P_alpha+P_beta,ERI,J)
       call cpu_time(end)
+
       time     = int(end - start)
       seconds1 = mod(mod(mod(time,86400),3600),60)
 
       ! ****************** !
   
       !   Compute the exchange potential K
-      call exchange_potential(nBas,P,ERI,K)
+      call exchange_potential_UHF(nBas,P_alpha,ERI,K_alpha)
+      call exchange_potential_UHF(nBas,P_beta ,ERI,K_beta)
+
       ! ****************** !
 
       !   Build Fock operator
     
-      F(:,:) = Hc(:,:) + J(:,:) + K(:,:)
+      F_alpha(:,:) = Hc(:,:) + J(:,:) - K_alpha(:,:)
+      F_beta (:,:) = Hc(:,:) + J(:,:) -  K_beta(:,:)
        
       !   Compute the error vector and extract the convergence criterion
-      error = matmul(F,matmul(P,S)) - matmul(matmul(S,P),F)
-      if(nSCF > 1) Conv = maxval(abs(error))
+
+      error_alpha = matmul(F_alpha,matmul(P_alpha,S)) - matmul(matmul(S,P_alpha),F_alpha)
+      error_beta  = matmul(F_beta , matmul(P_beta,S)) - matmul(matmul(S,P_beta) , F_beta)
+
+      if(nSCF > 1) Conv = max(maxval(abs(error_alpha)), maxval(abs(error_beta)))
+      
       if (Conv < thresh) exit 
 
       ! ****************** !
   
-      if (c_details) then 
-
-      write(HFfile,'(a)') ""
-      write(HFfile,'(3a)') "!" ,repeat('-',44), "!"
-      write(HFfile,'(a,I3)') "                 Iter  = ", nSCF
-      write(HFfile,'(3a)') "!" ,repeat('-',44), "!"
-      write(HFfile,'(a)') ""
-
-    
-      call header_HF("Hartree potential J = P(la,si)*ERI(mu,nu,la,si)",-1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(j,1))
-      do i = 1 , size(j,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (j(i,o),o=1,size(j,1))
-      end do 
-      write(HFfile,'(a)') ""
-
-      call header_HF("Exchange potential K = -0.5 P(la,si)*ERI(mu,la,si,nu)",-1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(k,1))
-      do i = 1 , size(k,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (k(i,o),o=1,size(k,1))
-      end do 
-      write(HFfile,'(a)') ""
-
-      call header_HF("Fock matrix F = Hc + J + K", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(F,1))
-      do i = 1 , size(F,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (F(i,o),o=1,size(F,1))
-      end do 
-      write(HFfile,'(a)') ""
-
-      end if 
-
-      !------------------------------------------------------------------------
+      !---------------------------------------------------------------- !
       !   Compute HF energy
-      !------------------------------------------------------------------------
+      !---------------------------------------------------------------- !
+
+      P_total(:,:) = P_alpha(:,:) + P_beta(:,:)
   
       !   Compute the kinetic energy
-      ET = trace_matrix(nBas,matmul(P,T))
+      ET = trace_matrix(nBas,matmul(P_total,T))
       ! ****************** !
 
       !   Compute the potential energy
-      EV = trace_matrix(nBas,matmul(P,V))
+      EV = trace_matrix(nBas,matmul(P_total,V))
       ! ****************** !
 
       !   Compute the Hartree energy
-      EJ = 0.5d0*trace_matrix(nBas,matmul(P,J))
+
+      EJ = 0.5d0*trace_matrix(nBas,matmul(P_total,J))
 
       ! ****************** !
 
       !   Compute the exchange energy
-      EK = 0.5d0*trace_matrix(nBas,matmul(P,K))
+      EK_alpha = -0.5d0 * trace_matrix(nBas,matmul(P_alpha,K_alpha))
+      EK_beta  = -0.5d0 * trace_matrix(nBas,matmul(P_beta ,K_beta))
+
+      EK = EK_alpha + EK_beta
 
       ! ****************** !
 
@@ -244,32 +267,59 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
         EHF_old = EHF 
       end if 
 
+
+      ! ****************** !
       !   Compute HOMO-LUMO gap
-          if(nBas > nO) then
-            Gap = e(nO+1) - e(nO)
-          else
-            Gap = 0d0
-          endif
+      ! ****************** !
+
+      if (n_alpha > 0 ) then 
+        if(nBas > n_alpha) then
+          Gap_alpha = e_alpha(n_alpha+1) - e_alpha(n_alpha)
+        else
+          Gap_alpha = 0d0
+        endif
+      end if 
+
+      if (n_beta > 0 ) then 
+        if(nBas > n_beta) then
+          Gap_beta = e_beta(n_beta+1) - e_beta(n_beta)
+        else
+          Gap_beta = 0d0
+        endif
+      end if 
+
+      if (n_alpha > 0 .and. n_beta > 0) then 
+        Gap = min(Gap_alpha, Gap_beta)
+      else if (n_alpha <= 0) then 
+        Gap = Gap_beta
+      elseif (n_beta <= 0) then
+        Gap = Gap_alpha
+      end if 
 
       ! ****************** !
 
       ! DIIS extrapolation ! 
 
       if(max_diis > 1) then
-        n_diis = min(n_diis+1,max_diis)
-        call DIIS_extrapolation(rcond,nBas*nBas,nBas*nBas,n_diis,err_diis,F_diis,error,F)
+        n_diis_alpha = min(n_diis_alpha+1,max_diis)
+        n_diis_beta  = min(n_diis_beta+1,max_diis)
+        call DIIS_extrapolation(rcond,nBas*nBas,nBas*nBas,n_diis_alpha,err_diis,F_diis,error_alpha,F_alpha)
+        call DIIS_extrapolation(rcond,nBas*nBas,nBas*nBas, n_diis_beta,err_diis,F_diis,error_beta , F_beta)
       end if
 
       !   Transform for the Fock matrix F in the orthogonal basis 
       
-      Fp = matmul(transpose(X),matmul(F,X))
+      Fp_alpha = matmul(transpose(X),matmul(F_alpha,X))
+      Fp_beta  = matmul(transpose(X),matmul(F_beta,X))
             
       !   Diagonalize F' to get MO coefficients (eigenvectors in the orthogonal basis) c' and MO energies (eigenvalues) e
 
-      cp(:,:) = Fp(:,:)
+      cp_alpha(:,:) = Fp_alpha(:,:)
+      cp_beta (:,:) =  Fp_beta(:,:)
 
       call cpu_time(start)
-        call diagonalize_matrix(nBas,cp,e)
+        call diagonalize_matrix(nBas,cp_alpha,e_alpha)
+        call diagonalize_matrix(nBas,cp_beta ,e_beta)
       call cpu_time(end)
 
       time    = int(end - start)
@@ -277,56 +327,13 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       !   Back-transform the MO coefficients c in the original non-orthogonal basis
 
-      c = matmul(X,cp)
+      c_alpha = matmul(X,cp_alpha)
+      c_beta  = matmul(X,cp_beta)
 
       !   Compute the density matrix P 
 
-      P(:,:) = 2d0*matmul(c(:,1:nO),transpose(c(:,1:nO)))
-
-
-      if (c_details) then 
-
-      call header_HF("Fock matrix in the orthogonal basis Fp =  X^t   F   X  ", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(Fp,1))
-      do i = 1 , size(Fp,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (Fp(i,o),o=1,size(Fp,1))
-      end do
-      write(HFfile,'(a)') ""
-
-      call header_HF("MO coefficients in the non-orthogonal basis c = X cp", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(c,1))
-      do i = 1 , size(c,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (c(i,o),o=1,size(c,1))
-      end do 
-      write(HFfile,'(a)') ""
-      
-      call header_HF("Density matrix P = 2 c c^t", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(P,1))
-      do i = 1 , size(P,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (P(i,o),o=1,size(P,1))
-      end do 
-      write(HFfile,'(a)') ""
-
-      call header_HF("HF Orbital Energies", -1)
-      do i = 1 , size(e)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  e(i)
-      end do
-
-      write(HFfile,'(a)') ""
-      write(HFfile,'(a,f16.10)')   " The Kinetic   Energy    = ", ET
-      write(HFfile,'(a,f16.10)')   " The Potential Energy    = ", EV
-      write(HFfile,'(a,f16.10)')   " The Hartree   Energy    = ", EJ
-      write(HFfile,'(a,f16.10,a)') " The Exchange  Energy    = ", EK  , "    +"
-      write(HFfile,'(a,f16.10,a)') " The Nuclear   Energy    = ", ENuc 
-      write(HFfile,'(a,f16.10)')   "-----------------------------------"
-      write(HFfile,'(a,f16.10)')   " The HF Energy        = ", EHF+ENuc
-      write(HFfile,'(a)') ""
-      write(HFfile,'(a)') "" 
-      
-      write(HFfile,'(2a)')  repeat('*_',36) , "*"
-      write(HFfile,'(a)')   repeat('_',73)
-
-      end if 
+      P_alpha(:,:) = matmul(c_alpha(:,1:n_alpha),transpose(c_alpha(:,1:n_alpha)))
+      P_beta(:,:)  = matmul(  c_beta(:,1:n_beta),transpose(c_beta (:,1:n_beta )))
 
       !   Dump results
    
@@ -337,10 +344,6 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       write(outfile,*) repeat('-', 110)
       
       enddo
-
-      if (c_details) then 
-        close(HFfile)
-      end if 
 
       !------------------------------------------------------------------------
       ! End of SCF loop
@@ -354,7 +357,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
         write(outfile,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
         write(outfile,*)
 
-        call print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,EK,EHF)
+        call print_UHF(nBas,n_alpha,n_beta,e_alpha,e_beta,C_alpha,C_beta,ENuc,ET,EV,EJ,EK,EHF)
   
         stop
   
@@ -362,6 +365,6 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       ! Compute final HF energy
 
-        call print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,EK,EHF)
+        call print_UHF(nBas,n_alpha,n_beta,e_alpha,e_beta,C_alpha,C_beta,ENuc,ET,EV,EJ,EK,EHF)
   
-end subroutine RHF
+end subroutine UHF

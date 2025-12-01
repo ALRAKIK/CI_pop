@@ -379,6 +379,11 @@ subroutine read_keywords(keyword)
 
         if (trim(line) == 'Details'  )   keyword(6) = 'Details'
 
+        if (trim(line) == 'MO'       )   keyword(7) = 'MO'
+
+        if (trim(line) == 'UHF'      )   keyword(8) = 'UHF'
+
+
       end do
 
 end subroutine

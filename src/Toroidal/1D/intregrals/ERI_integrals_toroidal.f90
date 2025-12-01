@@ -30,15 +30,12 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
       double precision                :: alpha , beta , gamma , delta 
       double precision                :: const  
       double precision                :: value_s 
-      double precision                :: kc1 , kc2 
       double precision                :: mu_x, mu_y , mu_z
       double precision                :: nu_x, nu_y , nu_z
       double precision                :: mu  , nu 
       double precision                :: xpA , xpB , xqC , xqD , phi 
       double precision                :: test 
-      double precision,parameter      :: eta = 1e-15
       integer                         :: pattern_id, encode_orbital_pattern
-      integer                         :: px_count  , count_px_orbitals
 
 
 
@@ -65,8 +62,6 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           c2    = two%coefficient(j)
           o2    = two%orbital
 
-          kc1   = dexp(-(alpha+beta)*(Lx**2)/(2.d0*pi**2))
-
           mu_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(XAB))))
           mu_y  = alpha + beta
           mu_z  = alpha + beta
@@ -86,8 +81,6 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               c4    = four%coefficient(l)
               o4    = four%orbital
 
-              kc2   = dexp(-(gamma+delta)*(Lx**2)/(2.d0*pi**2))
-
               nu_x  = dsqrt(dabs(gamma**2+delta**2+2.d0*gamma*delta*dcos(ax*(XCD))))
               nu_y  =  gamma+delta
               nu_z  =  gamma+delta
@@ -100,9 +93,9 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx 
 
-              !test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
+              test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              !if (test < 1e-12) cycle
+              if (test * const < 1e-16) cycle
 
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
@@ -111,7 +104,6 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               phi     = ax*(xp - xq)
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
-              px_count   = count_px_orbitals(o1, o2, o3, o4)
 
               !call integrate_ERI_sum(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
               !call integrate_ERI_integral(pattern_id,px_count,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)

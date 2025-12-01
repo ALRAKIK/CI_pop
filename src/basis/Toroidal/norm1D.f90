@@ -43,10 +43,10 @@ subroutine normalize_basis_tor_1D()
           end do 
           n_type = 1 
           call norm_orb_tor_1D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
-          write(2,'(4I4)') n_gaussian ,  n_contraction
-          write(3,'(4I4)') n_gaussian ,  n_contraction
-          write(4,'(4I4)') n_gaussian ,  n_contraction
-          write(5,'(4I4)') n_gaussian ,  n_contraction
+          write(2,'(4I4)') n_gaussian    ,  n_contraction
+          write(3,'(4I4)') n_gaussian    ,  n_contraction
+          write(4,'(4I4)') n_gaussian    ,  n_contraction
+          write(5,'(4I4)') n_gaussian    ,  n_contraction
           do i = 1 , n_gaussian
             write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
@@ -110,7 +110,9 @@ end subroutine normalize_basis_tor_1D
 
 subroutine norm_orb_tor_1D(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
+
       use gsl_bessel_mod
+      use bessel_functions
 
       implicit none 
 
@@ -129,7 +131,7 @@ subroutine norm_orb_tor_1D(n_gaussian , n_contraction, exponent, contraction  , 
       double precision               :: ax 
       double precision               :: norm(n_gaussian)
       double precision               :: THRMIN = 1.D-17
-      double precision , parameter   :: pi = 3.14159265358979323846D00
+      double precision , parameter   :: pi = 3.14159265358979323846264338327950288419716939937510d0
       double precision               :: I_0_gamma_x
       double precision               :: I_1_gamma_x
 
@@ -142,9 +144,10 @@ subroutine norm_orb_tor_1D(n_gaussian , n_contraction, exponent, contraction  , 
       do n = 1 , n_contraction
         do i = 1 , n_gaussian
 
-        Norm(i) = 1.d0 / dsqrt( Lx * (pi/(2.d0*exponent(i))) *  bessi_scaled(0,4.d0*exponent(i)/(ax*ax)) )
-
-        contractionN(i,n) =  contraction(i,n) * Norm(i) 
+        !Norm(i) = 1.d0 / dsqrt( Lx * (pi/(2.d0*exponent(i))) *  bessi_scaled(0,4.d0*exponent(i)/(ax*ax)) )
+         Norm(i) = 1.d0 / dsqrt( Lx * (pi/(2.d0*exponent(i))) *  iv_scaled(0.d0,4.d0*exponent(i)/(ax*ax)) )
+        
+         contractionN(i,n) =  contraction(i,n) * Norm(i) 
 
         end do 
       end do 
@@ -160,15 +163,16 @@ subroutine norm_orb_tor_1D(n_gaussian , n_contraction, exponent, contraction  , 
               beta  = exponent(j)
               gamma = alpha + beta
 
-              I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax**2)
+              !I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax**2)
+              I_0_gamma_x = iv_scaled(0.d0,2.d0*gamma/ax**2)
              
-
               c1 = contractionN(i,n)
               c2 = contractionN(j,n)
 
               const = c1*c2*Lx
 
               sum  = sum + const*I_0_gamma_x*(pi/gamma)
+
             end do 
           end do 
 

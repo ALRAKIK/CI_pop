@@ -39,8 +39,10 @@ program CI
       double precision,allocatable    ::                    T(:,:)
       double precision,allocatable    ::                    V(:,:)
       double precision,allocatable    ::                   Hc(:,:)
+      double precision,allocatable    ::                Hc_MO(:,:)
       double precision,allocatable    ::                    X(:,:)
       double precision,allocatable    ::              ERI(:,:,:,:)
+      double precision,allocatable    ::           ERI_MO(:,:,:,:)
       double precision,allocatable    ::                      e(:)
       double precision,allocatable    ::                    c(:,:)
 
@@ -52,6 +54,12 @@ program CI
 
       logical                         :: c_read, c_Integral, c_trexio
       logical                         :: c_Angstrom, c_plot, c_details
+      logical                         :: c_MO      , c_UHF
+
+
+      integer                         :: io_stat
+      character(len=100)              :: line
+      integer                         :: n_alpha , n_beta
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
@@ -73,6 +81,33 @@ program CI
       c_Angstrom = any(keyword == 'Angstrom')
       c_plot     = any(keyword == 'Plot')
       c_details  = any(keyword == 'Details')
+      c_MO       = any(keyword == 'MO')
+      c_UHF      = any(keyword == 'UHF')
+
+      if (c_UHF) then 
+        n_alpha = 0 
+        n_beta  = 0 
+        open(1,file="unitcell.mol")
+        do
+        read(1, '(A)',iostat=io_stat) line
+        if (io_stat /= 0) then
+          write(*,'(a)') ""
+          write(*,'(a)')'Error: Reached end of file without finding'
+          write(*,'(a)')'       opening UHF keyword in your unitcell'
+          write(*,'(a)') ""
+          close(1)
+          stop
+        end if
+
+        if (trim(line) == 'UHF') then
+          read(1, *,iostat=io_stat) n_alpha , n_beta
+          exit
+        end if
+
+        end do
+        close(1)
+      end if 
+
       
       ! --------------------------------------------------------------- !
       !               Read the Geometry, Label and the Charge           !
@@ -360,9 +395,15 @@ program CI
  
       !if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) E_nuc = 0.d0 
       
+      if (.not. c_UHF) then 
+         call cpu_time(start)
+           call RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+         call cpu_time(end)
+      else 
         call cpu_time(start)
-          call RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+          call UHF(nBas,c_details,n_alpha,n_beta,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
         call cpu_time(end)
+      end if 
 
         time = end - start
 
@@ -388,16 +429,22 @@ program CI
       ! AO to MO transformation
       !-----------------------------------------------------------------!
 
-      !  allocate(ERI_MO(nBas,nBas,nBas,nBas))
-      !  allocate(Hc_MO(nBas,nBas))
-      !  call cpu_time(start)
-      !  call AO_to_MO_HC (nBas,c,HC,HC_MO)
-      !  call AO_to_MO_ERI(nBas,c,ERI,ERI_MO)
-      !  call cpu_time(end)
+      if (c_MO) then 
+
+      allocate(ERI_MO(nBas,nBas,nBas,nBas))
+      allocate(Hc_MO(nBas,nBas))
+      call cpu_time(start)
+        call AO_to_MO_HC (nBas,c,T,HC_MO)
+        call AO_to_MO_ERI(nBas,c,ERI,ERI_MO)
+      call cpu_time(end)
+
+      call print_MO_file(nBas,HC_MO,ERI_MO)
     
-      !  time = end - start
-      !  write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',time,' seconds'
-      !  write(outfile,*)
+      time = end - start
+      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',time,' seconds'
+      write(outfile,*)
+
+      end if 
     
       !-----------------------------------------------------------------!
       ! FCI Energy calculation

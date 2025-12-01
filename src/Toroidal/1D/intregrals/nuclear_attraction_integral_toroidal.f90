@@ -57,7 +57,7 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
             
-            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
+            gamma_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
             gamma_y  = alpha+beta
             gamma_z  = alpha+beta
 
@@ -149,7 +149,7 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
             
-            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
+            gamma_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
             gamma_y  = alpha+beta
             gamma_z  = alpha+beta
 
@@ -244,7 +244,7 @@ subroutine nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atom
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
             
-            gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
+            gamma_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
             gamma_y  = alpha+beta
             gamma_z  = alpha+beta
 
@@ -325,6 +325,7 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xAB,p, result)
       use omp_lib
       use torus_init
       use gsl_bessel_mod
+      use bessel_functions
       use, intrinsic :: ieee_arithmetic
     
       implicit none
@@ -339,7 +340,7 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xAB,p, result)
     
       ! Local variables
       
-      double precision,parameter    :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
       integer,parameter             :: inf = 1 
       double precision,parameter    :: bound = 0.0d0
       integer, parameter            :: limit = 100
@@ -360,11 +361,12 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xAB,p, result)
         double precision, intent(in) :: x
         double precision     :: fx
 
-        double precision :: I_0_x ,dx 
+        double precision     :: I_0_x ,dx 
 
-        dx = 2.d0*dsqrt( gamma_x**2 + x**4 + 2.d0 * gamma_x * x**2 * dcos(ax*(XAB))) / ax**2
+        dx = 2.d0*dsqrt(dabs(gamma_x**2 + x**4 + 2.d0 * gamma_x * x**2 * dcos(ax*(XAB)))) / ax**2
 
-        I_0_x = bessi_scaled(0, dx)
+        !I_0_x = bessi_scaled(0, dx)
+        I_0_x = iv_scaled(0.d0, dx)
         
         fx  = 1.d0/(p+x**2) * dexp(-2.d0*(x**2+p)/ax**2 + dx )  * I_0_x
 
@@ -379,6 +381,7 @@ subroutine integrate_NA_sp_Toroidal(gamma_x,xP,xc,xb,p, result)
       use torus_init
       use gsl_bessel_mod
       use HeavisideModule
+      use bessel_functions
       use, intrinsic :: ieee_arithmetic
     
       implicit none
@@ -391,7 +394,7 @@ subroutine integrate_NA_sp_Toroidal(gamma_x,xP,xc,xb,p, result)
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
       integer         ,parameter    :: inf = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -419,7 +422,8 @@ subroutine integrate_NA_sp_Toroidal(gamma_x,xP,xc,xb,p, result)
 
         nu_x = dsqrt(gamma_x**2 + x**4 + 2.d0 * gamma_x * x**2 * dcos(ax*(xp-xc)))
 
-        I_1_x = bessi_scaled(1, 2.d0*nu_x/ax**2)
+        !I_1_x = bessi_scaled(1, 2.d0*nu_x/ax**2)
+         I_1_x = iv_scaled(1.d0, 2.d0*nu_x/ax**2)
 
         fx  = 1.d0/(p+x**2) * dexp(-2.d0*(x**2+p-nu_x)/ax**2) * dsin(ax*(xD-xB)) * I_1_x
 
@@ -433,9 +437,10 @@ subroutine integrate_NA_pp_px_Toroidal(gamma_x,xP,p,xc,xa,xb,result)
       use omp_lib
       use torus_init
       use HeavisideModule
+      use bessel_functions
+
       use, intrinsic :: ieee_arithmetic
       
-    
       implicit none
     
       ! Input parameters
@@ -446,8 +451,8 @@ subroutine integrate_NA_pp_px_Toroidal(gamma_x,xP,p,xc,xa,xb,result)
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-8 , epsrel = 1.0e-6
-      integer         ,parameter    :: inf = 1 
+      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      integer         ,parameter    :: inf = 1
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
       integer         ,parameter    :: lenw = limit*4
@@ -477,8 +482,11 @@ subroutine integrate_NA_pp_px_Toroidal(gamma_x,xP,p,xc,xa,xb,result)
 
         nu_x = dsqrt(gamma_x**2 + x**4 + 2.d0 * gamma_x * x**2 * dcos(ax*(xp-xc)))
         
-        I_0_x = bessi_scaled(0, 2.d0*nu_x/ax**2)
-        I_2_x = bessi_scaled(2, 2.d0*nu_x/ax**2)
+        !I_0_x = bessi_scaled(0, 2.d0*nu_x/ax**2)
+        !I_2_x = bessi_scaled(2, 2.d0*nu_x/ax**2)
+
+        I_0_x = iv_scaled(0.d0, 2.d0*nu_x/ax**2)
+        I_2_x = iv_scaled(2.d0, 2.d0*nu_x/ax**2)
 
         fx  = 1.d0/(p+x**2) * dexp(-2.d0*(x**2+p-nu_x)/ax**2) * ( cos(ax*(xb-xa)) * I_0_x - cos(ax*(2.d0*xD-xa-xb)) *  I_2_x  )
 
@@ -492,6 +500,7 @@ subroutine integrate_NA_pp_py_Toroidal(gamma_x,xpc,p, result)
       use quadpack, only : dqagi
       use omp_lib
       use torus_init
+      use bessel_functions
       use, intrinsic :: ieee_arithmetic
     
       implicit none
@@ -503,7 +512,7 @@ subroutine integrate_NA_pp_py_Toroidal(gamma_x,xpc,p, result)
       double precision, intent(out) :: result
     
       ! Local variables
-      double precision,parameter    :: epsabs = 1.0e-8 , epsrel = 1.0e-6
+      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
       integer,parameter             :: inf = 1 
       double precision,parameter    :: bound = 0.0d0
       integer, parameter            :: limit = 100
@@ -527,7 +536,9 @@ subroutine integrate_NA_pp_py_Toroidal(gamma_x,xpc,p, result)
         double precision :: I_0_x ,dx 
 
         dx = 2.d0*dsqrt( gamma_x**2 + x**4 + 2.d0 * gamma_x * x**2 * dcos(ax*(XPC))) / ax**2
-        I_0_x = bessi_scaled(0, dx)
+
+        !I_0_x = bessi_scaled(0, dx)
+        I_0_x = iv_scaled(0.d0, dx)
 
         fx  = (1.d0/(p+x**2))**2  * dexp(-2.d0*(x**2+p)/ax**2 + dx)  * I_0_x
 

@@ -144,11 +144,22 @@ subroutine AO_to_MO_HC(nBas,c,HC_AO,HC_MO)
 
       HC_MO(:,:) = 0d0
 
-      do i=1,2
-         do j=1,2
+      !do i=1,2
+      !   do j=1,2
+      !      HC_MO(i,j) = 0.d0 
+      !      do k=1,2
+      !         do l=1,2
+      !            HC_MO(i,j) = HC_MO(i,j)+c(k,i)*c(l,j)*HC_AO(k,l)
+      !         enddo
+      !      enddo
+      !   enddo
+      !enddo
+
+      do i=1,nbas
+         do j=1,nbas
             HC_MO(i,j) = 0.d0 
-            do k=1,2
-               do l=1,2
+            do k=1,nbas
+               do l=1,nbas
                   HC_MO(i,j) = HC_MO(i,j)+c(k,i)*c(l,j)*HC_AO(k,l)
                enddo
             enddo

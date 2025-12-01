@@ -21,6 +21,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       double precision,allocatable   :: two_electron(:,:,:,:)
       double precision               :: value
       integer                        :: fpuc
+      integer                        :: N_max
 
       double precision,intent(out)   :: two_electron_integrals(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
 
@@ -43,6 +44,8 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       end do 
 
       !-----------------------------------------------------------------!
+
+      N_max = 200
 
 
       call omp_set_dynamic(.false.)
@@ -133,7 +136,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
             if (i <= k .or. (i == k .and. j <= l)) then
 
-              call ERI_integral_4_function_toroidal_3D(ERI(i),ERI(j),ERI(k),ERI(l), value)
+              call ERI_integral_4_function_toroidal_3D(ERI(i),ERI(j),ERI(k),ERI(l), value,N_max)
 
                 two_electron(i,j,k,l) = value
                 !two_electron(i,j,l,k) = value
