@@ -50,7 +50,8 @@ contains
         real(8) :: x_prime, x_prime_2, sqrt_1_plus_x2, t, eta
         real(8) :: log_x2_over_4, x2_over_4, inv_x2_over_4, v_inv_x2_over_4
         real(8) :: sum_terms
-        integer :: k, c, i, peak_k
+        integer :: k, c, i
+        integer(8) :: peak_k
         
         ! Input validation
         if (x < 0.0d0 .or. (v_in < 0.0d0 .and. v_in /= floor(v_in))) then
@@ -236,7 +237,7 @@ contains
                 terms(k) = terms(k-1) - log(dble(k) * (dble(k)*inv_x2_over_4 + v_inv_x2_over_4))
             end do
             
-            peak_k = floor((-v + sqrt(v*v + x*x)) / 2.0d0)
+            peak_k = floor((-v + sqrt(v*v + x*x)) / 2.0d0,kind=8)
             if (peak_k < 0) peak_k = 0
             
             sum_terms = 0.0d0
