@@ -45,9 +45,6 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
       !-----------------------------------------------------------------!
 
-      N_max = 200
-
-
       call omp_set_dynamic(.false.)
       call omp_set_num_threads(omp_get_max_threads())
 

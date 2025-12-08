@@ -67,7 +67,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           mu_z  = alpha + beta
 
           call bary_center_toroidal(alpha,beta,xa,xb,xp)
-          yp    = 0.d0 
+          yp    = 0.d0
           zp    = 0.d0 
 
           mu = alpha+beta 
@@ -95,7 +95,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              if (test * const < 1e-16) cycle
+              if (test * const < 1e-20) cycle
 
               xpA     = ax*(xp - xa)
               xpB     = ax*(xp - xb) 
@@ -105,9 +105,10 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
 
-              !call integrate_ERI_sum(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+              
+              call integrate_ERI_sum(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
               !call integrate_ERI_integral(pattern_id,px_count,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
-              call integrate_ERI_integral_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+              !call integrate_ERI_integral_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
 
               value  = value    + const * value_s
 

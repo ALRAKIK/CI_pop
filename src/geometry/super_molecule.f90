@@ -307,6 +307,9 @@ subroutine read_2nd_line(type_of_calculation, number_of_unitcell,     &
 
         write(*,'(a)') "Type of calculation: Toroidal"
         read(1,*) number_of_unitcell , distance_between_unitcells, Lx
+        nx   = number_of_unitcell
+        ny   = 1
+        nz   = 1
 
       else if (type_of_calculation == "Tori2D") then 
 

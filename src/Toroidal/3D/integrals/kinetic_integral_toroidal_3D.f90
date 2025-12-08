@@ -334,7 +334,6 @@ subroutine kinetic_integral_pp_toroidal_3D(r1,r2,AO1,AO2,S_pp_normal)
             S11z = ( (dsin(az*(zp-z2))) * (dsin(az*(zp-z1))) * I_0_gamma_z +  0.5d0 * dcos(az*(2.d0*zp-z1-z2))* (I_0_gamma_z - I_2_gamma_z) ) /az**2
             S11z = S11z * Lz * dexp(-2.0d0*(alpha+beta-gamma_z)/az**2)
 
-
             D01x = - ax*ax*dsin(ax * (xp-x2)) * I_1_gamma_x - 3.0d0 * beta * dsin(2.0d0 * ax * (xp-x2)) * I_2_gamma_x + (2.d0*beta/ax)**2 * (0.25d0) * ( 3.0d0 * dsin(ax * (xp-x2)) * I_1_gamma_x - dsin(3.0d0 * ax * (xp-x2)) * I_3_gamma_x)
             D01x = D01x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) / ax 
 
@@ -377,7 +376,6 @@ subroutine kinetic_integral_pp_toroidal_3D(r1,r2,AO1,AO2,S_pp_normal)
               Z_k  = S11x * S00y * D00z
 
             end if
-
 
             if (AO1%orbital == "px" .and. AO2%orbital == "py") then 
 

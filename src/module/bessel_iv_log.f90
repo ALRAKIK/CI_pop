@@ -51,7 +51,7 @@ contains
         real(8) :: log_x2_over_4, x2_over_4, inv_x2_over_4, v_inv_x2_over_4
         real(8) :: sum_terms
         integer :: k, c, i
-        integer(8) :: peak_k
+        integer :: peak_k
         
         ! Input validation
         if (x < 0.0d0 .or. (v_in < 0.0d0 .and. v_in /= floor(v_in))) then
@@ -237,7 +237,8 @@ contains
                 terms(k) = terms(k-1) - log(dble(k) * (dble(k)*inv_x2_over_4 + v_inv_x2_over_4))
             end do
             
-            peak_k = floor((-v + sqrt(v*v + x*x)) / 2.0d0,kind=8)
+            peak_k = floor((-v + dsqrt(v*v + x*x)) / 2.0d0)
+            
             if (peak_k < 0) peak_k = 0
             
             sum_terms = 0.0d0
@@ -252,10 +253,11 @@ contains
     end function iv_log
     
     function iv_scaled(v_in, x) result(Iv)
-        real(8), intent(in) :: v_in, x
+        real(8), intent(in) :: x
+        integer, intent(in) :: v_in
         real(8) :: Iv
         
-          Iv = iv_log(v_in,x) - x
+          Iv = iv_log(dble(v_in),x) - x
           Iv = dexp(Iv)
           
     end function iv_scaled

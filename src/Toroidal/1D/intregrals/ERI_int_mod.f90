@@ -28,8 +28,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! integration parameter ! 
 
-      double precision,parameter         :: epsabs = 1.0e-16 , epsrel = 1.0e-10
-      integer, parameter                 :: limit = 100
+      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
+      integer, parameter                 :: limit = 50
       integer, parameter                 :: lenw = limit*4
       integer                            :: ier,last, neval , iwork(limit)
       double precision                   :: abserr, work(lenw)
@@ -140,7 +140,6 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
                     abserr, neval, ier, limit, lenw, last, &
                     iwork, work)
 
-
           if (ier > 2) then
             write(*,'(A,I4)') 'Error code from the case ', pattern_id
             stop 
@@ -157,7 +156,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
             stop 
           end if
 
-      ! --------------------- two  p function ------------------------- ! 
+      !--------------------- two  p function ------------------------- ! 
 
         case (0011) ! | s   s   px  px   ( 6 ) 
 
@@ -225,7 +224,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
               stop 
             end if
 
-      ! ---------------------- three  p function ---------------------- !
+      !---------------------- three  p function ---------------------- !
         
         case (0111) ! | s   px  px  px   ( 22) 
 
@@ -274,7 +273,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
                 stop 
               end if
           
-      ! ---------------------- four   p function ---------------------- !
+      !---------------------- four   p function ---------------------- !
 
         case (1111) ! | px  px  px  px   ( 86)
 
@@ -288,9 +287,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
               stop 
             end if
 
-      ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ! !!!!!!!!!!!!!!!!!!!!!!!!!!!! Y Y !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!! Y Y !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                       
         case (0022,0033) ! | s   s   py  py   ( 11)
 
@@ -643,8 +642,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_xxxx
-      !der_t       = bessi_scaled(0, z)
-      der_t       = iv_scaled(0.d0, z)
+      der_t       = bessi_scaled(0, z)
       f           = der_t * integral_t
        
       end function f0000
@@ -669,11 +667,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! - derivative part - !
 
-      !bz0   = bessi_scaled(0,z)
-      !bz2   = bessi_scaled(2,z)
-
-      bz0   = iv_scaled(0.d0,z)
-      bz2   = iv_scaled(2.d0,z)
+      bz0   = bessi_scaled(0,z)
+      bz2   = bessi_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
@@ -719,11 +714,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      ! bz0   = bessi_scaled(0,z)
-      ! bz2   = bessi_scaled(2,z)
-
-      bz0   = iv_scaled(0.d0,z)
-      bz2   = iv_scaled(2.d0,z)
+      bz0   = bessi_scaled(0,z)
+      bz2   = bessi_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
@@ -767,11 +759,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      !bz0   = bessi_scaled(0,z)
-      !bz2   = bessi_scaled(2,z)
-
-      bz0   = iv_scaled(0.d0,z)
-      bz2   = iv_scaled(2.d0,z)
+      bz0   = bessi_scaled(0,z)
+      bz2   = bessi_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
@@ -816,11 +805,8 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      !bz0   = bessi_scaled(0,z)
-      !bz2   = bessi_scaled(2,z)
-
-      bz0   = iv_scaled(0.d0,z)
-      bz2   = iv_scaled(2.d0,z)
+      bz0   = bessi_scaled(0,z)
+      bz2   = bessi_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
