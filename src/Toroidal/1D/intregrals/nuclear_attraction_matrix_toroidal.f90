@@ -59,7 +59,7 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
               end do 
             end do 
 
-          end if
+          end if 
 
           if (AO1%orbital =="s" .and. AO2%orbital(:1) == "p") then
             

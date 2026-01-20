@@ -615,36 +615,36 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       end select 
 
+
       result = result * dexp(-sf)
-
-
       
       contains 
 
       double precision function f0000(theta) Result(f)
 
       double precision,intent(in)  :: theta
+      
 
       ! - integral part - !
 
-      A           = 2.d0 * p_x / (ax2)
-      B           = 2.d0 * q_x / (ax2)
-      A2          = A*A
-      B2          = B*B
-      inv         = (p+q)/(p*q)
-      Iinv        = 1.d0/inv
-      psi         = phi - theta 
-      z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
-      term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
-      int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
+      A            = 2.d0 * p_x / (ax2)
+      B            = 2.d0 * q_x / (ax2)
+      A2           = A*A
+      B2           = B*B
+      inv          = (p+q)/(p*q)
+      Iinv         = 1.d0/inv
+      psi          = phi - theta 
+      z            = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
+      term         = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
+      const        = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      int_xxxx     = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
       integral_t  = int_xxxx
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
-       
+      
       end function f0000
 
       double precision function f0001(theta) Result(f)

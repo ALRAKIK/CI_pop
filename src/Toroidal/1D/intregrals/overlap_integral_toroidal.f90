@@ -26,7 +26,9 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       double precision                 :: I_0_gamma_x
       double precision                 :: ax2 
       double precision                 :: exp_arg
-      double precision                 :: mu 
+      double precision                 :: mu
+      double precision                 :: theta , theta2 , cos_theta , sum_ab
+      double precision                 :: term
 
 
 
@@ -51,23 +53,23 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           beta = AO2%exponent(j)
           c2   = AO2%coefficient(j)
 
-              const       = c1*c2
+            const       = Lx*c1*c2
 
-              gamma_x     = dsqrt(abs(alpha * alpha  + beta * beta + 2.d0 * alpha * beta * dcos(ax*(X))))
+              gamma_x     = dsqrt(dabs(alpha * alpha  + beta * beta + 2.d0 * alpha * beta * dcos(ax*(X))))
 
               mu          = alpha * beta / ( alpha + beta )
-
-              if ( gamma_x >  alpha+beta  ) gamma_x  =  alpha + beta 
                
-              I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/ax2)
+              I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/ax2)
 
-              exp_arg     = dexp(-2.d0*(alpha+beta-gamma_x)/ax2)
+              !exp_arg     = -2.d0 * (alpha + beta - gamma_x ) / ax2 + dlog(Lx) + dlog(c1) + dlog(c2) + I_0_gamma_x
               
-              overlap_x   =      Lx * exp_arg * I_0_gamma_x
+              !overlap_x   = dexp(exp_arg)
+              
+              overlap_x   = const * dexp(-2.d0 * (alpha + beta - gamma_x ) / ax2) * I_0_gamma_x
               overlap_y   = dexp(- mu * (Y*Y)) * dsqrt(pi/(alpha+beta))
               overlap_z   = dexp(- mu * (Z*Z)) * dsqrt(pi/(alpha+beta))
 
-              S_ss_normal =  S_ss_normal + const * overlap_x * overlap_y * overlap_z
+              S_ss_normal =  S_ss_normal + overlap_x * overlap_y * overlap_z
 
         end do 
       end do
@@ -135,7 +137,6 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
             gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
             xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
 
-
             I_0_gamma_x = bessi_scaled(0,2.d0*gamma_x/(ax*ax))
             I_1_gamma_x = bessi_scaled(1,2.d0*gamma_x/(ax*ax))
 
@@ -155,7 +156,7 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
             overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_1_gamma_x            * (dsin(ax*(xp-x2))/ax) 
             overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi/(alpha+beta))
             overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi/(alpha+beta))
-           
+
             end if 
 
             if (AO2%orbital=="py")   then 
@@ -245,9 +246,9 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           xp_C        = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
 
-          I_0_gamma_x = bessi_scaled(0, 2.d0*gamma_x/(ax*ax))
-          I_1_gamma_x = bessi_scaled(1, 2.d0*gamma_x/(ax*ax))
-          I_2_gamma_x = bessi_scaled(2, 2.d0*gamma_x/(ax*ax))
+          I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax*ax))
+          I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax*ax))
+          I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax*ax))
  
 
           !   Real Gaussian   !

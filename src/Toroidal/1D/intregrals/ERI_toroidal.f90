@@ -456,7 +456,7 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
       write(outfile,*) ''
       flush(outfile)
 
-            !$omp parallel do private(ij_index,i,j,k,l,value) &
+      !$omp parallel do private(ij_index,i,j,k,l,value) &
       !$omp shared(two_electron, ERI, i_index, j_index) &
       !$omp schedule(dynamic,optimal_chunk_size)
 

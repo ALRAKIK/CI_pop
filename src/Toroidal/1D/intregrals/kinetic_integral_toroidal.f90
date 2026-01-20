@@ -32,6 +32,8 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       double precision               :: const
       double precision               :: D00x , D00y , D00z
       double precision               :: S00x , S00y , S00z
+      double precision                 :: theta , theta2 , cos_theta , sum_ab
+
       
       !-----------------------------------------------------------------!
 
@@ -56,7 +58,7 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
 
-          const       = c1*c2
+          const       = Lx*c1*c2
           
           ! Clifford Gaussian ! 
 
@@ -79,11 +81,14 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
           ! ----------------------------------------------------------- !
 
-          D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * ( dcos(ax*(xp_C-x2))       * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+          !D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * ( dcos(ax*(xp_C-x2))       * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+          !D00x = -2.d0 * beta * dexp(-2.d0*(alpha+beta-gamma_x)/ax2+dlog(const)) * ( dcos(ax*(xp_C-x2))       * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+          D00x = -2.d0 * beta * dexp(-2.d0*(alpha+beta-gamma_x)/ax2+dlog(const)) * ( dcos(ax*(xp_C-x2))       * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
           D00y =                     dexp(- mu * (Y * Y))                 * ( 4.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe) 
           D00z =                     dexp(- mu * (Z * Z))                 * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe) 
 
-          S00x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x
+          !S00x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x
+          S00x =      dexp(-2.d0*(alpha+beta-gamma_x)/ax2+dlog(const))   * I_0_gamma_x
           S00y =      dexp(- mu * (Y * Y))                   * dsqrt(pi*inv_albe)
           S00z =      dexp(- mu * (Z * Z))                   * dsqrt(pi*inv_albe)
 
@@ -91,7 +96,8 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           Y_k = S00x * D00y * S00z 
           Z_k = S00x * S00y * D00z 
           
-          S_ss_normal =  S_ss_normal + (-0.5d0) * const  * (X_k+Y_k+Z_k)
+          !S_ss_normal =  S_ss_normal + (-0.5d0) * const  * (X_k+Y_k+Z_k)
+          S_ss_normal =  S_ss_normal + (-0.5d0) * (X_k+Y_k+Z_k)
 
         end do 
       end do

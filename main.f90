@@ -69,7 +69,7 @@ program CI
       !                   build the super molecule                      !
       ! --------------------------------------------------------------- !
       
-      call build_super_molecule(keyword,n_atom_unitcell)
+      call build_super_molecule(keyword,n_atom_unitcell) ! build the super molecule from the unitcell file 
 
       ! --------------------------------------------------------------- !
       !                        Read key words                           !
@@ -84,6 +84,11 @@ program CI
       c_MO       = any(keyword == 'MO')
       c_UHF      = any(keyword == 'UHF')
 
+
+      ! --------------------------------------------------------------- !
+      ! *************************************************************** !
+
+
       if (c_UHF) then 
         n_alpha = 0 
         n_beta  = 0 
@@ -93,7 +98,7 @@ program CI
         if (io_stat /= 0) then
           write(*,'(a)') ""
           write(*,'(a)')'Error: Reached end of file without finding'
-          write(*,'(a)')'       opening UHF keyword in your unitcell'
+          write(*,'(a)')'              UHF keyword in your unitcell'
           write(*,'(a)') ""
           close(1)
           stop
@@ -108,19 +113,21 @@ program CI
         close(1)
       end if 
 
-      
       ! --------------------------------------------------------------- !
-      !               Read the Geometry, Label and the Charge           !
+      ! *************************************************************** !
+
+      ! --------------------------------------------------------------- !
+      ! Read the Geometry, Label and the Charge from the super molecule !
       ! --------------------------------------------------------------- !
 
       call read_geometry(n_atoms,charge_tmp,geometry_tmp,               &
-      &                  calculation_type,label_tmp)
-            
+      &                  calculation_type,label_tmp)                      
+
       ! --------------------------------------------------------------- !
       !           prepare the folder to write the output files          !
       ! --------------------------------------------------------------- !
 
-      call initialize_ff(calculation_type,n_atoms)
+      call initialize_ff(calculation_type,n_atoms)         
 
       ! --------------------------------------------------------------- !
       !       If the calculation is on a torus read the parameters      !  
@@ -137,6 +144,14 @@ program CI
       allocate(geometry(n_atoms,3))
       allocate(charge(n_atoms))
       allocate(label(n_atoms))
+      allocate(atoms    (n_atoms))
+      allocate(norm_helper_px(n_atoms))
+      allocate(norm_helper_py(n_atoms))
+      allocate(norm_helper_pz(n_atoms))
+
+      ! --------------------------------------------------------------- !
+      !        Convert the geometry to Bohr if in Angstrom              !
+      ! --------------------------------------------------------------- !
 
       do i = 1 , n_atoms
         label(i)      =      label_tmp(i)
@@ -151,11 +166,6 @@ program CI
           geometry(i,3) = geometry_tmp(i,3)
         end if
       end do 
-
-      allocate(atoms    (n_atoms))
-      allocate(norm_helper_px(n_atoms))
-      allocate(norm_helper_py(n_atoms))
-      allocate(norm_helper_pz(n_atoms))
 
       ! --------------------------------------------------------------- !
 
@@ -172,6 +182,8 @@ program CI
 
 
       ! --------------------------------------------------------------- !
+      !                  build the atomic basis set                     !
+      ! --------------------------------------------------------------- !
 
       if (calculation_type == "Tori1D" .or. &
       &   calculation_type == "Tori2D" .or. &
@@ -185,16 +197,16 @@ program CI
 
       end if 
 
+      ! --------------------------------------------------------------- !
+      !                 Information from the Basis set                  !
+      ! --------------------------------------------------------------- !
+
       n_electron = 0 
       do i = 1 , n_atoms
         n_electron = n_electron + atoms(i)%charge
       end do 
 
       nO = n_electron/2
-
-      ! --------------------------------------------------------------- !
-      !                 Information from the Basis set                  !
-      ! --------------------------------------------------------------- !
 
       number_of_functions = 0 
       do i = 1 , n_atoms
@@ -227,6 +239,8 @@ program CI
       allocate(AO(number_of_functions))
 
       ! --------------------------------------------------------------- !
+      !          Classify the atomic orbitals and print them            !
+      ! --------------------------------------------------------------- !
 
       if (calculation_type == "Tori1D" .or.                             &
       &   calculation_type == "Tori2D" .or.                             & 
@@ -239,6 +253,7 @@ program CI
       end if
 
       call print_orbital_table(AO,number_of_functions)
+
 
       ! --------------------------------------------------------------- !
       !           print  Informations from the Basis set                !
@@ -349,7 +364,6 @@ program CI
       if (c_read) then
         call read_integrals_from_file(nBas,S,T,V,Hc,ERI,calculation_type)
       else 
-        !call read_integrals(nBas,S,T,V,Hc,ERI,calculation_type)
         HC (:,:) = T(:,:) + V(:,:)
       end if
 
@@ -380,6 +394,12 @@ program CI
 
       !call matout(nBas,nBas,S)
 
+      ! --------------------------------------------------------------- !
+
+
+      ! --------------------------------------------------------------- ! 
+      !        pure 2D toroidal case (not 2D in 3D normal case)         !
+      ! --------------------------------------------------------------- !
 
       if (calculation_type == "Tori2D" ) then 
         call get_X_from_overlap_2D(nBAS,S,X)
@@ -415,7 +435,6 @@ program CI
         call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
       end if 
 
-      
       
       !-----------------------------------------------------------------!
       !-----------------------------------------------------------------!

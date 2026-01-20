@@ -72,7 +72,8 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
           yp_R       = (alpha * y1 + beta * y2) * inv_albe
           zp_R       = (alpha * z1 + beta * z2) * inv_albe
 
-          kc       = 2.d0*sqrt(pi) * Lx * dexp(-mu * (Y*Y)) * dexp(-mu * (Z*Z))
+          !kc       = 2.d0*sqrt(pi) * Lx * dexp(-mu * (Y*Y)) * dexp(-mu * (Z*Z))
+          kc       = 2.d0*sqrt(pi) * Lx * c1 * c2 * dexp(-mu * (Y*Y)) * dexp(-mu * (Z*Z))
 
           do k = 1 , number_of_atoms
 
@@ -84,7 +85,9 @@ subroutine nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atom
               
             call integrate_NA_ss_Toroidal(gamma_x,xp_C-xc,yp_R-yc,zp_R-zc,albe, NA)
 
-            S_ss_normal =  S_ss_normal +  c1 * c2 * charge_atom * kc * NA 
+            !S_ss_normal =  S_ss_normal +  c1 * c2 * charge_atom * kc * NA 
+            S_ss_normal =  S_ss_normal +  charge_atom * kc * NA 
+            
             
           end do 
             
@@ -110,7 +113,7 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xPC,yPC,zPC,albe, result)
 
       double precision, intent(in)  :: gamma_x , albe
       double precision, intent(in)  :: xPC , yPC , zPC
-      
+
       ! Output parameters
 
       double precision, intent(out) :: result
@@ -149,7 +152,7 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xPC,yPC,zPC,albe, result)
 
         I_0_x = bessi_scaled(0, dx)
         
-        ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) + (zPC*zPC) )  *  I_0_x 
+        ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * ((yPC*yPC) + (zPC*zPC)) )  *  I_0_x 
 
       end function f_decay
 

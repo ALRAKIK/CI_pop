@@ -32,7 +32,7 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       call header_under("Calculate the integerals",-1)
       call Torus_def()
       write(outfile,*) ""
-      write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx 
+      write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx
       write(outfile,*) ""
 
 

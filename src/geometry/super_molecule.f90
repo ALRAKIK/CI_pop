@@ -84,7 +84,6 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
       ! --------------------------------------------------------------- !
       ! --------------------------------------------------------------- !
 
-
       num_atom_per_unitcell = num_atoms
 
       allocate(unitcell(num_atoms,3))

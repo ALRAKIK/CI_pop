@@ -86,19 +86,17 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               nu_z  =  gamma+delta
 
               call bary_center_toroidal(gamma,delta,xc,xd,xq)
-              yq    = 0.d0 
-              zq    = 0.d0 
+              yq     = 0.d0 
+              zq     = 0.d0 
                
-               nu    = gamma + delta
+              nu     = gamma + delta
 
-              const   = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx 
+              const  = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx
 
               test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
-              if (test * const < 1e-20) cycle
-
               xpA     = ax*(xp - xa)
-              xpB     = ax*(xp - xb) 
+              xpB     = ax*(xp - xb)
               xqC     = ax*(xq - xc)
               xqD     = ax*(xq - xd)
               phi     = ax*(xp - xq)
@@ -110,8 +108,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               !call integrate_ERI_integral(pattern_id,px_count,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
               !call integrate_ERI_integral_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
 
-              value  = value    + const * value_s
-
+              value  = value    + const * value_s  
+              
               
             end do
           end do 

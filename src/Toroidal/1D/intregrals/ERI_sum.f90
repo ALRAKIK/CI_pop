@@ -106,10 +106,10 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
         double precision, intent(in) :: u
         double precision :: y, t
         
-        !if (u >= 1.0d0) then
-        !  y = 0.0d0
-        !  return
-        !endif
+        if (u >= 1.0d0) then
+          y = 0.0d0
+          return
+        endif
         
         ! Transformation: t = u/(1-u)
         t = u / (1.0d0 - u)
@@ -5232,19 +5232,19 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
 
       case (0000) ! | s   s   s   s    ( 1 ) 
-n           = 0
-const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * iv_scaled(n, B) * iv_scaled(n, C) * const
-Peak        = ceiling(min(A,B,C))
-Nmax        = Peak+10
-do n = 1 , Nmax
-  termAn  = iv_scaled(n, A)
-  termBn  = iv_scaled(n, B)
-  termc   = iv_scaled(n, C) 
-  term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
-  if (abs(term) < tol) exit
-  sum     = sum + 2.d0 * real(term) * const
-end do
+      n           = 0
+      const       =  (pi * D)  *  (pi * D)   * dexp(A+B-2.d0*(p+q)*inv_ax2)
+      sum         = iv_scaled(n, A) * iv_scaled(n, B) * iv_scaled(n, C) * const
+      Peak        = ceiling(min(A,B,C))
+      Nmax        = Peak+10
+      do n = 1 , Nmax
+        termAn  = iv_scaled(n, A)
+        termBn  = iv_scaled(n, B)
+        termc   = iv_scaled(n, C) 
+        term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
+        if (abs(term) < tol) exit
+        sum     = sum + 2.d0 * real(term) * const
+      end do
 
 case (0001) ! | s   s   s   px   ( 2 ) 
 n           = 0

@@ -72,8 +72,7 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
 
                     if (p >= q) then
 
-                      call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l),value)
-
+                        call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l),value)
                         two_electron(i,j,k,l) = value
                         two_electron(j,i,k,l) = value
                         two_electron(i,j,l,k) = value     
