@@ -433,12 +433,12 @@ subroutine diagonalize_matrix(N,A,e)
       call dsyev('V','U',N,A,N,e,work,lwork,info)
 
       if(info /= 0) then
-        write(outfile,'(a)') 'Problem in diagonalize_matrix (dsyev)!!'
+        write(outfile,'(a,I0)') 'Problem in diagonalize_matrix (dsyev)!!  --> ' , info 
         stop
       endif
 
       do i = 1 , N
-        if (abs(e(i)) < 1e-10) e(i) = 0
+        if (abs(e(i)) < 1d-15) e(i) = 0.d0
       end do
 
 end subroutine diagonalize_matrix
