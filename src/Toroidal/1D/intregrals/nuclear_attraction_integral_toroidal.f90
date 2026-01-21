@@ -341,7 +341,7 @@ subroutine integrate_NA_spx_Toroidal(gamma_x,xP,xc,xb,yPC,zPC,albe, result)
 
         nu_x = dsqrt(gamma_x**2 + t2 * t2  + 2.d0 * gamma_x * t2 * dcos(ax*(xp-xc)))
 
-        I_1_x = bessi_scaled(1, 2.d0*nu_x/ax**2)
+        I_1_x = iv_scaled(1, 2.d0*nu_x/ax**2)
 
         ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe-nu_x)/ax**2) * dsin(ax*(xD-xB)) * I_1_x * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) + (zPC*zPC) )
 
@@ -400,7 +400,7 @@ subroutine integrate_NA_spy_Toroidal(gamma_x,xPc,yPC,yPB,zPC,albe, result)
 
         dx = 2.d0*dsqrt(dabs(gamma_x**2 + t4 + 2.d0 * gamma_x * t2 * dcos(ax*(XPC)))) / ax**2
 
-        I_0_x = bessi_scaled(0, dx)
+        I_0_x = iv_scaled(0, dx)
         
         ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) + (zPC*zPC) )  *  I_0_x * (yPB - t2/(albe+t2) * (yPC))
 
@@ -460,7 +460,7 @@ subroutine integrate_NA_spz_Toroidal(gamma_x,xPc,yPC,zPC,zPB,albe, result)
 
         dx = 2.d0*dsqrt(dabs(gamma_x**2 + t4 + 2.d0 * gamma_x * t2 * dcos(ax*(XPC)))) / ax**2
 
-        I_0_x = bessi_scaled(0, dx)
+        I_0_x = iv_scaled(0, dx)
         
         ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) + (zPC*zPC) )  *  I_0_x * (zPB - t2/(albe+t2) * (zPC)) 
 
@@ -824,6 +824,8 @@ subroutine integrate_NA_px_px_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(ft)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: ft
 
@@ -845,9 +847,9 @@ subroutine integrate_NA_px_px_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t4 + 2.d0 * gamma_x * t2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = 0.5d0 * dexp(-2.d0*(t2+albe)/ax**2 + dx) * ( dcos(ax*(xb-xa)) * I_0_x - dcos(ax*(2.d0*xD-xa-xb)) *  I_2_x  )
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) )
@@ -908,6 +910,8 @@ subroutine integrate_NA_px_py_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(fx)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: fx
 
@@ -932,9 +936,9 @@ subroutine integrate_NA_px_py_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = dexp(-2.d0*(t2+albe)/ax**2 + dx) * I_1_x * dsin(ax*(xD-xA))
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC)) * (yPB - t2/(albe+t2) * (yPC))
@@ -996,6 +1000,8 @@ subroutine integrate_NA_px_pz_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(fx)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: fx
 
@@ -1020,9 +1026,9 @@ subroutine integrate_NA_px_pz_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = dexp(-2.d0*(t2+albe)/ax**2 + dx) * I_1_x * dsin(ax*(xD-xA))
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC))
@@ -1084,6 +1090,8 @@ subroutine integrate_NA_py_px_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(fx)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: fx
 
@@ -1108,9 +1116,9 @@ subroutine integrate_NA_py_px_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = dexp(-2.d0*(t2+albe)/ax**2 + dx) * I_1_x * dsin(ax*(xD-xB))
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC)) * (yPA - t2/(albe+t2) * (yPC))
@@ -1172,6 +1180,8 @@ subroutine integrate_NA_py_py_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(fx)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: fx
 
@@ -1197,9 +1207,9 @@ subroutine integrate_NA_py_py_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t4 + 2.d0 * gamma_x * t2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = dexp(-2.d0*(t**2+albe)/ax**2 + dx) * I_0_x
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) ) * ( (yPA * yPB) - t2/(albe+t2) * yPC * (yPA+yPB) + 0.5d0 * 1.d0/(albe+t2) + (t2/(albe+t2)) * (t2/(albe+t2)) * (yPC*yPC))
@@ -1260,6 +1270,8 @@ subroutine integrate_NA_py_pz_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(fx)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: fx
 
@@ -1286,9 +1298,9 @@ subroutine integrate_NA_py_pz_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t4 + 2.d0 * gamma_x * t2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx) *  I_0_x
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) ) * (yPA - t2/(albe+t2) * (yPC))
@@ -1349,6 +1361,8 @@ subroutine integrate_NA_pz_px_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(fx)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: fx
 
@@ -1373,9 +1387,9 @@ subroutine integrate_NA_pz_px_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = dexp(-2.d0*(t2+albe)/ax**2 + dx) * I_1_x * dsin(ax*(xD-xB))
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC)) 
@@ -1437,6 +1451,8 @@ subroutine integrate_NA_pz_py_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(fx)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: fx
 
@@ -1463,9 +1479,9 @@ subroutine integrate_NA_pz_py_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t4 + 2.d0 * gamma_x * t2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx) *  I_0_x
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) ) * (yPB - t2/(albe+t2) * (yPC))
@@ -1526,6 +1542,8 @@ subroutine integrate_NA_pz_pz_Toroidal(xpC,ypC,zpC, &
       function f_decay(t) result(fx)
 
         use gsl_bessel_mod
+        use bessel_functions
+
         double precision, intent(in) :: t
         double precision             :: fx
 
@@ -1551,9 +1569,9 @@ subroutine integrate_NA_pz_pz_Toroidal(xpC,ypC,zpC, &
 
         dx = 2.d0*dsqrt( gamma_x**2 + t4 + 2.d0 * gamma_x * t2 * dcos(ax*(XpC))) / ax**2
         
-        I_0_x = bessi_scaled(0, dx)
-        I_1_x = bessi_scaled(1, dx)
-        I_2_x = bessi_scaled(2, dx)
+        I_0_x = iv_scaled(0, dx)
+        I_1_x = iv_scaled(1, dx)
+        I_2_x = iv_scaled(2, dx)
 
         Nax   = dexp(-2.d0*(t**2+albe)/ax**2 + dx) * I_0_x
         Nay   = dsqrt(pi/(albe+t2)) * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) ) 
