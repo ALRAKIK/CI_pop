@@ -67,6 +67,53 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
+      write(outfile,*)'|                          One electron integrals  calculation                           |'
+      write(outfile,*)'******************************************************************************************'
+      write(outfile,*)
+
+      write(outfile,*)
+      write(outfile,*) ' Overlap integral'
+      write(outfile,*) '------------------'
+      write(outfile,*)
+      do mu = 1 , size(S,1)
+        do nu = mu , size(S,1)
+          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , S(mu,nu)
+        end do 
+      end do
+
+      write(outfile,*)
+      write(outfile,*) "---------------------------------"
+
+      write(outfile,*)
+      write(outfile,*) ' Kinetic integral'
+      write(outfile,*) '------------------'
+      write(outfile,*)
+
+      do mu = 1 , size(T,1)
+        do nu = mu , size(T,1)
+          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , T(mu,nu)
+        end do 
+      end do
+
+      write(outfile,*)
+      write(outfile,*) "---------------------------------"
+
+      write(outfile,*)
+      write(outfile,*) ' Nuclear attraction integral'
+      write(outfile,*) '-----------------------------'
+      write(outfile,*)
+
+      do mu = 1 , size(V,1)
+        do nu = mu , size(V,1)
+          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , V(mu,nu)
+        end do 
+      end do
+
+      write(outfile,*)
+      write(outfile,*) "---------------------------------"
+
+      write(outfile,*)
+      write(outfile,*)'******************************************************************************************'
       write(outfile,*)'|                          Restricted Hartree-Fock calculation                           |'
       write(outfile,*)'******************************************************************************************'
       write(outfile,*)
