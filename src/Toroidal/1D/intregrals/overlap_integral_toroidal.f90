@@ -24,11 +24,7 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       double precision                 :: overlap_x , overlap_y , overlap_z 
       double precision                 :: gamma_x    
       double precision                 :: I_0_gamma_x
-      double precision                 :: ax2 
-      double precision                 :: exp_arg
-      double precision                 :: mu
-      double precision                 :: theta , theta2 , cos_theta , sum_ab
-      double precision                 :: term
+      double precision                 :: ax2 , mu
 
 
 

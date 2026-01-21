@@ -127,6 +127,17 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
         end do 
       end do
 
+      do i = 1 , size(overlap,1)
+        do j = i , size(overlap,1)
+          if (abs(overlap(i,j)) > 1e-15 ) write(outfile,*) i , j , overlap(i,j)
+        end do 
+      end do 
+
+
+
+
+
+
 end subroutine overlap_matrix_toroidal
 
       !-----------------------------------------------------------------!
