@@ -65,7 +65,7 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                call overlap_integral_ss_toroidal(r1,r2,AO1,AO2,overlap(i,j))
+                !call overlap_integral_ss_toroidal(r1,r2,AO1,AO2,overlap(i,j))
               end do 
             end do 
 
@@ -75,7 +75,7 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                !call overlap_integral_sp_toroidal(r1,r2,AO1,AO2,overlap(i,j))
+                call overlap_integral_sp_toroidal(r1,r2,AO1,AO2,overlap(i,j))
               end do 
             end do
 
