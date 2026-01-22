@@ -176,7 +176,7 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
             S_sp_normal =  S_sp_normal + const * overlap_x * overlap_y * overlap_z
 
             write(outfile,*) 'overlap_x   ' , overlap_x
-            write(outfile,*) 'components  ' , (dsin(ax*(xp-x2))/ax),  xp , (alpha*dsin(ax*x1)+beta*dsin(ax*x2)) , (alpha*dcos(ax*x1)+beta*dcos(ax*x2)) , x1 , x2
+            write(outfile,*) 'components  ' ,  xp , (alpha*dsin(ax*x1)+beta*dsin(ax*x2)) , (alpha*dcos(ax*x1)+beta*dcos(ax*x2)) , dcos(ax*x1) , dcos(ax*x2) 
 
         end do 
       end do
