@@ -130,11 +130,11 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
             ! Clifford Gaussian !
 
-            gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
+            gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
             xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
 
-            I_0_gamma_x = bessi_scaled(0,2.d0*gamma_x/(ax*ax))
-            I_1_gamma_x = bessi_scaled(1,2.d0*gamma_x/(ax*ax))
+            I_0_gamma_x = iv_scaled(0,2.d0*gamma_x/(ax*ax))
+            I_1_gamma_x = iv_scaled(1,2.d0*gamma_x/(ax*ax))
 
             !    Real Gaussain  ! 
 
