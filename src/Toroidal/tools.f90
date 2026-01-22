@@ -12,31 +12,22 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
 
       rp = datan((e1*dsin(ax*r1)+e2*dsin(ax*r2))/(e1*dcos(ax*r1)+e2*dcos(ax*r2)))/ax + 0.5d0 * Lx * Heaviside(-e1*dcos(ax*r1)-e2*dcos(ax*r2)) 
 
-      if (abs(e1 - e2) < 1.d-10) then 
+      if (dabs(e1 - e2) < 1.d-10) then 
+        rp = datan((dsin(ax*r1)+dsin(ax*r2))/(dcos(ax*r1)+dcos(ax*r2)))/ax + 0.5d0 * Lx * Heaviside(-e1*dcos(ax*r1)-e2*dcos(ax*r2))
+      end if 
 
-        if (dabs(r1-r2) > 0.50d0*Lx) then 
-          
-          if (r1 > r2) then 
-            rp =  r1 + (r2 + Lx)
-          elseif (r2 > r1) then 
-            rp = (r1 + Lx) + r2 
-          else 
-            rp = r1 + r2  
-          end if
-
-          rp = 0.5d0 * rp
-        
+      if (dabs((e1*dcos(ax*r1)+e2*dcos(ax*r2))) < 1.d0-14 ) then 
+        if (e1 > e2) then 
+          rp = r1 
+        else if (e1 < e2) then 
+          rp = r2 
         else 
-
-          rp = 0.5d0 * ( r1 + r2 )
-
+          rp = 0.d0 
         end if 
+      end if 
 
-      end if
 
-      if (abs(r1 - r2) < 1e-9) then 
-        rp = 0.5d0 * abs((r1 + r2))
-      end if
+
 
 end subroutine bary_center_toroidal
 

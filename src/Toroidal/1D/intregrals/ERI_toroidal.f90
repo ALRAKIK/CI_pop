@@ -468,9 +468,9 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
 
             if (i <= k .or. (i == k .and. j <= l)) then
 
-              call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), value)
+              call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))
 
-              two_electron(i,j,k,l) = value
+              !two_electron(i,j,k,l) = value
 
             end if
           end do
