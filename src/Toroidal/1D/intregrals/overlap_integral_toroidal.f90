@@ -83,6 +83,8 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       use HeavisideModule
       use bessel_functions
 
+      use files
+
       implicit none 
 
       double precision  ,intent(in)    :: r1(3) , r2(3)
@@ -131,7 +133,7 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
             ! Clifford Gaussian !
 
             gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
-            xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
+            xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
 
             I_0_gamma_x = iv_scaled(0,2.d0*gamma_x/(ax*ax))
             I_1_gamma_x = iv_scaled(1,2.d0*gamma_x/(ax*ax))
@@ -172,6 +174,11 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
             end if 
 
             S_sp_normal =  S_sp_normal + const * overlap_x * overlap_y * overlap_z
+
+            write(outfile,*) 'overlap_x' , overlap_x 
+            write(outfile,*) 'overlap_x' , overlap_y 
+            write(outfile,*) 'overlap_x' , overlap_z
+            write(outfile,*) 'TOTAL    ' , S_sp_normal
 
         end do 
       end do
