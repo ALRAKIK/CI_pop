@@ -109,23 +109,23 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
 
-      do i = 1 , index_unitcell
-        do j = 1 , number_of_functions
-          if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
-        end do 
-      end do 
+      !do i = 1 , index_unitcell
+      !  do j = 1 , number_of_functions
+      !    if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
+      !  end do 
+      !end do 
 
-      do i = index_unitcell + 1   , number_of_functions
-        do j = index_unitcell + 1 , number_of_functions
-          overlap(i,j) = overlap(i-index_unitcell,j-index_unitcell)
-        end do 
-      end do 
+      !do i = index_unitcell + 1   , number_of_functions
+      !  do j = index_unitcell + 1 , number_of_functions
+      !    overlap(i,j) = overlap(i-index_unitcell,j-index_unitcell)
+      !  end do 
+      !end do 
  
-      do i = 1 , number_of_functions - 1 
-        do j = i , number_of_functions
-          overlap(j,i) = overlap(i,j)
-        end do 
-      end do
+      !do i = 1 , number_of_functions - 1 
+      !  do j = i , number_of_functions
+      !    overlap(j,i) = overlap(i,j)
+      !  end do 
+      !end do
 
       do i = 1 , size(overlap,1)
         do j = i , size(overlap,1)
