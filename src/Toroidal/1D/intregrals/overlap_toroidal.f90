@@ -65,7 +65,7 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
             
             do k = 1 , size  (AO1%exponent)
               do l = 1 , size  (AO2%exponent)
-                !call overlap_integral_ss_toroidal(r1,r2,AO1,AO2,overlap(i,j))
+                call overlap_integral_ss_toroidal(r1,r2,AO1,AO2,overlap(i,j))
               end do 
             end do 
 
@@ -85,7 +85,7 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
                 
             do k = 1, size(AO1%exponent)
               do l = 1, size(AO2%exponent)
-                !call overlap_integral_sp_toroidal(r2, r1, AO2, AO1, overlap(i,j))
+                call overlap_integral_sp_toroidal(r2, r1, AO2, AO1, overlap(i,j))
               end do 
             end do
 
@@ -95,7 +95,7 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
                 
             do k = 1, size(AO1%exponent)
               do l = 1, size(AO2%exponent)
-                !call overlap_integral_pp_toroidal(r1, r2, AO1, AO2, overlap(i,j))
+                call overlap_integral_pp_toroidal(r1, r2, AO1, AO2, overlap(i,j))
               end do 
             end do
 
@@ -109,33 +109,23 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
 
-      !do i = 1 , index_unitcell
-      !  do j = 1 , number_of_functions
-      !    if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
-      !  end do 
-      !end do 
-
-      !do i = index_unitcell + 1   , number_of_functions
-      !  do j = index_unitcell + 1 , number_of_functions
-      !    overlap(i,j) = overlap(i-index_unitcell,j-index_unitcell)
-      !  end do 
-      !end do 
- 
-      !do i = 1 , number_of_functions - 1 
-      !  do j = i , number_of_functions
-      !    overlap(j,i) = overlap(i,j)
-      !  end do 
-      !end do
-
-      do i = 1 , size(overlap,1)
-        do j = i , size(overlap,1)
-          write(outfile,*) i , j , overlap(i,j)
-        end do 
+      do i = 1 , index_unitcell
+       do j = 1 , number_of_functions
+         if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
+       end do 
       end do 
 
-
-
-
+      do i = index_unitcell + 1   , number_of_functions
+       do j = index_unitcell + 1 , number_of_functions
+         overlap(i,j) = overlap(i-index_unitcell,j-index_unitcell)
+       end do 
+      end do 
+ 
+      do i = 1 , number_of_functions - 1 
+       do j = i , number_of_functions
+         overlap(j,i) = overlap(i,j)
+       end do 
+      end do
 
 
 end subroutine overlap_matrix_toroidal
