@@ -236,11 +236,7 @@ end do
       Nmax        = Peak+10
       do n = 1 , Nmax
         termAn  = iv_scaled(n, A)
-        if (q_x < 1.d0-15) then 
-          termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
-        else 
-          termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
-        end if 
+        termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
         termc   = iv_scaled(n, C) 
         term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
         if (abs(term) < tol) exit
