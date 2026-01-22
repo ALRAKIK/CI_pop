@@ -55,9 +55,8 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,intent(out)  :: c(nBas,nBas)
 
       ! ----------------------    Time     ---------------------------- !
-      integer                       :: days, hours, minutes, seconds , seconds1 , seconds2 , time 
+      integer                       :: seconds1 , seconds2 , time 
       double precision              :: start,end
-      double precision              :: start_time, end_time
       !-----------------------------------------------------------------!
 
       
@@ -65,52 +64,52 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
         open(HFfile,file=trim(tmp_file_name)//"/RHF.out")
       end if 
 
-      write(outfile,*)
-      write(outfile,*)'******************************************************************************************'
-      write(outfile,*)'|                          One electron integrals  calculation                           |'
-      write(outfile,*)'******************************************************************************************'
-      write(outfile,*)
+      ! write(outfile,*)
+      ! write(outfile,*)'******************************************************************************************'
+      ! write(outfile,*)'|                          One electron integrals  calculation                           |'
+      ! write(outfile,*)'******************************************************************************************'
+      ! write(outfile,*)
 
-      write(outfile,*)
-      write(outfile,*) ' Overlap integral'
-      write(outfile,*) '------------------'
-      write(outfile,*)
-      do mu = 1 , size(S,1)
-        do nu = mu , size(S,1)
-          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , S(mu,nu)
-        end do 
-      end do
+      ! write(outfile,*)
+      ! write(outfile,*) ' Overlap integral'
+      ! write(outfile,*) '------------------'
+      ! write(outfile,*)
+      ! do mu = 1 , size(S,1)
+      !   do nu = mu , size(S,1)
+      !     if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , S(mu,nu)
+      !   end do 
+      ! end do
 
-      write(outfile,*)
-      write(outfile,*) "---------------------------------"
+      ! write(outfile,*)
+      ! write(outfile,*) "---------------------------------"
 
-      write(outfile,*)
-      write(outfile,*) ' Kinetic integral'
-      write(outfile,*) '------------------'
-      write(outfile,*)
+      ! write(outfile,*)
+      ! write(outfile,*) ' Kinetic integral'
+      ! write(outfile,*) '------------------'
+      ! write(outfile,*)
 
-      do mu = 1 , size(T,1)
-        do nu = mu , size(T,1)
-          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , T(mu,nu)
-        end do 
-      end do
+      ! do mu = 1 , size(T,1)
+      !   do nu = mu , size(T,1)
+      !     if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , T(mu,nu)
+      !   end do 
+      ! end do
 
-      write(outfile,*)
-      write(outfile,*) "---------------------------------"
+      ! write(outfile,*)
+      ! write(outfile,*) "---------------------------------"
 
-      write(outfile,*)
-      write(outfile,*) ' Nuclear attraction integral'
-      write(outfile,*) '-----------------------------'
-      write(outfile,*)
+      ! write(outfile,*)
+      ! write(outfile,*) ' Nuclear attraction integral'
+      ! write(outfile,*) '-----------------------------'
+      ! write(outfile,*)
 
-      do mu = 1 , size(V,1)
-        do nu = mu , size(V,1)
-          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , V(mu,nu)
-        end do 
-      end do
+      ! do mu = 1 , size(V,1)
+      !   do nu = mu , size(V,1)
+      !     if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , V(mu,nu)
+      !   end do 
+      ! end do
 
-      write(outfile,*)
-      write(outfile,*) "---------------------------------"
+      ! write(outfile,*)
+      ! write(outfile,*) "---------------------------------"
 
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
@@ -203,13 +202,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       nSCF = nSCF + 1
   
       !   Compute the Hartree potential J
-
-      call cpu_time(start)
         call hartree_potential(nBas,P,ERI,J)
-      call cpu_time(end)
-      time     = int(end - start)
-      seconds1 = mod(mod(mod(time,86400),3600),60)
-
       ! ****************** !
   
       !   Compute the exchange potential K
@@ -292,11 +285,12 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       end if 
 
       !   Compute HOMO-LUMO gap
-          if(nBas > nO) then
-            Gap = e(nO+1) - e(nO)
-          else
-            Gap = 0d0
-          endif
+
+      if(nBas > nO) then
+        Gap = e(nO+1) - e(nO)
+      else
+        Gap = 0d0
+      endif
 
       ! ****************** !
 
@@ -315,12 +309,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       cp(:,:) = Fp(:,:)
 
-      call cpu_time(start)
-        call diagonalize_matrix(nBas,cp,e)
-      call cpu_time(end)
-
-      time    = int(end - start)
-      seconds2= mod(mod(mod(time,86400),3600),60)
+      call diagonalize_matrix(nBas,cp,e)
 
       !   Back-transform the MO coefficients c in the original non-orthogonal basis
 
@@ -379,8 +368,6 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
    
       write(outfile,"(1x,a1,i2,1x,a1,f16.8,1x,a1,f10.6,1x,a1,f10.6,1x,a1,f16.8,4x,a1,f16.8,4x,a1,f16.8,4x,a1)")      & 
       "|",nSCF,"|",EHF+ENuc,"|",Conv,"|",Gap,"|",ET,"|",EV,"|",Ej+EK,"|"
-      write(outfile,*) repeat('-', 110)
-        write(outfile,'(1x,a1,a7,5X,a6,2X,I0,4x,a,4X,a6,2X,I0,4x,a)') '|','Time = ','Diag ',seconds2, "sec", 'trans ',seconds1, "sec"
       write(outfile,*) repeat('-', 110)
       
       enddo
