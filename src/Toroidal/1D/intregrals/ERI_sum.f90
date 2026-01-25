@@ -231,12 +231,16 @@ end do
       case (0011) ! | s   s   px  px   ( 6 ) 
       n           = 0
       const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-      sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+      sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       Peak        = ceiling(min(A,B,C))
       Nmax        = Peak+10
       do n = 1 , Nmax
         termAn  = iv_scaled(n, A)
+        if (q_x < 1.d-10) then 
+        termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+        else 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+        end if 
         termc   = iv_scaled(n, C) 
         term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
         if (abs(term) < tol) exit
@@ -471,12 +475,16 @@ end do
 case (0111) ! | s   px  px  px   ( 22) 
 n           = 0
 const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A)))
+  if (q_x < 1.d-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -711,12 +719,16 @@ end do
 case (0211) ! | s   py  px  px   ( 38) 
 n           = 0
 const       =  (0.d0)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = iv_scaled(n, A)
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -951,12 +963,16 @@ end do
 case (0311) ! | s   pz  px  px   ( 54) 
 n           = 0
 const       =  (pi * D)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = iv_scaled(n, A)
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -1191,12 +1207,16 @@ end do
 case (1011) ! | px  s   px  px   ( 70) 
 n           = 0
 const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A)))
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -1356,11 +1376,15 @@ end do
 case (1100) ! | px  px  s   s    ( 81) 
 n           = 0
 const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1371,11 +1395,15 @@ end do
 case (1101) ! | px  px  s   px   ( 82) 
 n           = 0
 const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B)))
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1386,11 +1414,15 @@ end do
 case (1102) ! | px  px  s   py   ( 83) 
 n           = 0
 const       =  (0.d0)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1401,11 +1433,15 @@ end do
 case (1103) ! | px  px  s   pz   ( 84) 
 n           = 0
 const       =  (pi * D)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1416,11 +1452,15 @@ end do
 case (1110) ! | px  px  px  s    ( 85) 
 n           = 0
 const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B)))
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1431,12 +1471,20 @@ end do
 case (1111) ! | px  px  px  px   ( 86) 
 n           = 0
 const       =  (pi * D)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then  
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
-  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc * cxqd * iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
+  termBn  = inv_ax2 * (cxqc * cxqd * iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -1446,11 +1494,15 @@ end do
 case (1112) ! | px  px  px  py   ( 87) 
 n           = 0
 const       =  (0.d0)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B)))
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1461,11 +1513,15 @@ end do
 case (1113) ! | px  px  px  pz   ( 88) 
 n           = 0
 const       =  (pi * D)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if
   termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B)))
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1476,11 +1532,15 @@ end do
 case (1120) ! | px  px  py  s    ( 89) 
 n           = 0
 const       =  (0.d0)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1491,11 +1551,15 @@ end do
 case (1121) ! | px  px  py  px   ( 90) 
 n           = 0
 const       =  (0.d0)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B)))
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1506,11 +1570,15 @@ end do
 case (1122) ! | px  px  py  py   ( 91) 
 n           = 0
 const       = ( 0.5d0 * (p+t2) * D2 * pi * D ) *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1521,11 +1589,15 @@ end do
 case (1123) ! | px  px  py  pz   ( 92) 
 n           = 0
 const       =  (0.d0)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1536,11 +1608,15 @@ end do
 case (1130) ! | px  px  pz  s    ( 93) 
 n           = 0
 const       =  (pi * D)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1551,11 +1627,15 @@ end do
 case (1131) ! | px  px  pz  px   ( 94) 
 n           = 0
 const       =  (pi * D)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (iv_scaled(n-1,B)-iv_scaled(n+1,B)) + sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B)))
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1566,11 +1646,15 @@ end do
 case (1132) ! | px  px  pz  py   ( 95) 
 n           = 0
 const       =  (0.d0)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1581,11 +1665,15 @@ end do
 case (1133) ! | px  px  pz  pz   ( 96) 
 n           = 0
 const       =  (pi * D)  * ( 0.5d0 * (p+t2) * D2 * pi * D )  * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
+sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
+  if (p_x < 1.d0-10) then 
+  termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
+  else 
   termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
+  end if 
   termBn  = iv_scaled(n, B)
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
@@ -1671,12 +1759,16 @@ end do
 case (1211) ! | px  py  px  px   ( 102) 
 n           = 0
 const       =  (0.d0)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A)))
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -1911,12 +2003,16 @@ end do
 case (1311) ! | px  pz  px  px   ( 118) 
 n           = 0
 const       =  (pi * D)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A)))
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -2151,12 +2247,16 @@ end do
 case (2011) ! | py  s   px  px   ( 134) 
 n           = 0
 const       =  (0.d0)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = iv_scaled(n, A)
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -2391,12 +2491,16 @@ end do
 case (2111) ! | py  px  px  px   ( 150) 
 n           = 0
 const       =  (0.d0)  *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A)))
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -2631,12 +2735,16 @@ end do
 case (2211) ! | py  py  px  px   ( 166) 
 n           = 0
 const       = ( 0.5d0  * (q+t2) * D2 * pi * D ) *  (pi * D)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = iv_scaled(n, A)
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -2871,12 +2979,16 @@ end do
 case (2311) ! | py  pz  px  px   ( 182) 
 n           = 0
 const       =  (0.d0)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = iv_scaled(n, A)
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -3111,12 +3223,16 @@ end do
 case (3011) ! | pz  s   px  px   ( 198) 
 n           = 0
 const       =  (pi * D)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = iv_scaled(n, A)
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -3351,12 +3467,16 @@ end do
 case (3111) ! | pz  px  px  px   ( 214) 
 n           = 0
 const       =  (pi * D)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A)))
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -3591,12 +3711,16 @@ end do
 case (3211) ! | pz  py  px  px   ( 230) 
 n           = 0
 const       =  (0.d0)  *  (0.d0)   * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = iv_scaled(n, A)
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit
@@ -3831,12 +3955,16 @@ end do
 case (3311) ! | pz  pz  px  px   ( 246) 
 n           = 0
 const       =  (pi * D)  * ( 0.5d0  * (q+t2) * D2 * pi * D )  * exp(A+B-2.d0*(p+q)*inv_ax2)
-sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B)))) * iv_scaled(n, C) * const
+sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
 Peak        = ceiling(min(A,B,C))
 Nmax        = Peak+10
 do n = 1 , Nmax
   termAn  = iv_scaled(n, A)
+  if (q_x < 1.d0-10) then 
+  termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
+  else 
   termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
+  end if 
   termc   = iv_scaled(n, C) 
   term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
   if (abs(term) < tol) exit

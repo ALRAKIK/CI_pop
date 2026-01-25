@@ -22,7 +22,7 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
         else if (e1 < e2) then 
           rp = r2 
         else 
-          rp = 0.d0 
+          rp = r1
         end if 
       end if 
 
