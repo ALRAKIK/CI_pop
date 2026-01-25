@@ -24,10 +24,7 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
         else 
           rp = r1
         end if 
-      end if 
-
-
-
+      end if
 
 end subroutine bary_center_toroidal
 
