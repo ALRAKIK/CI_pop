@@ -73,6 +73,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       c2xqcd = dcos(ax*(2.d0*xq-xC-xD))
       s2xqcd = dsin(ax*(2.d0*xq-xC-xD))
 
+      A   = 2.d0  * p_x   * inv_ax2
+      B   = 2.d0  * q_x   * inv_ax2
+
+      print*, A 
+      print*, B 
+      print*, "==================="
+
 
       !call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr,   &
       !&          neval, ier,Limit,Lenw,Last,Iwork,Work)
@@ -138,16 +145,11 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       t3 = t2 * t 
       t4 = t3 * t 
 
-      A   = 2.d0  * p_x   * inv_ax2
-      B   = 2.d0  * q_x   * inv_ax2
       C   = 2.d0  * t * t * inv_ax2
 
       D   = 1.d0/(dsqrt(p*q+(p+q)*t2))
 
-      D2  = D * D 
-
-      print*, A
-
+      D2  = D * D
       
       select case(pattern_id)
       
