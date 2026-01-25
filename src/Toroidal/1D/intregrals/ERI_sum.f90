@@ -235,8 +235,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       Peak        = ceiling(min(A,B,C))
       Nmax        = Peak+10
-      write(outfile,*) "const         " , const 
-      write(outfile,*) "A , B , C  =  " , A , B , C 
       do n = 1 , Nmax
         termAn  = iv_scaled(n, A)
         if (q_x < 1.d-10) then 
