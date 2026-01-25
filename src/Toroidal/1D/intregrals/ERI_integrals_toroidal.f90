@@ -70,12 +70,6 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           yp    = 0.d0
           zp    = 0.d0 
 
-          print*, "alpha  ", alpha
-          print*, "beta   ", beta
-          print*, "xa     ", xa
-          print*, "xb     ", xb
-          print*, "xp     ", xp
-
           mu = alpha+beta 
           
           do k = 1 , size(three%exponent)
@@ -95,14 +89,6 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               yq     = 0.d0 
               zq     = 0.d0 
                
-              print*, "------------------  "
-              print*, "gamma  ", gamma 
-              print*, "delta  ", delta 
-              print*, "xc     ", xc
-              print*, "xd     ", xd
-              print*, "xq     ", xq
-
-
               nu     = gamma + delta
 
               const  = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx
@@ -114,6 +100,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               xqC     = ax*(xq - xc)
               xqD     = ax*(xq - xd)
               phi     = ax*(xp - xq)
+              print*, phi 
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
 
