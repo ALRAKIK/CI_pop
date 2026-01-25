@@ -76,8 +76,8 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       A   = 2.d0  * p_x   * inv_ax2
       B   = 2.d0  * q_x   * inv_ax2
 
-      print*, A 
-      print*, B 
+      print*, p_x , A
+      print*, q_x , B
       print*, "==================="
 
 
