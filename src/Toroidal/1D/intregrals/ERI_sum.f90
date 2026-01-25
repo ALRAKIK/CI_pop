@@ -142,12 +142,12 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       B   = 2.d0  * q_x   * inv_ax2
       C   = 2.d0  * t * t * inv_ax2
 
-      !A   = max(A, 1.0d-30)
-      !B   = max(B, 1.0d-30)
-
       D   = 1.d0/(dsqrt(p*q+(p+q)*t2))
 
       D2  = D * D 
+
+      print*, A
+
       
       select case(pattern_id)
       
@@ -232,7 +232,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       case (0011) ! | s   s   px  px   ( 6 ) 
       n           = 0
       const       =  (pi * D)  *  (pi * D)   * dexp(A+B-2.d0*(p+q)*inv_ax2)
-      print*, const
       sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       Peak        = ceiling(min(A,B,C))
       Nmax        = Peak+10
