@@ -1487,14 +1487,11 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
         else 
         termBn  = inv_ax2 * (cxqc * cxqd * iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
         end if
-        if (dabs(A) < 1.d0-10 .and. dabs(B) < 1.d0-10) then 
-        termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
-        termBn  = inv_ax2 * (cxqc * cxqd * iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
-        end if 
         termc   = iv_scaled(n, C) 
         term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
         if (abs(term) < tol) exit
         sum     = sum + 2.d0 * real(term) * const
+        print*, exp(I_dp*dble(n)*phi)
       end do
 
 ! case (1112) ! | px  px  px  py   ( 87) 
