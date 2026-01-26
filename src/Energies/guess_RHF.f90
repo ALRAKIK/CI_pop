@@ -22,6 +22,8 @@ subroutine guess_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
 
       allocate(cp(nbas,nbas),c(nbas,nbas),ct(nbas,nbas), e(nbas))
 
+      cp(:,:) = 0.d0 
+
       cp(:,:) = matmul(transpose(X(:,:)), matmul(HC(:,:), X(:,:)))
 
       call diagonalize_matrix(nbas, cp, e)
@@ -31,7 +33,6 @@ subroutine guess_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
       ct(:,:) = transpose(c)
 
       P(:,:) = 2d0 * matmul(c(:,1:nO), transpose(c(:,1:nO)))
-
 
       ! --------------------------------------------------------------- !
       !                          Print                                  !

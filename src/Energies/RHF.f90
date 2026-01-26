@@ -64,52 +64,52 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
         open(HFfile,file=trim(tmp_file_name)//"/RHF.out")
       end if 
 
-      ! write(outfile,*)
-      ! write(outfile,*)'******************************************************************************************'
-      ! write(outfile,*)'|                          One electron integrals  calculation                           |'
-      ! write(outfile,*)'******************************************************************************************'
-      ! write(outfile,*)
+      write(outfile,*)
+      write(outfile,*)'******************************************************************************************'
+      write(outfile,*)'|                          One electron integrals  calculation                           |'
+      write(outfile,*)'******************************************************************************************'
+      write(outfile,*)
 
-      ! write(outfile,*)
-      ! write(outfile,*) ' Overlap integral'
-      ! write(outfile,*) '------------------'
-      ! write(outfile,*)
-      ! do mu = 1 , size(S,1)
-      !   do nu = mu , size(S,1)
-      !     if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , S(mu,nu)
-      !   end do 
-      ! end do
+      write(outfile,*)
+      write(outfile,*) ' Overlap integral'
+      write(outfile,*) '------------------'
+      write(outfile,*)
+      do mu = 1 , size(S,1)
+        do nu = mu , size(S,1)
+          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , S(mu,nu)
+        end do 
+      end do
 
-      ! write(outfile,*)
-      ! write(outfile,*) "---------------------------------"
+      write(outfile,*)
+      write(outfile,*) "---------------------------------"
 
-      ! write(outfile,*)
-      ! write(outfile,*) ' Kinetic integral'
-      ! write(outfile,*) '------------------'
-      ! write(outfile,*)
+      write(outfile,*)
+      write(outfile,*) ' Kinetic integral'
+      write(outfile,*) '------------------'
+      write(outfile,*)
 
-      ! do mu = 1 , size(T,1)
-      !   do nu = mu , size(T,1)
-      !     if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , T(mu,nu)
-      !   end do 
-      ! end do
+      do mu = 1 , size(T,1)
+        do nu = mu , size(T,1)
+          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , T(mu,nu)
+        end do 
+      end do
 
-      ! write(outfile,*)
-      ! write(outfile,*) "---------------------------------"
+      write(outfile,*)
+      write(outfile,*) "---------------------------------"
 
-      ! write(outfile,*)
-      ! write(outfile,*) ' Nuclear attraction integral'
-      ! write(outfile,*) '-----------------------------'
-      ! write(outfile,*)
+      write(outfile,*)
+      write(outfile,*) ' Nuclear attraction integral'
+      write(outfile,*) '-----------------------------'
+      write(outfile,*)
 
-      ! do mu = 1 , size(V,1)
-      !   do nu = mu , size(V,1)
-      !     if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , V(mu,nu)
-      !   end do 
-      ! end do
+      do mu = 1 , size(V,1)
+        do nu = mu , size(V,1)
+          if (S(mu,nu) > 1.d-16) write(outfile,'(I3,I3,f24.16)') mu , nu , V(mu,nu)
+        end do 
+      end do
 
-      ! write(outfile,*)
-      ! write(outfile,*) "---------------------------------"
+      write(outfile,*)
+      write(outfile,*) "---------------------------------"
 
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
@@ -219,7 +219,23 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       if (Conv < thresh) exit 
 
       ! ****************** !
+
+      
+      write(outfile,'(15x,1000(i3,15x))') (i,i=1,size(j,1))
+      do i = 1 , size(j,1)
+        write(outfile,'(i3,6x,1000(f16.10,2x))') i ,  (j(i,o),o=1,size(j,1))
+      end do 
+      write(outfile,'(a)') ""
+
+      
+      write(outfile,'(15x,1000(i3,15x))') (i,i=1,size(k,1))
+      do i = 1 , size(k,1)
+        write(outfile,'(i3,6x,1000(f16.10,2x))') i ,  (k(i,o),o=1,size(k,1))
+      end do 
+      write(outfile,'(a)') ""
   
+
+      
       if (c_details) then 
 
       write(HFfile,'(a)') ""

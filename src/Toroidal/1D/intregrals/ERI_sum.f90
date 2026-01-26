@@ -37,7 +37,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       
       integer                            :: Nmax
       double precision,parameter         :: pi   = 3.14159265358979323846D00
-      double precision,parameter         :: pi2  = pi * pi      
+      double precision,parameter         :: pi2  = pi * pi
 
       double precision                   :: inv_ax 
       double precision                   :: inv_ax2
