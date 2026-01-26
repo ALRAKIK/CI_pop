@@ -68,7 +68,12 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
           call bary_center_toroidal(alpha,beta,xa,xb,xp)
           yp    = 0.d0
-          zp    = 0.d0
+          zp    = 0.d0 
+
+          print*, alpha , beta 
+          print*, xa    , xb 
+          print*, xp 
+          print*, "+++++++++++++++"
 
           mu = alpha+beta 
           
@@ -88,6 +93,11 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               call bary_center_toroidal(gamma,delta,xc,xd,xq)
               yq     = 0.d0 
               zq     = 0.d0 
+              
+              print*, gamma , delta 
+              print*, xc    , xd 
+              print*, xq 
+              print*, "-------------------------"
 
               nu     = gamma + delta
 
