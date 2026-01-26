@@ -149,6 +149,10 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       D   = 1.d0/(dsqrt(p*q+(p+q)*t2))
 
       D2  = D * D
+
+      termAn = 0.d0 
+      termBn = 0.d0 
+      termC  = 0.d0
       
       select case(pattern_id)
       
