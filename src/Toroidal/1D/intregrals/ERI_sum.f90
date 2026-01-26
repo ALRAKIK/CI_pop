@@ -27,7 +27,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
     
       ! Local variables
 
-      double precision,parameter         :: epsabs = 1.0e-10 , epsrel = 1.0e-8
+      double precision,parameter         :: epsabs = 1.0d-10 , epsrel = 1.0d-8
       integer,parameter                  :: inf = 1 
       double precision,parameter         :: bound = 0.0d0
       integer, parameter                 :: limit = 50
