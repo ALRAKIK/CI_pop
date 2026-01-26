@@ -1491,7 +1491,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
         term    = exp(I_dp*dble(n)*phi) * termC * termAn * termBn
         if (abs(term) < tol) exit
         sum     = sum + 2.d0 * real(term) * const
-        print*, exp(I_dp*dble(n)*phi)
+        print*, termAn , termBn
       end do
 
 ! case (1112) ! | px  px  px  py   ( 87) 
