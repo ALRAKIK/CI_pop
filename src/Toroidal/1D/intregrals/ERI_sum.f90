@@ -76,9 +76,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       A   = 2.d0  * p_x   * inv_ax2
       B   = 2.d0  * q_x   * inv_ax2
 
-      A = max(A,1.d0-30)
-      B = max(B,1.d0-30)
-
 
       !call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr,   &
       !&          neval, ier,Limit,Lenw,Last,Iwork,Work)
