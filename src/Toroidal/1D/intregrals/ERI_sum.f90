@@ -1478,9 +1478,16 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       Peak        = ceiling(min(A,B,C))
       Nmax        = Peak+10
       do n = 1 , Nmax
+        print*, 'DEBUG: p_x = ', p_x
+        print*, 'DEBUG: dabs(p_x) = ', dabs(p_x)
+        print*, 'DEBUG: 1.d0-10 = ', 1.d0-10
+        print*, 'DEBUG: Condition = ', dabs(p_x) < 1.d0-10
+        print*, 'DEBUG: Taking which branch? ', merge('IF  ','ELSE', dabs(p_x) < 1.d0-10)
         if (dabs(p_x) < 1.d0-10) then  
+        print*, 'DEBUG: Taking IF branch'
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
         else 
+        print*, 'DEBUG: Taking ELSE branch'
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
         end if 
         if (dabs(q_x) < 1.d0-10) then 
