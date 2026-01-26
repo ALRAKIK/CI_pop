@@ -76,6 +76,10 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       A   = 2.d0  * p_x   * inv_ax2
       B   = 2.d0  * q_x   * inv_ax2
 
+      A = max(A,1.d0-30)
+      B = max(B,1.d0-30)
+
+
       !call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr,   &
       !&          neval, ier,Limit,Lenw,Last,Iwork,Work)
 
@@ -1473,12 +1477,12 @@ end do
       Peak        = ceiling(min(A,B,C))
       Nmax        = Peak+10
       do n = 1 , Nmax
-        if (p_x < 1.d0-6) then  
+        if (p_x < 1.d0-10) then  
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
         else 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
         end if 
-        if (q_x < 1.d0-6) then 
+        if (q_x < 1.d0-10) then 
         termBn  = inv_ax2 * (cxqc * cxqd * iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
         else 
         termBn  = inv_ax2 * (cxqc * cxqd * iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
