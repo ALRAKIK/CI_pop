@@ -10,11 +10,11 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
 
       ! local !
 
-      double precision,parameter    :: epsilon = 1.d0-10
+      double precision,parameter    :: epsilon = 1.d0-12
 
       ! ----------------------------------------------------------------!
 
-      rp = datan((e1*dsin(ax*r1)+e2*dsin(ax*r2))/(e1*dcos(ax*r1)+e2*dcos(ax*r2)+1.d-30))/ax + 0.5d0 * Lx * Heaviside(-e1*dcos(ax*r1)-e2*dcos(ax*r2)) 
+      rp = datan((e1*dsin(ax*r1)+e2*dsin(ax*r2))/(e1*dcos(ax*r1)+e2*dcos(ax*r2)))/ax + 0.5d0 * Lx * Heaviside(-e1*dcos(ax*r1)-e2*dcos(ax*r2)) 
 
       if (dabs(r1-r2) < 0.5*Lx + epsilon .and. dabs(r1-r2) > 0.5*Lx - epsilon ) then
 
