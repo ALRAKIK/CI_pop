@@ -32,7 +32,7 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
 
       end if 
 
-      if (dabs((e1*dcos(ax*r1)+e2*dcos(ax*r2))) < 1.d0-14 ) then 
+      if (dabs((e1*dcos(ax*r1)+e2*dcos(ax*r2))) < 1.d-14 ) then 
         if (e1 > e2) then 
           rp = r1 
         else if (e1 < e2) then 
