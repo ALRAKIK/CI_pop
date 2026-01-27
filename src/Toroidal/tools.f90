@@ -10,7 +10,7 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
 
       ! local !
 
-      double precision,parameter    :: epsilon = 1.d0-10
+      double precision,parameter    :: epsilon = 1.d0-5
 
       ! ----------------------------------------------------------------!
 
