@@ -104,6 +104,9 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               write(*,*) "q_x         " , gamma**2 , delta**2  , 2.d0*gamma*delta*dcos(ax*(XCD))
               write(*,*) "sqrt(p_x)         " , dsqrt(alpha**2 +  beta**2  +  2.d0*alpha*beta*dcos(ax*(XAB)))
               write(*,*) "sqrt(q_x)         " , dsqrt(gamma**2 + delta**2  + 2.d0*gamma*delta*dcos(ax*(XCD)))
+              write(*,*) "sqrt(dabs(p_x))         " , dsqrt(dabs(alpha**2 +  beta**2  +  2.d0*alpha*beta*dcos(ax*(XAB))))
+              write(*,*) "sqrt(dabs(q_x))         " , dsqrt(dabs(gamma**2 + delta**2  + 2.d0*gamma*delta*dcos(ax*(XCD))))
+              write(*,*) "sqrt(dabs(q_x))         " , dsqrt(dabs(gamma*gamma + delta*delta + 2.d0*gamma*delta*dcos(ax*(XCD))))
               write(*,*) "Xab , Xcd   " , xa , xb , Xab ,xc,xd, Xcd 
               write(*,*) "p_x , q_x   " , mu_x , nu_x
 
