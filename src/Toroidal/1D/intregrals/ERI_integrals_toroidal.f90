@@ -93,6 +93,11 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               const  = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx
 
+              write(*,*) "Const     " , const 
+              write(*,*) "xp , xq   " , xp , xq 
+              write(*,*) "mu , nu   " , mu , nu 
+              write(*,*) "p_x , q_x " , mu_x , nu_x
+
               !test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
               xpA     = ax*(xp - xa)
