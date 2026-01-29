@@ -86,7 +86,8 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
       if (ier > 2) then
         write(*,'(A,I8,A)') 'Error code = ', ier
-        stop
+        write(outfile,'(A,I8,A)') 'you have an integral did not converge '
+        !stop
       end if
 
       contains
