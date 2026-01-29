@@ -62,7 +62,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           c2    = two%coefficient(j)
           o2    = two%orbital
 
-          mu_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(XAB))))
+          mu_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*dcos(ax*(XAB))))
           mu_y  = alpha + beta
           mu_z  = alpha + beta
 
@@ -96,6 +96,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               write(*,*) "Const     " , const 
               write(*,*) "xp , xq   " , xp , xq 
               write(*,*) "mu , nu   " , mu , nu 
+              write(*,*) "exponents " , alpha , beta , gamma , delta  
+              write(*,*) "Xab , Xcd " , Xab , Xcd 
               write(*,*) "p_x , q_x " , mu_x , nu_x
 
               !test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
