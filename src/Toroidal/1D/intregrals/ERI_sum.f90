@@ -77,11 +77,11 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       B   = 2.d0  * q_x   * inv_ax2
 
 
-      call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr,   &
-      &          neval, ier,Limit,Lenw,Last,Iwork,Work)
+      !call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr,   &
+      !&          neval, ier,Limit,Lenw,Last,Iwork,Work)
 
-      !call dqags(transformed_integrand, 0.0d0, 1.0d0, epsabs, epsrel, &
-      !           result, abserr, neval, ier, limit, lenw, last, iwork, work)
+      call dqags(transformed_integrand, 0.0d0, 1.0d0, epsabs, epsrel, &
+                 result, abserr, neval, ier, limit, lenw, last, iwork, work)
 
 
       if (ier > 2) then
