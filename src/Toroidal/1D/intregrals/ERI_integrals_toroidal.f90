@@ -100,8 +100,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               write(*,*) "exponents^2 " , alpha**2 , beta**2 , gamma**2 , delta**2
               write(*,*) "add         " , 2.d0*alpha*beta*dcos(ax*(XAB)) , 2.d0*gamma*delta*dcos(ax*(XCD))
               write(*,*) "ax          " , ax
-              write(*,*) "p_x         " , alpha**2 + beta**2  + 2.d0*alpha*beta*dcos(ax*(XAB)) 
-              write(*,*) "q_x         " , gamma**2 + delta**2 + 2.d0*gamma*delta*dcos(ax*(XCD))
+              write(*,*) "p_x         " , alpha**2 ,  beta**2  ,  2.d0*alpha*beta*dcos(ax*(XAB)) 
+              write(*,*) "q_x         " , gamma**2 , delta**2  , 2.d0*gamma*delta*dcos(ax*(XCD))
               write(*,*) "Xab , Xcd   " , Xab , Xcd 
               write(*,*) "p_x , q_x   " , mu_x , nu_x
 
