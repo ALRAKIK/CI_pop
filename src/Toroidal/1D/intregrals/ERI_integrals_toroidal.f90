@@ -62,7 +62,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           c2    = two%coefficient(j)
           o2    = two%orbital
 
-          mu_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*dcos(ax*(XAB))))
+          mu_x  = dsqrt(dabs(alpha*alpha + beta*beta + 2.d0*alpha*beta*dcos(ax*(XAB))))
           mu_y  = alpha + beta
           mu_z  = alpha + beta
 
@@ -81,7 +81,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               c4    = four%coefficient(l)
               o4    = four%orbital
 
-              nu_x  = dsqrt(dabs(gamma**2+delta**2+2.d0*gamma*delta*dcos(ax*(XCD))))
+              nu_x  = dsqrt(dabs(gamma*gamma + delta*delta + 2.d0*gamma*delta*dcos(ax*(XCD))))
               nu_y  =  gamma+delta
               nu_z  =  gamma+delta
 
@@ -99,6 +99,9 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               write(*,*) "exponents   " , alpha , beta , gamma , delta
               write(*,*) "exponents^2 " , alpha**2 , beta**2 , gamma**2 , delta**2
               write(*,*) "add         " , 2.d0*alpha*beta*dcos(ax*(XAB)) , 2.d0*gamma*delta*dcos(ax*(XCD))
+              write(*,*) "ax          " , ax
+              write(*,*) "p_x         " , alpha**2 + beta**2  + 2.d0*alpha*beta*dcos(ax*(XAB)) 
+              write(*,*) "q_x         " , gamma**2 + delta**2 + 2.d0*gamma*delta*dcos(ax*(XCD))
               write(*,*) "Xab , Xcd   " , Xab , Xcd 
               write(*,*) "p_x , q_x   " , mu_x , nu_x
 
