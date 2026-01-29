@@ -34,6 +34,51 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
 
 end subroutine bary_center_toroidal
 
+
+subroutine bary_exponent(e1,e2,x,p)
+
+      use torus_init
+      use HeavisideModule
+
+      implicit none
+      double precision, intent(in)  :: e1, e2
+      double precision, intent(in)  :: x
+      double precision, intent(out) :: p
+
+      ! local !
+
+      double precision,parameter    :: epsilon = 1.d-12
+      double precision              :: e12 , e22
+
+      ! ----------------------------------------------------------------!
+
+
+      e12 = e1 * e1 
+      e22 = e2 * e2 
+
+      
+      if (dabs(x) > 0.5d0*Lx-epsilon .and. dabs(x) < 0.5d0*Lx+epsilon) then 
+        if ((e1 - e2) < 1.d-6) then
+          p = 0.d0 
+          print*, "case 1"
+        else 
+          p = dabs(e1 - e2)
+        end if 
+      else 
+        p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
+        p = dsqrt(dabs(p))
+        print*, "case 2"
+      end if 
+
+      
+
+
+
+
+      
+
+end subroutine bary_exponent
+
       ! ----------------------------------------------------------------!
       ! ----------------------------------------------------------------!
 

@@ -81,7 +81,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               c4    = four%coefficient(l)
               o4    = four%orbital
 
-              nu_x  = dsqrt(dabs(gamma*gamma + delta*delta + 2.d0*gamma*delta*dcos(ax*(XCD))))
+              !nu_x  = dsqrt(dabs(gamma*gamma + delta*delta + 2.d0*gamma*delta*dcos(ax*(XCD))))
+              call bary_exponent(gamma,delta,XCD,nu_x)
               nu_y  =  gamma+delta
               nu_z  =  gamma+delta
 
