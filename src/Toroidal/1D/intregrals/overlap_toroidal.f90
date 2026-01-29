@@ -127,14 +127,6 @@ subroutine overlap_matrix_toroidal(number_of_atoms,number_of_functions,atoms,AO,
        end do 
       end do
 
-      write(outfile,'(a)') "The Overlap Matrix"
-      do i = 1 , size(overlap,1)
-        do j = i , size(overlap,1)
-          write(outfile,*) i , j , Overlap(i,j)
-        end do 
-      end do 
-
-
 end subroutine overlap_matrix_toroidal
 
       !-----------------------------------------------------------------!

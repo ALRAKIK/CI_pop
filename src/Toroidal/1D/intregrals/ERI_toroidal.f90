@@ -456,26 +456,38 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
       write(outfile,*) ''
       flush(outfile)
 
-      !$omp parallel do private(ij_index,i,j,k,l,value) &
-      !$omp shared(two_electron, ERI, i_index, j_index) &
-      !$omp schedule(dynamic,optimal_chunk_size)
+      ! !$omp parallel do private(ij_index,i,j,k,l,value) &
+      ! !$omp shared(two_electron, ERI, i_index, j_index) &
+      ! !$omp schedule(dynamic,optimal_chunk_size)
 
-      do ij_index = 1, total_ij_pairs
-          i = i_index(ij_index)
-          j = j_index(ij_index)
-        do k = 1, number_of_functions  
-          do l = k, number_of_functions
+      ! do ij_index = 1, total_ij_pairs
+      !     i = i_index(ij_index)
+      !     j = j_index(ij_index)
+      !   do k = 1, number_of_functions  
+      !     do l = k, number_of_functions
 
-            if (i <= k .or. (i == k .and. j <= l)) then
+      !       if (i <= k .or. (i == k .and. j <= l)) then
 
-              call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))
+      !         call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))
 
-            end if
-          end do
-        end do
-      end do
+      !       end if
+      !     end do
+      !   end do
+      ! end do
       
-      !$omp end parallel do
+      ! !$omp end parallel do
+
+
+      call ERI_integral_4_function_toroidal(ERI(1),ERI(1),ERI(3),ERI(13), two_electron(1,1,3,13))
+
+
+
+
+
+
+
+
+
 
       deallocate(i_index, j_index)
 
