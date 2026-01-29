@@ -60,14 +60,12 @@ subroutine bary_exponent(e1,e2,x,p)
       if (dabs(x) > 0.5d0*Lx-epsilon .and. dabs(x) < 0.5d0*Lx+epsilon) then 
         if ((e1 - e2) < 1.d-6) then
           p = 0.d0 
-          print*, "case 1"
         else 
           p = dabs(e1 - e2)
         end if 
       else 
         p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
         p = dsqrt(dabs(p))
-        print*, "case 2"
       end if 
 
       

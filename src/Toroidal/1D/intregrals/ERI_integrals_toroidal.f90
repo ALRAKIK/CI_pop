@@ -62,7 +62,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           c2    = two%coefficient(j)
           o2    = two%orbital
 
-          mu_x  = dsqrt(dabs(alpha*alpha + beta*beta + 2.d0*alpha*beta*dcos(ax*(XAB))))
+          !mu_x  = dsqrt(dabs(alpha*alpha + beta*beta + 2.d0*alpha*beta*dcos(ax*(XAB))))
+          call bary_exponent(alpha,beta,XAB,mu_x)
           mu_y  = alpha + beta
           mu_z  = alpha + beta
 
@@ -93,23 +94,6 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               nu     = gamma + delta
 
               const  = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx
-
-              write(*,*) "Const       " , const 
-              write(*,*) "xp , xq     " , xp , xq 
-              write(*,*) "mu , nu     " , mu , nu 
-              write(*,*) "exponents   " , alpha , beta , gamma , delta
-              write(*,*) "exponents^2 " , alpha**2 , beta**2 , gamma**2 , delta**2
-              write(*,*) "add         " , 2.d0*alpha*beta*dcos(ax*(XAB)) , 2.d0*gamma*delta*dcos(ax*(XCD))
-              write(*,*) "ax          " , ax
-              write(*,*) "p_x         " , alpha**2 ,  beta**2  ,  2.d0*alpha*beta*dcos(ax*(XAB)) 
-              write(*,*) "q_x         " , gamma**2 , delta**2  , 2.d0*gamma*delta*dcos(ax*(XCD))
-              write(*,*) "sqrt(p_x)         " , dsqrt(alpha**2 +  beta**2  +  2.d0*alpha*beta*dcos(ax*(XAB)))
-              write(*,*) "sqrt(q_x)         " , dsqrt(gamma**2 + delta**2  + 2.d0*gamma*delta*dcos(ax*(XCD)))
-              write(*,*) "sqrt(dabs(p_x))         " , dsqrt(dabs(alpha**2 +  beta**2  +  2.d0*alpha*beta*dcos(ax*(XAB))))
-              write(*,*) "sqrt(dabs(q_x))         " , dsqrt(dabs(gamma**2 + delta**2  + 2.d0*gamma*delta*dcos(ax*(XCD))))
-              write(*,*) "sqrt(dabs(q_x))         " , dsqrt(dabs(gamma*gamma + delta*delta + 2.d0*gamma*delta*dcos(ax*(XCD))))
-              write(*,*) "Xab , Xcd   " , xa , xb , Xab ,xc,xd, Xcd 
-              write(*,*) "p_x , q_x   " , mu_x , nu_x
 
               !test = dexp(-(alpha+beta-mu_x)*(Lx**2)/(2.d0*pi**2)) * dexp(-(gamma+delta-nu_x)*(Lx**2)/(2.d0*pi**2))
 
