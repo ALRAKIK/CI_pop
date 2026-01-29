@@ -51,7 +51,9 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
             const       = Lx*c1*c2
 
-              gamma_x     = dsqrt(dabs(alpha * alpha  + beta * beta + 2.d0 * alpha * beta * dcos(ax*(X))))
+              !gamma_x     = dsqrt(dabs(alpha * alpha  + beta * beta + 2.d0 * alpha * beta * dcos(ax*(X))))
+              call bary_exponent(alpha,beta,X,gamma_x)
+
 
               mu          = alpha * beta / ( alpha + beta )
                
@@ -130,9 +132,9 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
             ! Clifford Gaussian !
 
-            gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
+            !gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
             !xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
-
+            call bary_exponent(alpha,beta,X,gamma_x)
             call bary_center_toroidal(alpha,beta,x1,x2,xp)
 
 
@@ -240,9 +242,13 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           ! Clifford Gaussian !
 
-          gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
-          gamma_y     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y))))
-          gamma_z     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z))))
+          !gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
+          !gamma_y     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y))))
+          !gamma_z     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z))))
+
+          call bary_exponent(alpha,beta,X,gamma_x)
+          call bary_exponent(alpha,beta,Y,gamma_y)
+          call bary_exponent(alpha,beta,Z,gamma_z)
 
           !xp_C        = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
           call bary_center_toroidal(alpha,beta,x1,x2,xp_C)

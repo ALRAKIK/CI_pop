@@ -62,13 +62,16 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           
           ! Clifford Gaussian ! 
 
-          gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
+          !gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
+          call bary_exponent(alpha,beta,X,gamma_x)
 
           I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax2))
           I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax2))
           I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax2))
 
-          xp_C        = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2))
+          !xp_C        = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2))
+          call bary_center_toroidal(alpha,beta,x1,x2,xp_C)
+
 
           !   Real Gaussian   !
 
@@ -164,9 +167,12 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
           ! Clifford Gaussian !
 
-          gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
+          !gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
+          call bary_exponent(alpha,beta,X,gamma_x)
 
-          xp_C          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
+          !xp_C          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
+          call bary_center_toroidal(alpha,beta,x1,x2,xp_C)
+
 
           I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax**2))
           I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax**2))
@@ -316,9 +322,11 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           ! Clifford Gaussian !
             
-          gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
+          !gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
+          call bary_exponent(alpha,beta,X,gamma_x)
 
-          xp_C          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2)) 
+          !xp_C          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2)) 
+          call bary_center_toroidal(alpha,beta,x1,x2,xp_C)
 
           I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax**2))
           I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax**2))
