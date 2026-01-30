@@ -16,7 +16,12 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
 
       ! - local - !
 
-      double precision               :: start,end,time
+      ! ----------------------    Time     ---------------------------- !
+      integer                        :: days, hours, minutes, seconds , time 
+      double precision               :: start,end
+      !-----------------------------------------------------------------!
+
+
 
       ! - output - ! 
 
@@ -24,6 +29,9 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       double precision,intent(out)   ::   K(number_of_functions,number_of_functions)
       double precision,intent(out)   ::  NA(number_of_functions,number_of_functions)
       double precision,intent(out)   :: ERI(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
+
+
+
 
       ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - !
 
@@ -48,9 +56,13 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
 
       write(outfile,*) ""
 
-      time = end - start
+      time = int(end - start)
+      days = (time/86400)
+      hours=mod(time,86400)/3600
+      minutes=mod(mod(time,86400),3600)/60
+      seconds=mod(mod(mod(time,86400),3600),60)
 
-      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for integrals = ',time,' seconds'
+      write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'Total CPU time for integrals = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
       write(outfile,*)
       flush(outfile)
 

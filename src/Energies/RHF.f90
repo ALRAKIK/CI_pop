@@ -55,8 +55,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,intent(out)  :: c(nBas,nBas)
 
       ! ----------------------    Time     ---------------------------- !
-      integer                       :: seconds1 , seconds2 , time 
-      double precision              :: start,end
+
       !-----------------------------------------------------------------!
 
       
@@ -64,52 +63,52 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
         open(HFfile,file=trim(tmp_file_name)//"/RHF.out")
       end if 
 
-      write(outfile,*)
-      write(outfile,*)'******************************************************************************************'
-      write(outfile,*)'|                          One electron integrals  calculation                           |'
-      write(outfile,*)'******************************************************************************************'
-      write(outfile,*)
+      ! write(outfile,*)
+      ! write(outfile,*)'******************************************************************************************'
+      ! write(outfile,*)'|                          One electron integrals  calculation                           |'
+      ! write(outfile,*)'******************************************************************************************'
+      ! write(outfile,*)
 
-      write(outfile,*)
-      write(outfile,*) ' Overlap integral'
-      write(outfile,*) '------------------'
-      write(outfile,*)
-      do mu = 1 , size(S,1)
-        do nu = mu , size(S,1)
-          write(outfile,'(I3,I3,f24.16)') mu , nu , S(mu,nu)
-        end do 
-      end do
+      ! write(outfile,*)
+      ! write(outfile,*) ' Overlap integral'
+      ! write(outfile,*) '------------------'
+      ! write(outfile,*)
+      ! do mu = 1 , size(S,1)
+      !   do nu = mu , size(S,1)
+      !     write(outfile,'(I3,I3,f24.16)') mu , nu , S(mu,nu)
+      !   end do 
+      ! end do
 
-      write(outfile,*)
-      write(outfile,*) "---------------------------------"
+      ! write(outfile,*)
+      ! write(outfile,*) "---------------------------------"
 
-      write(outfile,*)
-      write(outfile,*) ' Kinetic integral'
-      write(outfile,*) '------------------'
-      write(outfile,*)
+      ! write(outfile,*)
+      ! write(outfile,*) ' Kinetic integral'
+      ! write(outfile,*) '------------------'
+      ! write(outfile,*)
 
-      do mu = 1 , size(T,1)
-        do nu = mu , size(T,1)
-          write(outfile,'(I3,I3,f24.16)') mu , nu , T(mu,nu)
-        end do 
-      end do
+      ! do mu = 1 , size(T,1)
+      !   do nu = mu , size(T,1)
+      !     write(outfile,'(I3,I3,f24.16)') mu , nu , T(mu,nu)
+      !   end do 
+      ! end do
 
-      write(outfile,*)
-      write(outfile,*) "---------------------------------"
+      ! write(outfile,*)
+      ! write(outfile,*) "---------------------------------"
 
-      write(outfile,*)
-      write(outfile,*) ' Nuclear attraction integral'
-      write(outfile,*) '-----------------------------'
-      write(outfile,*)
+      ! write(outfile,*)
+      ! write(outfile,*) ' Nuclear attraction integral'
+      ! write(outfile,*) '-----------------------------'
+      ! write(outfile,*)
 
-      do mu = 1 , size(V,1)
-        do nu = mu , size(V,1)
-          write(outfile,'(I3,I3,f24.16)') mu , nu , V(mu,nu)
-        end do 
-      end do
+      ! do mu = 1 , size(V,1)
+      !   do nu = mu , size(V,1)
+      !     write(outfile,'(I3,I3,f24.16)') mu , nu , V(mu,nu)
+      !   end do 
+      ! end do
 
-      write(outfile,*)
-      write(outfile,*) "---------------------------------"
+      ! write(outfile,*)
+      ! write(outfile,*) "---------------------------------"
 
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
