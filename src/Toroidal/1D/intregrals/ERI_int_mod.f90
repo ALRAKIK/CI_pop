@@ -1,6 +1,6 @@
 subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
 
-      use quadpack , only : dqag
+      use quadpack , only : dqag , dqags
       use iso_c_binding
       use torus_init
       use gsl_bessel_mod
@@ -90,8 +90,6 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ax2 = ax  * ax
       ax3 = ax2 * ax
       ax4 = ax3 * ax
-
-      sf  = 0.d0
 
       select case (pattern_id)
         
@@ -611,12 +609,10 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
                 end if
 
         case default 
+          
           result = 0.d0 
 
       end select 
-
-
-      result = result * dexp(-sf)
       
       contains 
 
@@ -636,7 +632,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi          = phi - theta 
       z            = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term         = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const        = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const        = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx     = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
@@ -662,13 +658,13 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz2   = iv_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
@@ -707,15 +703,15 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz2   = iv_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
@@ -752,15 +748,15 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz2   = iv_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
@@ -798,15 +794,15 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz2   = iv_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
@@ -847,16 +843,16 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
       bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
       bmix2  = 12.0d0*(bz0 - bz2)
@@ -901,16 +897,16 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
       bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
       bmix2  = 12.0d0*(bz0 - bz2)
@@ -963,16 +959,16 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
       bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
       bmix2  = 12.0d0*(bz0 - bz2)
@@ -1024,16 +1020,16 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
       bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
       bmix2  = 12.0d0*(bz0 - bz2)
@@ -1085,16 +1081,16 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
       bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
       bmix2  = 12.0d0*(bz0 - bz2)
@@ -1147,16 +1143,16 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
       bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
       bmix2  = 12.0d0*(bz0 - bz2)
@@ -1218,7 +1214,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
@@ -1229,13 +1225,13 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z5 = z4 * z
       z6 = z5 * z  
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
-      bz5   = bessi_scaled(5,z)
-      bz6   = bessi_scaled(6,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
+      bz5   = iv_scaled(5,z)
+      bz6   = iv_scaled(6,z)
 
       bmix1  = (3.0d0*bz0 - 4.0d0*bz2 + bz4)
       bmix2  = 12.0d0*(bz0 - bz2)
@@ -1368,7 +1364,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
@@ -1379,13 +1375,13 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z5 = z4 * z
       z6 = z5 * z  
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
-      bz5   = bessi_scaled(5,z)
-      bz6   = bessi_scaled(6,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
+      bz5   = iv_scaled(5,z)
+      bz6   = iv_scaled(6,z)
 
       st  = dsin(theta)       ;    ct  = dcos(theta)
       st2 = st * st           ;    ct2 = ct * ct  
@@ -1463,7 +1459,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
@@ -1474,13 +1470,13 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z5 = z4 * z
       z6 = z5 * z  
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
-      bz5   = bessi_scaled(5,z)
-      bz6   = bessi_scaled(6,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
+      bz5   = iv_scaled(5,z)
+      bz6   = iv_scaled(6,z)
 
       st  = dsin(theta)        ;    ct  = dcos(theta)
       st2 = st  * st           ;    ct2 = ct  * ct  
@@ -1555,7 +1551,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
@@ -1566,13 +1562,13 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z5 = z4 * z
       z6 = z5 * z  
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
-      bz5   = bessi_scaled(5,z)
-      bz6   = bessi_scaled(6,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
+      bz5   = iv_scaled(5,z)
+      bz6   = iv_scaled(6,z)
 
       st  = dsin(theta)        ;    ct  = dcos(theta)
       st2 = st  * st           ;    ct2 = ct  * ct  
@@ -1654,7 +1650,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       psi         = phi - theta 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
       int_xxxx    = const * 0.5d0 * pi * dsqrt(inv) * erfcx(term) / (p+q)
 
       ! - derivative part - !
@@ -1666,15 +1662,15 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z6 = z5 * z
       z7 = z6 * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
-      bz5   = bessi_scaled(5,z)
-      bz6   = bessi_scaled(6,z)
-      bz7   = bessi_scaled(7,z)
-      bz8   = bessi_scaled(8,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
+      bz5   = iv_scaled(5,z)
+      bz6   = iv_scaled(6,z)
+      bz7   = iv_scaled(7,z)
+      bz8   = iv_scaled(8,z)
 
       st  = dsin(theta)        ;    ct  = dcos(theta)
       st2 = st  * st           ;    ct2 = ct  * ct
@@ -1781,7 +1777,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = 2.d0 * p * ppq * dsqrt(beta)
       term2    = erfcx(term) * dsqrt(pi) * dsqrt(inv) * (3.d0*p*q+2.d0*q2+p2*(1.d0-2.d0*q*beta))
@@ -1790,7 +1786,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_xxyy
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f0022
@@ -1817,7 +1813,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = 2.d0 * p * ppq * dsqrt(beta)
       int_xxyy = const * 0.125d0 * dsqrt(pi) * ( term1 ) / ( q * ppq3 )
@@ -1825,7 +1821,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_xxyy
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f0033t1
@@ -1852,7 +1848,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term2    = erfcx(term) * dsqrt(pi) * dsqrt(inv) * (3.d0*p*q+2.d0*q2+p2*(1.d0-2.d0*q*beta))
       int_xxyy = const * 0.125d0 * dsqrt(pi) * ( term2 ) / ( q * ppq3 )
@@ -1860,7 +1856,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_xxyy
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f0033t2
@@ -1889,7 +1885,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = 2.d0 * p * ppq * dsqrt(beta)
       term2    = erfcx(term) * dsqrt(pi) * dsqrt(inv) * (3.d0*p*q+2.d0*q2+p2*(1.d0-2.d0*q*beta))
@@ -1899,9 +1895,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -1947,7 +1943,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
       term2    = erfcx(term) * pi * dsqrt(inv) * ( ppq + 2.d0 * p * q * beta )
@@ -1956,7 +1952,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_xyxy
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f0202
@@ -1984,7 +1980,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
       term2    = erfcx(term) * pi * dsqrt(inv) * ( ppq + 2.d0 * p * q * beta )
@@ -1994,9 +1990,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -2042,7 +2038,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
       term2    = erfcx(term) * pi * dsqrt(inv) * ( ppq + 2.d0 * p * q * beta )
@@ -2051,7 +2047,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_xyxy
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f0220
@@ -2080,7 +2076,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
       term2    = erfcx(term) * pi * dsqrt(inv) * ( ppq + 2.d0 * p * q * beta )
@@ -2088,9 +2084,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -2136,7 +2132,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = 2.d0 * p * ppq * dsqrt(beta)
@@ -2147,9 +2143,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
       st = dsin(theta)       ;    ct = dcos(theta)
 
@@ -2193,7 +2189,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = 2.d0 * p * ppq * dsqrt(beta)
       term2    = erfcx(term) * dsqrt(pi) * dsqrt(inv) * (3.d0*p*q+2.d0*q2+p2*(1.d0-2.d0*q*beta))
@@ -2205,11 +2201,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z3 = z2 * z
       z4 = z3 * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
 
       st  = dsin(theta)       ;    ct = dcos(theta)
@@ -2259,7 +2255,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2268,9 +2264,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       ! - derivative part - !
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -2317,7 +2313,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2330,11 +2326,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z3 = z2 * z
       z4 = z3 * z  
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
 
       st  = dsin(theta)       ;    ct = dcos(theta)
@@ -2391,7 +2387,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
       term2    = erfcx(term) * pi * dsqrt(inv) * ( ppq + 2.d0 * p * q * beta )
@@ -2401,9 +2397,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -2449,7 +2445,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
       term2    = erfcx(term) * pi * dsqrt(inv) * ( ppq + 2.d0 * p * q * beta )
@@ -2461,11 +2457,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z3 = z2 * z
       z4 = z3 * z  
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
 
       st  = dsin(theta)       ;    ct = dcos(theta)
@@ -2523,7 +2519,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2533,7 +2529,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_yxyx
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f2002
@@ -2562,7 +2558,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
       term2    = erfcx(term) * pi * dsqrt(inv) * ( ppq + 2.d0 * p * q * beta )
@@ -2572,9 +2568,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -2620,7 +2616,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2630,7 +2626,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_yxyx
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f2020
@@ -2659,7 +2655,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2670,9 +2666,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -2718,7 +2714,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2729,9 +2725,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -2780,7 +2776,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2793,11 +2789,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z3 = z2 * z
       z4 = z3 * z  
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
 
       st  = dsin(theta)       ;    ct = dcos(theta)
@@ -2861,7 +2857,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2872,9 +2868,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -2922,7 +2918,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = -2.d0 * dsqrt(pi*beta) * ppq
@@ -2935,11 +2931,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z3 = z2 * z
       z4 = z3 * z  
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
 
       st  = dsin(theta)       ;    ct = dcos(theta)
@@ -2998,7 +2994,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = 2.d0 * p * q2 * dsqrt(beta)
       term2    = erfcx(term) * dsqrt(pi)  * (2.d0*p2 + q2 + p * q * (3.d0-2.d0*q*beta)) / dsqrt(inv)
@@ -3007,7 +3003,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_yyxx
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f2200
@@ -3036,7 +3032,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = 2.d0 * p * q2 * dsqrt(beta)
@@ -3047,9 +3043,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -3096,7 +3092,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1    = 2.d0 * p * q2 * dsqrt(beta)
@@ -3107,9 +3103,9 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z2 = z * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
 
 
       st = dsin(theta)       ;    ct = dcos(theta)
@@ -3156,7 +3152,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = 2.d0 * p * q2 * dsqrt(beta)
       term2    = erfcx(term) * dsqrt(pi)  * (2.d0*p2 + q2 + p * q * (3.d0-2.d0*q*beta)) / dsqrt(inv)
@@ -3168,11 +3164,11 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       z3 = z2 * z
       z4 = z3 * z 
 
-      bz0   = bessi_scaled(0,z)
-      bz1   = bessi_scaled(1,z)
-      bz2   = bessi_scaled(2,z)
-      bz3   = bessi_scaled(3,z)
-      bz4   = bessi_scaled(4,z)
+      bz0   = iv_scaled(0,z)
+      bz1   = iv_scaled(1,z)
+      bz2   = iv_scaled(2,z)
+      bz3   = iv_scaled(3,z)
+      bz4   = iv_scaled(4,z)
 
 
       st  = dsin(theta)       ;    ct = dcos(theta)
@@ -3227,7 +3223,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    = erfcx(term) * pi * ( ppq2 * (4.d0 * p + q ) * ( p + 4.d0 * q ) - 4.d0 * p * ( p - 2.d0 * q) * ( 2.d0 * p - q ) * q * ppq * beta  + 12.d0 * p3 * q3 * beta2 )
       term2    = 2.d0 * p * dsqrt(pi) * dsqrt(inv) * q * dsqrt(beta) * (4.d0 * p3 - 3.d0 * p * q2 + 4.d0 * q3 - 3.d0 * p2 * q * (1.d0+2.d0*q*beta) ) 
@@ -3236,7 +3232,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_yyyy
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f2222
@@ -3269,7 +3265,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
 
       term1 = erfcx(term) * pi * ( ppq2 * ( 4.d0 * p2 + 11.d0 * p * q + 4.d0 * q2 ) - 4.d0 * p * q * ppq * ( 2.d0 * p2 + p * q + 2.d0 * q2 ) * beta + 4.d0 * p3 * q3 * beta2 )
@@ -3279,7 +3275,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_yyzz
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f2233
@@ -3313,7 +3309,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    =   2.d0 * p * dsqrt(pi) * dsqrt(inv) * q * sqrt(beta) * ( 5.d0 * ppq + 2.d0 * p * q * beta )
       term2    =  - erfcx(term) * pi * (3.d0 * ppq2 + 12.d0 * p * q * ppq * beta + 4.d0 * p2 * q2 * beta2)
@@ -3322,7 +3318,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_yzyz
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f2323
@@ -3356,7 +3352,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
 
       z           = dsqrt(  dabs( A2 + B2 + 2.d0 * A * B * dcos(theta) ) )
       term        = dsqrt(  dabs( 2.d0 * Iinv * ( 1.d0 - dcos(psi) ) )   ) / ax
-      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2+sf)
+      const       = 0.5d0 * pi * dexp(z-2.d0*(p+q)/ax2)
 
       term1    =   2.d0 * p * dsqrt(pi) * dsqrt(inv) * q * sqrt(beta) * ( 5.d0 * ppq + 2.d0 * p * q * beta )
       term2    =  - erfcx(term) * pi * (3.d0 * ppq2 + 12.d0 * p * q * ppq * beta + 4.d0 * p2 * q2 * beta2)
@@ -3365,7 +3361,7 @@ subroutine integrate_ERI_integral_mod(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD
       ! - derivative part - !
 
       integral_t  = int_yzyz
-      der_t       = bessi_scaled(0, z)
+      der_t       = iv_scaled(0, z)
       f           = der_t * integral_t
 
       end function f2332
