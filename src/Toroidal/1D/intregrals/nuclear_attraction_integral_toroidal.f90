@@ -122,7 +122,7 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xPC,yPC,zPC,albe, result)
     
       ! Local variables
       
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer,parameter             :: inf = 1 
       double precision,parameter    :: bound = 0.0d0
       integer, parameter            :: limit = 100
@@ -320,7 +320,7 @@ subroutine integrate_NA_spx_Toroidal(gamma_x,xP,xc,xb,yPC,zPC,albe, result)
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer         ,parameter    :: inf = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -381,7 +381,7 @@ subroutine integrate_NA_spy_Toroidal(gamma_x,xPc,yPC,yPB,zPC,albe, result)
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer         ,parameter    :: inf = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -445,7 +445,7 @@ subroutine integrate_NA_spz_Toroidal(gamma_x,xPc,yPC,zPC,zPB,albe, result)
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-16 , epsrel = 1.d-10
       integer         ,parameter    :: inf = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -825,7 +825,7 @@ subroutine integrate_NA_px_px_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -917,7 +917,7 @@ subroutine integrate_NA_px_py_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-16 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -1012,7 +1012,7 @@ subroutine integrate_NA_px_pz_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -1107,7 +1107,7 @@ subroutine integrate_NA_py_px_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -1202,7 +1202,7 @@ subroutine integrate_NA_py_py_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -1297,7 +1297,7 @@ subroutine integrate_NA_py_pz_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-16 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -1393,7 +1393,7 @@ subroutine integrate_NA_pz_px_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -1488,7 +1488,7 @@ subroutine integrate_NA_pz_py_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-16 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
@@ -1584,7 +1584,7 @@ subroutine integrate_NA_pz_pz_Toroidal(xpC,ypC,zpC, &
     
       ! Local variables
 
-      double precision,parameter    :: epsabs = 1.0e-16 , epsrel = 1.0e-10
+      double precision,parameter    :: epsabs = 1.d-12 , epsrel = 1.d-10
       integer         ,parameter    :: inf   = 1 
       double precision,parameter    :: bound = 0.0d0
       integer         ,parameter    :: limit = 100
