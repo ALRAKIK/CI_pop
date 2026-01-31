@@ -107,15 +107,15 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
 
 
-              !if (abs(test) >= 1.d-16) then
-              !  call integrate_ERI_sum(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
-              !  value  = value    + test * value_s
-              !end if 
+              if (abs(test) >= 1.d-17) then
+               call integrate_ERI_sum(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+               value  = value    + test * value_s
+              end if 
 
               !call integrate_ERI_integral(pattern_id,px_count,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
 
-              call integrate_ERI_integral_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
-              value  = value    + const * value_s
+              ! call integrate_ERI_integral_mod(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+              ! value  = value    + const * value_s
 
               
               
