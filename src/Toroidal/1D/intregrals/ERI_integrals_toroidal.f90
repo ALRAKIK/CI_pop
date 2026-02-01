@@ -94,7 +94,7 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               nu     = gamma + delta
 
-              const  = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi) * (Lx * Lx)
+              const  = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi)*Lx*Lx
 
               test = dexp(-0.5d0*(alpha+beta+gamma+delta-mu_x-nu_x)*(Lx*Lx)/(pi*pi)) * const
 
