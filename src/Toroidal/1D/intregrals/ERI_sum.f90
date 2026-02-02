@@ -221,7 +221,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       do n = 1 , Nmax
         termAn  = iv_scaled(n, A)
-        if (q_x < 1.d-10) then 
+        if (dabs(q_x) < 1.d-15) then 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
         else 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
@@ -311,7 +311,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       sum         = inv_ax * 0.5d0 * (sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       do n = 1 , Nmax
         termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpb * (iv_scaled(n-1,A)+iv_scaled(n+1,A)))
-        if (q_x < 1.d-10) then 
+        if (dabs(q_x) < 1.d-15) then 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
         else 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
@@ -514,7 +514,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       sum         = inv_ax * 0.5d0 * (sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       do n = 1 , Nmax
         termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (iv_scaled(n-1,A) - iv_scaled(n+1,A)) + sxpa * (iv_scaled(n-1,A)+iv_scaled(n+1,A)))
-        if (q_x < 1.d-10) then 
+        if (dabs(q_x) < 1.d-15) then 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
         else 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
@@ -559,7 +559,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       const       =  (pi * D)  *  (pi * D)
       sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
       do n = 1 , Nmax
-        if (p_x < 1.d-10) then 
+        if (dabs(p_x) < 1.d-15) then 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
         else 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
@@ -577,7 +577,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       const       =  (pi * D)  *  (pi * D)
       sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax * 0.5d0 * (sxqd * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
       do n = 1 , Nmax
-        if (p_x < 1.d-10) then 
+        if (dabs(p_x) < 1.d-15) then 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
         else 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
@@ -595,7 +595,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       const       =  (pi * D)  *  (pi * D)
       sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax * 0.5d0 * (sxqc * (iv_scaled(n-1,B)+iv_scaled(n+1,B))) * iv_scaled(n, C) * const
       do n = 1 , Nmax
-        if (p_x < 1.d-10) then 
+        if (dabs(p_x) < 1.d-15) then 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
         else 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
@@ -613,12 +613,12 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       const       =  (pi * D)  *  (pi * D)
       sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       do n = 1 , Nmax
-        if (dabs(p_x) < 1.d-10) then  
+        if (dabs(p_x) < 1.d-15) then  
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
         else 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
         end if 
-        if (dabs(q_x) < 1.d-10) then 
+        if (dabs(q_x) < 1.d-15) then 
         termBn  = inv_ax2 * (cxqc * cxqd * iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
         else 
         termBn  = inv_ax2 * (cxqc * cxqd * iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
@@ -635,7 +635,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       const       = ( 0.5d0 * (p+t2) * D2 * pi * D ) *  (pi * D)
       sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
       do n = 1 , Nmax
-        if (p_x < 1.d-10) then 
+        if (dabs(p_x) < 1.d-15) then 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
         else 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
@@ -653,7 +653,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       const       =  (pi * D)  * ( 0.5d0 * (p+t2) * D2 * pi * D )
       sum         = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))) * iv_scaled(n, B) * iv_scaled(n, C) * const
       do n = 1 , Nmax
-        if (p_x < 1.d-10) then 
+        if (dabs(p_x) < 1.d-15) then 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A))))
         else 
         termAn  = inv_ax2 * (cxpa * cxpb * iv_scaled(n,A)-c2xpab*(0.25d0*(iv_scaled(n-2,A)+2.d0*iv_scaled(n,A)+iv_scaled(n+2,A)))+I_dp/A*n * s2xpab * (0.5d0*(iv_scaled(n-1,A)+iv_scaled(n+1,A))))
@@ -941,7 +941,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       do n = 1 , Nmax
         termAn  = iv_scaled(n, A)
-        if (q_x < 1.d-10) then 
+        if (dabs(q_x) < 1.d-15) then 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
         else 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
@@ -1199,7 +1199,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       sum         = iv_scaled(n, A) * inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))) * iv_scaled(n, C) * const
       do n = 1 , Nmax
         termAn  = iv_scaled(n, A)
-        if (q_x < 1.d-10) then 
+        if (dabs(q_x) < 1.d-15) then 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B))))
         else 
         termBn  = inv_ax2 * (cxqc*cxqd*iv_scaled(n,B)-c2xqcd*(0.25d0*(iv_scaled(n-2,B)+2.d0*iv_scaled(n,B)+iv_scaled(n+2,B)))-I_dp/B*n * s2xqcd * (0.5d0*(iv_scaled(n-1,B)+iv_scaled(n+1,B))))
