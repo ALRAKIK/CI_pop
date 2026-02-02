@@ -72,7 +72,6 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           !xp_C        = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2))
           call bary_center_toroidal(alpha,beta,x1,x2,xp_C)
 
-
           !   Real Gaussian   !
 
           albe        = alpha + beta 
