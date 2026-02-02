@@ -111,10 +111,9 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               print*, "delta    =  ", delta
               print*, "xc , xd  =  ", xc , xd 
               print*, "-----------------------"
-              print*, "xp       =  ", xp
-              print*, "alpha    =  ", alpha 
-              print*, "beta     =  ", beta
-              print*, "xa , xb  =  ", xa , xb 
+              print*, "numerator   = ",  dsin(ax*xc) , dsin(ax*xd) , dsin(ax*xc) + dsin(ax*xd) , gamma*dsin(ax*xc) + delta * dsin(ax*xd)  
+              print*, "denominator = ",  dcos(ax*xc) , dcos(ax*xd) , dcos(ax*xc) + dcos(ax*xd) , gamma*dcos(ax*xc) + delta * dcos(ax*xd) 
+              print*, "-----------------------"
               
 
 
