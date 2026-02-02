@@ -106,10 +106,15 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
 
-              ! print*, "xq       =  ", xq
-              ! print*, "gamma    =  ", gamma 
-              ! print*, "delta    =  ", delta
-              ! print*, "xc , xd  =  ", xc , xd 
+              print*, "xq       =  ", xq
+              print*, "gamma    =  ", gamma 
+              print*, "delta    =  ", delta
+              print*, "xc , xd  =  ", xc , xd 
+              print*, "-----------------------"
+              print*, "xp       =  ", xp
+              print*, "alpha    =  ", alpha 
+              print*, "beta     =  ", beta
+              print*, "xa , xb  =  ", xa , xb 
               
 
 
