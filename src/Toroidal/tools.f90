@@ -173,7 +173,7 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
         do j = 1, nf
           do k = 1, nf
             do l = 1, nf
-              eri(i,j,k,l) = eri_tmp(i,j,k,l)
+              if (dabs(eri_tmp(i,j,k,l)) > 1.d-12) eri(i,j,k,l) = eri_tmp(i,j,k,l)
             end do
           end do
         end do
