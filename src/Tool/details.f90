@@ -62,7 +62,7 @@ subroutine details_integrals(n_f,S,T,V,ERI)
 
       open(1,file=trim(tmp_file_name)//"/ERI.dat")
 
-        do i = 1, n_f
+        do i = 1, 6
           do j = 1 , n_f
             do k = 1 , n_f
               do l = 1 , n_f
