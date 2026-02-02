@@ -353,7 +353,6 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
 
       double precision               :: geometry(number_of_atoms,3)
       double precision,allocatable   :: two_electron(:,:,:,:)
-      double precision               :: value      
       integer                        :: fpuc
 
       ! --------------------------------------------------------------- !
@@ -456,7 +455,7 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
       write(outfile,*) ''
       flush(outfile)
 
-      !$omp parallel do private(ij_index,i,j,k,l,value) &
+      !$omp parallel do private(ij_index,i,j,k,l) &
       !$omp shared(two_electron, ERI, i_index, j_index) &
       !$omp schedule(dynamic,optimal_chunk_size)
 
@@ -498,17 +497,6 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
       call cpu_time(start)
         call symmetry_of_integrals_ERI(number_of_functions,fpuc,two_electron,two_electron_integrals)
       call cpu_time(end)
-
-      time = int(end - start)
-      days = (time/86400)
-      hours=mod(time,86400)/3600
-      minutes=mod(mod(time,86400),3600)/60
-      seconds=mod(mod(mod(time,86400),3600),60)
-
-      write(outfile,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'CPU time for Translational symmetry = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
-      write(outfile,"(a)") ""
-      write(outfile,"(a)") "Translation symmetry applied to integrals"
-      write(outfile,"(a)") "" 
 
       time = int(end - start)
       days = (time/86400)

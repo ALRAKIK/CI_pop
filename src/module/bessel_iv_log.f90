@@ -15,7 +15,7 @@ module bessel_functions
       private
     
       ! Public interface
-      public                      :: iv_log , iv_scaled , iv_log_scaled
+      public                      :: iv_log , iv_scaled , iv_log_scaled , Iv_array
     
       ! Constants
       integer, parameter          :: N_TERMS = 41
@@ -312,5 +312,86 @@ module bessel_functions
           Iv = iv_log(dble(v_in),x)
           
       end function iv_log_scaled
+
+      subroutine Iv_array(nmin, nmax, x, result_array)
+    
+      implicit none
+  
+      ! Arguments
+      integer, intent(in)                                    :: nmin, nmax
+      double precision, intent(in)                           :: x
+      double precision, dimension(0:nmax-nmin), intent(out)  :: result_array
+  
+      ! Local variables
+      double precision   :: ax, two_over_x
+      double precision   :: Inp1, In, Inm1
+      integer            :: j, n
+  
+
+      ! Handle x = 0 case
+      if (x == 0.0d0) then
+        do j = 0, nmax - nmin
+          result_array(j) = 0.0d0
+        end do
+        if (nmin == 0) result_array(0) = 1.0d0
+        return
+      end if
+  
+      ! Handle nmax = 0 case
+      if (nmax == 0) then
+        result_array(0) = iv_scaled(0,x)
+        return
+      end if
+  
+      ! Main computation using backward recurrence
+
+      ax = abs(x)
+      
+      two_over_x = 2.0d0 / ax
+  
+      Inp1 = iv_scaled(nmax + 1, ax)
+      In   = iv_scaled(nmax, ax)
+
+      if (Inp1 < 1.d-280 .or. In < 1.d-280) then
+        ! Fallback to direct computation if scaling fails
+        do n = nmin, nmax
+          result_array(n - nmin) = iv_scaled(n, x)
+        end do
+        return
+      end if
+
+      ! Backward recurrence: In-1 = In+1 + (n * 2/x) * In
+      do n = nmax, nmin, -1
+        result_array(n - nmin) = In
+        Inm1 = Inp1 + dble(n) * two_over_x * In
+        Inp1 = In
+        In = Inm1
+      end do
+
+      ! Adjust signs for negative x
+      ! For odd orders, negate the result
+      if (x < 0.0d0) then
+        do n = nmin, nmax
+          if (mod(n, 2) /= 0) then  ! n is odd
+            result_array(n - nmin) = -result_array(n - nmin)
+          end if
+        end do
+      end if
+  
+end subroutine Iv_array
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 end module bessel_functions
