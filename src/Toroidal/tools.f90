@@ -10,27 +10,27 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
 
       ! local !
 
-      double precision,parameter    :: epsilon = 1.d-12
+      double precision,parameter    :: epsilon = 1.d-6
 
       ! ----------------------------------------------------------------!
 
       rp = datan((e1*dsin(ax*r1)+e2*dsin(ax*r2))/(e1*dcos(ax*r1)+e2*dcos(ax*r2)))/ax + 0.5d0 * Lx * Heaviside(-e1*dcos(ax*r1)-e2*dcos(ax*r2)) 
 
-      ! if (dabs(r1-r2) < 0.5*Lx + epsilon .and. dabs(r1-r2) > 0.5*Lx - epsilon ) then
+      if (dabs(r1-r2) < 0.5*Lx + epsilon .and. dabs(r1-r2) > 0.5*Lx - epsilon ) then
 
-      !   if (dabs(e1-e2) < 1.d-10) then 
-      !     rp = 0.5d0 * ( r1 + r2 )
-      !   else 
-      !     if (e1 > e2) then 
-      !       rp = r1 
-      !     else if (e2 > e1) then 
-      !       rp = r2 
-      !     else 
-      !       rp = 0.5d0 * ( r1 + r2 )
-      !     end if 
-      !   end if 
+        if (dabs(e1-e2) < 1.d-10) then 
+          rp = 0.5d0 * ( r1 + r2 )
+        else 
+          if (e1 > e2) then 
+            rp = r1 
+          else if (e2 > e1) then 
+            rp = r2 
+          else 
+            rp = 0.5d0 * ( r1 + r2 )
+          end if 
+        end if 
 
-      ! end if
+      end if
 
 end subroutine bary_center_toroidal
 
@@ -47,7 +47,7 @@ subroutine bary_exponent(e1,e2,x,p)
 
       ! local !
 
-      double precision,parameter    :: epsilon = 1.d-12
+      double precision,parameter    :: epsilon = 1.d-6
       double precision              :: e12 , e22
 
       ! ----------------------------------------------------------------!
@@ -57,19 +57,19 @@ subroutine bary_exponent(e1,e2,x,p)
       e22 = e2 * e2 
 
       
-      ! if (dabs(x) > 0.5d0*Lx-epsilon .and. dabs(x) < 0.5d0*Lx+epsilon) then 
-      !   if (dabs(e1 - e2) < 1.d-8) then
-      !     p = 0.d0 
-      !   else 
-      !     p = dabs(e1 - e2)
-      !   end if 
-      ! else 
-      !   p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
-      !   p = dsqrt(dabs(p))
-      ! end if 
+       if (dabs(x) > 0.5d0*Lx-epsilon .and. dabs(x) < 0.5d0*Lx+epsilon) then 
+         if (dabs(e1 - e2) < 1.d-8) then
+           p = 0.d0 
+         else 
+           p = dabs(e1 - e2)
+         end if 
+       else 
+         p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
+         p = dsqrt(dabs(p))
+       end if 
 
-      p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
-      p = dsqrt(dabs(p))
+      !p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
+      !p = dsqrt(dabs(p))
 
 
 
