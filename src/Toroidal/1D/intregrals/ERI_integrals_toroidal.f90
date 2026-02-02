@@ -106,14 +106,14 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               pattern_id = encode_orbital_pattern(o1, o2, o3, o4)
 
-              print*, "xq       =  ", xq
-              print*, "gamma    =  ", gamma 
-              print*, "delta    =  ", delta
-              print*, "xc , xd  =  ", xc , xd 
-              print*, "-----------------------"
-              print*, "numerator   = ",  dsin(ax*xc) , dsin(ax*xd) , dsin(ax*xc) + dsin(ax*xd) , gamma*dsin(ax*xc) + delta * dsin(ax*xd)  
-              print*, "denominator = ",  dcos(ax*xc) , dcos(ax*xd) , dcos(ax*xc) + dcos(ax*xd) , gamma*dcos(ax*xc) + delta * dcos(ax*xd) 
-              print*, "-----------------------"
+              !print*, "xq       =  ", xq
+              !print*, "gamma    =  ", gamma 
+              !print*, "delta    =  ", delta
+              !print*, "xc , xd  =  ", xc , xd 
+              !print*, "-----------------------"
+              !print*, "numerator   = ",  dsin(ax*xc) , dsin(ax*xd) , dsin(ax*xc) + dsin(ax*xd) , gamma*dsin(ax*xc) + delta * dsin(ax*xd)  
+              !print*, "denominator = ",  dcos(ax*xc) , dcos(ax*xd) , dcos(ax*xc) + dcos(ax*xd) , gamma*dcos(ax*xc) + delta * dcos(ax*xd) 
+              !print*, "-----------------------"
               
 
 
