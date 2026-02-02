@@ -31,7 +31,7 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
         end if
         
       else if (dabs(e1-e2) < 1.d-10) then 
-        if (dabs(r1-r2) >= 0.5*Lx - 1.d-6 ) then
+        if (dabs(r1-r2) > 0.5*Lx + epsilon ) then
           rp = 0.5d0 * ( r1 + r2 ) - 0.5 * Lx
         else 
           rp = 0.5d0 * ( r1 + r2 )

@@ -476,8 +476,6 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
       
       !$omp end parallel do      
 
-      !call ERI_integral_4_function_toroidal(ERI(2),ERI(15),ERI(14),ERI(32), two_electron(2,15,14,32))
-
       deallocate(i_index, j_index)
 
       end_time = omp_get_wtime()
