@@ -28,9 +28,6 @@ subroutine extract_basis(number_of_atoms,charge)
 
       ! --------------------------------------------------------------- !
       Call HEADER ('The BASIS',-1)
-      write(outfile,*)
-      write(outfile,'(2a)') "      ",repeat("=",67)
-      write(outfile,*)
       ! --------------------------------------------------------------- !
 
       do
@@ -53,7 +50,7 @@ subroutine extract_basis(number_of_atoms,charge)
 
 close(2)
 
-      ! --------------------------------------------------------------- !      
+      ! --------------------------------------------------------------- !    
       write(outfile,'(2a)') "      ",repeat("=",67)
       ! --------------------------------------------------------------- !
 
@@ -89,9 +86,6 @@ subroutine extract_basis_tor(number_of_atoms,charge)
 
       ! --------------------------------------------------------------- !
       Call HEADER ('The BASIS',-1)
-      write(outfile,*)
-      write(outfile,'(2a)') "      ",repeat("=",67)
-      write(outfile,*)
       ! --------------------------------------------------------------- !
 
       do 

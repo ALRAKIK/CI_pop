@@ -127,7 +127,7 @@ program CI
       !           prepare the folder to write the output files          !
       ! --------------------------------------------------------------- !
 
-      call initialize_ff(calculation_type,n_atoms)         
+      call initialize_ff(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
 
       ! --------------------------------------------------------------- !
       !       If the calculation is on a torus read the parameters      !  
@@ -167,9 +167,11 @@ program CI
         end if
       end do 
 
-      ! --------------------------------------------------------------- !
+      ! --------------------------------------------------------------- !       
 
       Call Title()
+      Call Print_the_input_file() 
+      ! --------------------------------------------------------------- ! 
 
       Call HEADER ('The Geometry',-1)
 
@@ -179,7 +181,6 @@ program CI
 
       write(outfile,*)
       write(outfile,*)
-
 
       ! --------------------------------------------------------------- !
       !                  build the atomic basis set                     !
@@ -279,6 +280,8 @@ program CI
 
       write(outfile,'(A)')
       flush(outfile)
+
+      stop
 
       ! --------------------------------------------------------------- !
       !                    Nuclear repulsion energy                     !
