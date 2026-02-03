@@ -1,4 +1,4 @@
-subroutine trexio_conv_init(calculation_type, n_atoms)
+subroutine trexio_conv_init(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
    
       use files 
       use trexio
@@ -9,19 +9,26 @@ subroutine trexio_conv_init(calculation_type, n_atoms)
 
       character(len=10),intent(in)    :: calculation_type
       integer          ,intent(in)    :: n_atoms
+      integer          ,intent(in)    :: n_atom_unitcell
+      character(len=2) ,intent(in)    :: label_tmp(n_atom_unitcell)
 
       ! local ! 
 
       integer(trexio_exit_code)       :: rc       
+      integer                         :: i
       character*(128)                 :: err_msg  
       character(len=100)              :: trexio_file_name
+      character(len=100)              :: label
 
 
       ! --------------------------------------------------------------- !
       !                 initializing the trexio file                    !
       ! --------------------------------------------------------------- !
 
-      write(trexio_file_name,'(A,A,I0,A)') trim(calculation_type),"_",n_atoms,".trexio"
+      write(label,'(100A)') (trim(label_tmp(i)), i = 1, n_atom_unitcell)
+
+
+      write(trexio_file_name,'(A,A,A,A,I0,A)') trim(calculation_type),"_",trim(label),"_",n_atoms,".trexio"
 
       call system("rm -r  "// trim(trexio_file_name))
 
@@ -229,19 +236,6 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
           print *, 'Error: '//trim(err_msg)
         call exit(-1)
       end if
-
-
-
-
-
-
-
-
-
-
-
-
-
       
       !          - Writing the Orbitals (AO group) information -        !
 

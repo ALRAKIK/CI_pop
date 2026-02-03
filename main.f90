@@ -293,7 +293,7 @@ program CI
 
 
       if (c_trexio) then
-        call trexio_conv_init(calculation_type, n_atoms)
+        call trexio_conv_init(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
         call trexio_conv_global(n_atoms,label,geometry,charge,          &
         &                       E_nuc,n_electron,number_of_functions,   &
         &                       number_of_primitives,number_of_shells)
