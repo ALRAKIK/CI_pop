@@ -92,17 +92,19 @@ subroutine guess_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
       write(HFfile,'(a)') ""
       
       call header_HF("Guess Orbital Energies", -1)
+
       do i = 1 , size(e)
         write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  e(i)
       end do 
+      
       write(HFfile,'(a)') ""
 
       write(HFfile,'(a)') ""
-      write(HFfile,'(a,f16.10)')   " The Kinetic   Energy    = ", ET
-      write(HFfile,'(a,f16.10)')   " The Potential Energy    = ", EV
-      write(HFfile,'(a,f16.10,a)') " The Nuclear   Energy    = ", ENuc , "  +"
-      write(HFfile,'(a,f16.10)')   "-----------------------------------"
-      write(HFfile,'(a,f16.10)') " The Energy of the guess  = ", ET+EV+ENuc
+      write(HFfile,'(a,f24.16)')   " The Kinetic   Energy    = ", ET
+      write(HFfile,'(a,f24.16)')   " The Potential Energy    = ", EV
+      write(HFfile,'(a,f24.16,a)') " The Nuclear   Energy    = ", ENuc , "  +"
+      write(HFfile,'(a,f24.16)')   "-----------------------------------"
+      write(HFfile,'(a,f24.16)') " The Energy of the guess  = ", ET+EV+ENuc
       write(HFfile,'(a)') ""
 
       write(HFfile,'(2a)')  repeat('*_',36) , "*"
@@ -111,11 +113,11 @@ subroutine guess_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
       end if 
 
       write(outfile,'(a)') ""
-      write(outfile,'(a,f16.10)')   "      The Kinetic   Energy    = ", ET
-      write(outfile,'(a,f16.10)')   "      The Potential Energy    = ", EV
-      write(outfile,'(a,f16.10,a)') "      The Nuclear   Energy    = ", ENuc , "  +"
-      write(outfile,'(a,f16.10)')   "      -----------------------------------"
-      write(outfile,'(a,f16.10)')   "      The guess Energy        = ", ET+EV+ENuc
+      write(outfile,'(a,f24.16)')   "      The Kinetic   Energy    = ", ET
+      write(outfile,'(a,f24.16)')   "      The Potential Energy    = ", EV
+      write(outfile,'(a,f24.16,a)') "      The Nuclear   Energy    = ", ENuc , "  +"
+      write(outfile,'(a,f24.16)')   "      -----------------------------------"
+      write(outfile,'(a,f24.16)')   "      The guess Energy        = ", ET+EV+ENuc
       write(outfile,'(a)') ""
 
 
