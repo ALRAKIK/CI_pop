@@ -55,6 +55,7 @@ program CI
       logical                         :: c_read, c_Integral, c_trexio
       logical                         :: c_Angstrom, c_plot, c_details
       logical                         :: c_MO      , c_UHF , c_Huckel
+      logical                         :: c_MP2
 
 
       integer                         :: io_stat
@@ -84,6 +85,7 @@ program CI
       c_MO       = any(keyword == 'MO')
       c_UHF      = any(keyword == 'UHF')
       c_Huckel   = any(keyword == 'Huckel')
+      c_MP2      = any(keyword == 'MP2')
 
 
       ! --------------------------------------------------------------- !
@@ -450,7 +452,7 @@ program CI
       ! AO to MO transformation
       !-----------------------------------------------------------------!
 
-      if (c_MO) then 
+      if (c_MO .or. c_MP2) then 
 
       allocate(ERI_MO(nBas,nBas,nBas,nBas))
       allocate(Hc_MO(nBas,nBas))
@@ -462,10 +464,31 @@ program CI
       call print_MO_file(nBas,HC_MO,ERI_MO)
     
       time = end - start
-      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',time,' seconds'
-      write(outfile,*)
+      
 
       end if 
+
+      !-----------------------------------------------------------------!
+      ! FCI Energy calculation
+      !-----------------------------------------------------------------!
+      if (c_MP2) then 
+        call cpu_time(start)
+          call MP2(nBas,nO,e,ERI_MO,E_nuc,EHF)
+        call cpu_time(end)
+
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',time,' seconds'
+        write(outfile,*)
+
+        time = end - start
+        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for MP2 calculation = ',time,' seconds'
+        write(outfile,*)
+
+      end if
+
+      ! --------------------------------------------------------------- !
+      ! --------------------------------------------------------------- !
+
+
     
       !-----------------------------------------------------------------!
       ! FCI Energy calculation
@@ -475,8 +498,12 @@ program CI
         
       !end if
 
-      ! ---------------------------------------------------------------- !
-      ! ---------------------------------------------------------------- !
+      ! --------------------------------------------------------------- !
+      ! --------------------------------------------------------------- !
+
+
+
+
 
       close(outfile)
 
