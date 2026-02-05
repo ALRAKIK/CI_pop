@@ -385,6 +385,8 @@ subroutine read_keywords(keyword)
 
         if (trim(line) == 'UHF'      )   keyword(8) = 'UHF'
 
+        if (trim(line) == 'Huckel'   )   keyword(9) = 'Huckel'
+
 
       end do
 

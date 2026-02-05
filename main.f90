@@ -54,7 +54,7 @@ program CI
 
       logical                         :: c_read, c_Integral, c_trexio
       logical                         :: c_Angstrom, c_plot, c_details
-      logical                         :: c_MO      , c_UHF
+      logical                         :: c_MO      , c_UHF , c_Huckel
 
 
       integer                         :: io_stat
@@ -83,6 +83,7 @@ program CI
       c_details  = any(keyword == 'Details')
       c_MO       = any(keyword == 'MO')
       c_UHF      = any(keyword == 'UHF')
+      c_Huckel   = any(keyword == 'Huckel')
 
 
       ! --------------------------------------------------------------- !
@@ -418,7 +419,7 @@ program CI
       
       if (.not. c_UHF) then 
          call cpu_time(start)
-           call RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
+           call RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
          call cpu_time(end)
       else 
         call cpu_time(start)

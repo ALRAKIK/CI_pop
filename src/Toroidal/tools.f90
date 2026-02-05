@@ -44,7 +44,11 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
         rp = datan((e1*dsin(ax*r1)+e2*dsin(ax*r2))/val)/ax + 0.5d0 * Lx * Heaviside(-val)
        end if
 
-      !rp = atan2((e1*dsin(ax*r1)+e2*dsin(ax*r2)), (e1*dcos(ax*r1)+e2*dcos(ax*r2))) / ax      
+      !rp = atan2((e1*dsin(ax*r1)+e2*dsin(ax*r2)), (e1*dcos(ax*r1)+e2*dcos(ax*r2))) / ax     
+       
+      ! print*, "e1    , e2        = ",  e1 , e2 
+      ! print*, "r1    , r2        = ",  r1 , r2 
+      ! print*, "rp                = ",  rp 
     
 
 

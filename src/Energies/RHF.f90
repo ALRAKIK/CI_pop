@@ -1,4 +1,4 @@
-subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
+subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       ! Perform a restricted Hartree-Fock calculation
 
@@ -19,7 +19,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       double precision,intent(in)   :: ENuc
 
-      logical         ,intent(in)   :: c_details
+      logical         ,intent(in)   :: c_details , c_Huckel
   
       ! Local variables
   
@@ -125,7 +125,13 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       allocate(err_diis(nBas*nBas,max_diis))
       allocate(F_diis(nBas*nBas,max_diis))
        
-      call    guess_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
+      if (c_Huckel) then 
+         call header_under("Huckel guess",-1)
+         call guess_Huckel_RHF(nBas,c_details,nO,Hc,X,ENuc,S,T,V,P)
+      else 
+         call header_under("AO guess",-1)
+      call    guess_AO_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
+      end if 
          
       ! --------------------------------------------------------------- !
       !              check that P_{mu nu} S_{mu nu} = N 
@@ -277,7 +283,7 @@ subroutine RHF(nBas,c_details,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       EHF = ET + EV + EJ + EK
 
-      if ((abs(EHF - EHF_old) < thresh ) .and. nSCF > 15 ) exit
+      !if ((abs(EHF - EHF_old) < thresh ) .and. nSCF > 15 ) exit
 
       if (nSCF > 2) then 
         EHF_old = EHF 

@@ -1,4 +1,4 @@
-subroutine guess_AO_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
+subroutine guess_Huckel_RHF(nBas,c_details,nO,HC,X,ENuc,S,T,V,P)
 
       use files
 
@@ -8,23 +8,34 @@ subroutine guess_AO_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
       integer         , intent(in)  :: nBas , nO 
       double precision, intent(in)  :: HC(nBas,nBas), X(nBas,nBas)
       double precision, intent(in)  ::  T(nBas,nBas), V(nBas,nBas)
+      double precision, intent(in)  ::  S(nBas,nBas)
       double precision, intent(in)  :: ENuc
       logical         , intent(in)  :: c_details
       double precision,external     :: trace_matrix
       ! --------------------------------------------------------------- !
       double precision,allocatable  :: cp(:,:), c(:,:) , e(:) , ct(:,:)
-      integer                       :: i      , o 
+      integer                       :: i      , o  ,   j 
       double precision              :: ET     , EV
       ! --------------------------------------------------------------- !
       double precision, intent(out) :: P(nbas,nbas)
       ! --------------------------------------------------------------- !
-
+      ! extended Huckel parameter
+      double precision,parameter    :: alpha = 0.875d0 
+      ! --------------------------------------------------------------- !
 
       allocate(cp(nbas,nbas),c(nbas,nbas),ct(nbas,nbas), e(nbas))
 
       cp(:,:) = 0.d0 
 
-      cp(:,:) = matmul(transpose(X(:,:)), matmul(HC(:,:), X(:,:)))
+      do i = 1 , nbas 
+        cp(i,i) = Hc(i,i)
+        do j = 1 + i , nbas
+          cp(i,j) = alpha * S(i,j) * ( Hc(i,i) + Hc(j,j) )
+          cp(j,i) = cp(i,j)
+        end do 
+      end do
+
+      !cp(:,:) = matmul(transpose(X(:,:)), matmul(HC(:,:), X(:,:)))
 
       call diagonalize_matrix(nbas, cp, e)
 
@@ -126,4 +137,4 @@ subroutine guess_AO_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
       ! --------------------------------------------------------------- !
 
 
-end subroutine guess_AO_RHF 
+end subroutine guess_Huckel_RHF 
