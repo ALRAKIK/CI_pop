@@ -198,12 +198,6 @@ subroutine trexio_conv_global(n_atoms,label,geometry,charge,E_nuc,n_electron,&
         call exit(-1)
       end if
 
-
-
-
-
-
-
       !       - Writing the Basis set (basis group) information -       !
 
       rc = trexio_write_basis_type(trexio_file,"Gaussian",8)
