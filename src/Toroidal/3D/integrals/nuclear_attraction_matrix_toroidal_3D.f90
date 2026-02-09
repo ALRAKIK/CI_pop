@@ -43,8 +43,6 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
 
       NA(:,:) = 0.d0 
   
-      !do i = 1 , number_of_functions
-
       do i = 1 , fpuc
         do j = 1 , number_of_functions
         

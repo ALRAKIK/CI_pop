@@ -86,14 +86,7 @@ subroutine bary_exponent(e1,e2,x,p)
        else 
          p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
          p = dsqrt(dabs(p))
-       end if 
-
-      !p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
-      !p = dsqrt(dabs(p))
-
-
-
-
+       end if
       
 
 end subroutine bary_exponent
