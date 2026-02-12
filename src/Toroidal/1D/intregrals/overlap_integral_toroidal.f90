@@ -1,7 +1,5 @@
 subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
-
-      use gsl_bessel_mod
       use torus_init
       use classification_ERI
       use bessel_functions
@@ -51,17 +49,11 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
             const       = Lx*c1*c2
 
-              !gamma_x     = dsqrt(dabs(alpha * alpha  + beta * beta + 2.d0 * alpha * beta * dcos(ax*(X))))
-              call bary_exponent(alpha,beta,X,gamma_x)
-
+              call bary_exponent_x(alpha,beta,X,gamma_x)
 
               mu          = alpha * beta / ( alpha + beta )
                
               I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/ax2)
-
-              !exp_arg     = -2.d0 * (alpha + beta - gamma_x ) / ax2 + dlog(Lx) + dlog(c1) + dlog(c2) + I_0_gamma_x
-              
-              !overlap_x   = dexp(exp_arg)
               
               overlap_x   = const * dexp(-2.d0 * (alpha + beta - gamma_x ) / ax2) * I_0_gamma_x
               overlap_y   = dexp(- mu * (Y*Y)) * dsqrt(pi/(alpha+beta))
@@ -79,10 +71,8 @@ end subroutine overlap_integral_ss_toroidal
 
 subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
-      use gsl_bessel_mod
       use torus_init
       use classification_ERI
-      use HeavisideModule
       use bessel_functions
 
       implicit none 
@@ -132,12 +122,9 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
             ! Clifford Gaussian !
 
-            !gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
-            !xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
-            call bary_exponent(alpha,beta,X,gamma_x)
-            call bary_center_toroidal(alpha,beta,x1,x2,xp)
 
-
+            call bary_exponent_x(alpha,beta,X,gamma_x)
+            call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
 
             I_0_gamma_x = iv_scaled(0,2.d0*gamma_x/(ax*ax))
             I_1_gamma_x = iv_scaled(1,2.d0*gamma_x/(ax*ax))
@@ -188,11 +175,9 @@ end subroutine overlap_integral_sp_toroidal
 
 subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
-      use gsl_bessel_mod
       use torus_init
       use atom_basis
       use classification_ERI
-      use HeavisideModule
       use bessel_functions
 
       implicit none 
@@ -209,7 +194,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
       double precision                 :: X , Y , Z
       double precision                 :: const , term 
       double precision                 :: overlap_x  ,overlap_y  ,overlap_z 
-      double precision                 :: gamma_x    ,gamma_y    ,gamma_z
+      double precision                 :: gamma_x
       double precision                 :: xp_C
       double precision                 :: yp_R         ,zp_R
       double precision                 :: I_0_gamma_x
@@ -242,16 +227,9 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           ! Clifford Gaussian !
 
-          !gamma_x     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
-          !gamma_y     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y))))
-          !gamma_z     = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z))))
+          call bary_exponent_x(alpha,beta,X,gamma_x)
 
-          call bary_exponent(alpha,beta,X,gamma_x)
-          call bary_exponent(alpha,beta,Y,gamma_y)
-          call bary_exponent(alpha,beta,Z,gamma_z)
-
-          !xp_C        = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
-          call bary_center_toroidal(alpha,beta,x1,x2,xp_C)
+          call bary_center_toroidal_x(alpha,beta,x1,x2,xp_C)
 
           I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax*ax))
           I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax*ax))

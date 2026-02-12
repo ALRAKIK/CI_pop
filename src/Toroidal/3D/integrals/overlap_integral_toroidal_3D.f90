@@ -51,13 +51,9 @@ subroutine overlap_integral_ss_toroidal_3D(r1,r2,AO1,AO2,S_ss_normal)
               const       = c1*c2
               const       = sign(dabs(const)**(1.0D0/3.0D0),const)
 
-              !gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
-              !gamma_y     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y)))
-              !gamma_z     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z)))
-
-              call bary_exponent(alpha,beta,X,gamma_x)
-              call bary_exponent(alpha,beta,Y,gamma_y)
-              call bary_exponent(alpha,beta,Z,gamma_z)
+              call bary_exponent_x(alpha,beta,X,gamma_x)
+              call bary_exponent_y(alpha,beta,Y,gamma_y)
+              call bary_exponent_z(alpha,beta,Z,gamma_z)
 
               I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax2))
               I_0_gamma_y = iv_scaled(0, 2.d0*gamma_y/(ay2))
@@ -127,22 +123,14 @@ subroutine overlap_integral_sp_toroidal_3D(r1,r2,AO1,AO2,S_sp_normal)
 
               const       = c1*c2
               const       = sign(dabs(const)**(1.0D0/3.0D0),const)
-        
-              !gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(ax*(X)))
-              !gamma_y     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(ay*(Y)))
-              !gamma_z     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(az*(Z)))
+      
+              call bary_exponent_x(alpha,beta,X,gamma_x)
+              call bary_exponent_y(alpha,beta,Y,gamma_y)
+              call bary_exponent_z(alpha,beta,Z,gamma_z)
 
-              call bary_exponent(alpha,beta,X,gamma_x)
-              call bary_exponent(alpha,beta,Y,gamma_y)
-              call bary_exponent(alpha,beta,Z,gamma_z)
-
-              !xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
-              !yp          = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5d0 * Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))  
-              !zp          = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5d0 * Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))  
-
-              call bary_center_toroidal(alpha,beta,x1,x2,xp)
-              call bary_center_toroidal(alpha,beta,y1,y2,yp)
-              call bary_center_toroidal(alpha,beta,z1,z2,zp)
+              call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
+              call bary_center_toroidal_y(alpha,beta,y1,y2,yp)
+              call bary_center_toroidal_z(alpha,beta,z1,z2,zp)
 
               
               I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax**2))
@@ -239,21 +227,13 @@ subroutine overlap_integral_pp_toroidal_3D(r1,r2,AO1,AO2,S_pp_normal)
               const       = c1*c2
               const       = sign(dabs(const)**(1.0D0/3.0D0),const)
         
-              !gamma_x     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
-              !gamma_y     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y)))
-              !gamma_z     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z)))
+              call bary_exponent_x(alpha,beta,X,gamma_x)
+              call bary_exponent_y(alpha,beta,Y,gamma_y)
+              call bary_exponent_z(alpha,beta,Z,gamma_z)
 
-              call bary_exponent(alpha,beta,X,gamma_x)
-              call bary_exponent(alpha,beta,Y,gamma_y)
-              call bary_exponent(alpha,beta,Z,gamma_z)
-
-              !xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))  
-              !yp          = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5*Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))
-              !zp          = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5*Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))
-
-              call bary_center_toroidal(alpha,beta,x1,x2,xp)
-              call bary_center_toroidal(alpha,beta,y1,y2,yp)
-              call bary_center_toroidal(alpha,beta,z1,z2,zp)
+              call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
+              call bary_center_toroidal_y(alpha,beta,y1,y2,yp)
+              call bary_center_toroidal_z(alpha,beta,z1,z2,zp)
         
               I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax**2))
               I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax**2))

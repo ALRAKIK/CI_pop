@@ -64,11 +64,11 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           o2    = two%orbital
 
           !mu_x  = dsqrt(dabs(alpha*alpha + beta*beta + 2.d0*alpha*beta*dcos(ax*(XAB))))
-          call bary_exponent(alpha,beta,XAB,mu_x)
+          call bary_exponent_x(alpha,beta,XAB,mu_x)
           mu_y  = alpha + beta
           mu_z  = alpha + beta
 
-          call bary_center_toroidal(alpha,beta,xa,xb,xp)
+          call bary_center_toroidal_x(alpha,beta,xa,xb,xp)
           yp    = 0.d0
           zp    = 0.d0
 
@@ -84,11 +84,11 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               o4    = four%orbital
 
               !nu_x  = dsqrt(dabs(gamma*gamma + delta*delta + 2.d0*gamma*delta*dcos(ax*(XCD))))
-              call bary_exponent(gamma,delta,XCD,nu_x)
+              call bary_exponent_x(gamma,delta,XCD,nu_x)
               nu_y  =  gamma+delta
               nu_z  =  gamma+delta
 
-              call bary_center_toroidal(gamma,delta,xc,xd,xq)
+              call bary_center_toroidal_x(gamma,delta,xc,xd,xq)
               yq     = 0.d0 
               zq     = 0.d0
 

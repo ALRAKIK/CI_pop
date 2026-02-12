@@ -133,15 +133,6 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
               call ERI_integral_4_function_toroidal_3D(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))
 
-                !two_electron(i,j,k,l) = value
-                !two_electron(i,j,l,k) = value
-                !two_electron(j,i,k,l) = value
-                !two_electron(j,i,l,k) = value
-                !two_electron(k,l,i,j) = value
-                !two_electron(k,l,j,i) = value
-                !two_electron(l,k,i,j) = value
-                !two_electron(l,k,j,i) = value
-
             end if
           end do
         end do

@@ -2,7 +2,6 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
       
       use torus_init    
       use classification_ERI
-      use HeavisideModule
 
       implicit none 
 
@@ -72,13 +71,13 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
           !mu_y  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(YAB)))
           !mu_z  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(ZAB)))
 
-          call bary_exponent(alpha,beta,XAB,mu_x)
-          call bary_exponent(alpha,beta,YAB,mu_y)
-          call bary_exponent(alpha,beta,ZAB,mu_z)
+          call bary_exponent_x(alpha,beta,XAB,mu_x)
+          call bary_exponent_y(alpha,beta,YAB,mu_y)
+          call bary_exponent_z(alpha,beta,ZAB,mu_z)
 
-          call bary_center_toroidal(alpha,beta,xa,xb,xp)
-          call bary_center_toroidal(alpha,beta,ya,yb,yp)
-          call bary_center_toroidal(alpha,beta,za,zb,zp)
+          call bary_center_toroidal_x(alpha,beta,xa,xb,xp)
+          call bary_center_toroidal_y(alpha,beta,ya,yb,yp)
+          call bary_center_toroidal_z(alpha,beta,za,zb,zp)
 
           mu = alpha+beta 
           
@@ -95,13 +94,13 @@ subroutine ERI_integral_4_function_toroidal_3D(one,two,three,four,value)
               !nu_y  = dsqrt(gamma**2+delta**2+2.d0*gamma*delta*dcos(ay*(YCD)))
               !nu_z  = dsqrt(gamma**2+delta**2+2.d0*gamma*delta*dcos(az*(ZCD)))
 
-              call bary_exponent(gamma,delta,XCD,nu_x)
-              call bary_exponent(gamma,delta,YCD,nu_y)
-              call bary_exponent(gamma,delta,ZCD,nu_z)
+              call bary_exponent_x(gamma,delta,XCD,nu_x)
+              call bary_exponent_y(gamma,delta,YCD,nu_y)
+              call bary_exponent_z(gamma,delta,ZCD,nu_z)
 
-              call bary_center_toroidal(gamma,delta,xc,xd,xq)
-              call bary_center_toroidal(gamma,delta,yc,yd,yq)
-              call bary_center_toroidal(gamma,delta,zc,zd,zq)
+              call bary_center_toroidal_x(gamma,delta,xc,xd,xq)
+              call bary_center_toroidal_y(gamma,delta,yc,yd,yq)
+              call bary_center_toroidal_z(gamma,delta,zc,zd,zq)
                
               nu    = gamma + delta
 

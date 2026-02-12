@@ -62,17 +62,17 @@ subroutine nuclear_attraction_integral_ss_toroidal_3D(number_of_atoms,geometry,a
             !gamma_y  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y)))
             !gamma_z  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z)))
 
-            call bary_exponent(alpha,beta,X,gamma_x)
-            call bary_exponent(alpha,beta,Y,gamma_y)
-            call bary_exponent(alpha,beta,Z,gamma_z)
+            call bary_exponent_x(alpha,beta,X,gamma_x)
+            call bary_exponent_y(alpha,beta,Y,gamma_y)
+            call bary_exponent_z(alpha,beta,Z,gamma_z)
 
             !xp       = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
             !yp       = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5*Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))
             !zp       = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5*Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))
 
-            call bary_center_toroidal(alpha,beta,x1,x2,xp)
-            call bary_center_toroidal(alpha,beta,y1,y2,yp)
-            call bary_center_toroidal(alpha,beta,z1,z2,zp)
+            call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
+            call bary_center_toroidal_y(alpha,beta,y1,y2,yp)
+            call bary_center_toroidal_z(alpha,beta,z1,z2,zp)
 
             kc       = c1 * c2 * 2.d0/dsqrt(pi) * Lx * Ly * Lz
 
@@ -152,9 +152,9 @@ subroutine integrate_NA_ss_Toroidal_3D(xpC,ypC,zpC, &
         !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
         !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
 
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -241,17 +241,17 @@ subroutine nuclear_attraction_integral_sp_toroidal_3D(number_of_atoms,geometry,a
             !gamma_y  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(ay*(Y)))
             !gamma_z  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(az*(Z)))
 
-            call bary_exponent(alpha,beta,X,gamma_x)
-            call bary_exponent(alpha,beta,Y,gamma_y)
-            call bary_exponent(alpha,beta,Z,gamma_z)
+            call bary_exponent_x(alpha,beta,X,gamma_x)
+            call bary_exponent_y(alpha,beta,Y,gamma_y)
+            call bary_exponent_z(alpha,beta,Z,gamma_z)
 
             !xp       = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2))
             !yp       = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5d0 * Ly * Heaviside(-alpha*dcos(ay*y1)-beta*dcos(ay*y2))
             !zp       = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5d0 * Lz * Heaviside(-alpha*dcos(az*z1)-beta*dcos(az*z2))
 
-            call bary_center_toroidal(alpha,beta,x1,x2,xp)
-            call bary_center_toroidal(alpha,beta,y1,y2,yp)
-            call bary_center_toroidal(alpha,beta,z1,z2,zp)
+            call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
+            call bary_center_toroidal_y(alpha,beta,y1,y2,yp)
+            call bary_center_toroidal_z(alpha,beta,z1,z2,zp)
 
             kc       = c1 * c2  * 2.d0/dsqrt(pi) * Lx * Ly * Lz
 
@@ -379,17 +379,11 @@ subroutine integrate_NA_spx_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: xD
         double precision             :: Nax   , Nay   , NAz
 
-        !xD   = datan((gamma_x*dsin(ax*xp)+t**2.d0*dsin(ax*xc))/(gamma_x*dcos(ax*xp)+t**2.d0*dcos(ax*xc)))/ax + 0.5d0 * Lx * Heaviside(-gamma_x*dcos(ax*xp)-t**2.d0*dcos(ax*xc))
+        call bary_center_toroidal_x(gamma_x,t*t,xp,xc,xD)
 
-        call bary_center_toroidal(gamma_x,t*t,xp,xc,xD)
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -465,17 +459,11 @@ subroutine integrate_NA_spy_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: yD
         double precision             :: Nax   , Nay   , NAz
 
-        !yD   = datan((gamma_y*dsin(ay*yp)+t**2.d0*dsin(ay*yc))/(gamma_y*dcos(ay*yp)+t**2.d0*dcos(ay*yc)))/ay + 0.5d0 * Ly * Heaviside(-gamma_y*dcos(ay*yp)-t**2.d0*dcos(ay*yc))
+        call bary_center_toroidal_y(gamma_y,t*t,yp,yc,yD)
 
-        call bary_center_toroidal(gamma_y,t*t,yp,yc,yD)
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -552,17 +540,12 @@ subroutine integrate_NA_spz_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: zD 
         double precision             :: Nax   , Nay   , NAz
 
-        !zD   = datan((gamma_z*dsin(az*zp)+t**2.d0*dsin(az*zc))/(gamma_z*dcos(az*zp)+t**2.d0*dcos(az*zc)))/az + 0.5d0 * Lz * Heaviside(-gamma_z*dcos(az*zp)-t**2.d0*dcos(az*zc))
 
-        call bary_center_toroidal(gamma_z,t*t,zp,zc,zD)
+        call bary_center_toroidal_z(gamma_z,t*t,zp,zc,zD)
 
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -649,17 +632,17 @@ subroutine nuclear_attraction_integral_pp_toroidal_3D(number_of_atoms,geometry,a
             !gamma_y  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y)))
             !gamma_z  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z)))
 
-            call bary_exponent(alpha,beta,X,gamma_x)
-            call bary_exponent(alpha,beta,Y,gamma_y)
-            call bary_exponent(alpha,beta,Z,gamma_z)
+            call bary_exponent_x(alpha,beta,X,gamma_x)
+            call bary_exponent_y(alpha,beta,Y,gamma_y)
+            call bary_exponent_z(alpha,beta,Z,gamma_z)
 
             !xp       = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
             !yp       = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5d0 * Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))
             !zp       = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5d0 * Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))
 
-            call bary_center_toroidal(alpha,beta,x1,x2,xp)
-            call bary_center_toroidal(alpha,beta,y1,y2,yp)
-            call bary_center_toroidal(alpha,beta,z1,z2,zp)
+            call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
+            call bary_center_toroidal_y(alpha,beta,y1,y2,yp)
+            call bary_center_toroidal_z(alpha,beta,z1,z2,zp)
 
             kc       = c1 * c2 * 2.d0/dsqrt(pi) * Lx * Ly * Lz
 
@@ -940,18 +923,11 @@ subroutine integrate_NA_px_px_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: xD    , yD    , zD
         double precision             :: Nax   , Nay   , NAz 
 
+        call bary_center_toroidal_x(gamma_x,t*t,xp,xc,xD)
 
-        !xD   = datan((gamma_x*dsin(ax*xp)+t**2.d0*dsin(ax*xc))/(gamma_x*dcos(ax*xp)+t**2.d0*dcos(ax*xc)))/ax + 0.5d0 * Lx * Heaviside(-gamma_x*dcos(ax*xp)-t**2.d0*dcos(ax*xc))
-
-        call bary_center_toroidal(gamma_x,t*t,xp,xc,xD)
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -1041,20 +1017,13 @@ subroutine integrate_NA_px_py_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: Nax   , Nay   , NAz 
 
 
-        !xD   = datan((gamma_x*dsin(ax*xp)+t**2.d0*dsin(ax*xc))/(gamma_x*dcos(ax*xp)+t**2.d0*dcos(ax*xc)))/ax + 0.5d0 * Lx * Heaviside(-gamma_x*dcos(ax*xp)-t**2.d0*dcos(ax*xc))
-        !yD   = datan((gamma_y*dsin(ay*yp)+t**2.d0*dsin(ay*yc))/(gamma_y*dcos(ay*yp)+t**2.d0*dcos(ay*yc)))/ay + 0.5d0 * Ly * Heaviside(-gamma_y*dcos(ay*yp)-t**2.d0*dcos(ay*yc))
 
-        call bary_center_toroidal(gamma_x,t*t,xp,xc,xD)
-        call bary_center_toroidal(gamma_y,t*t,yp,yc,yD)
+        call bary_center_toroidal_x(gamma_x,t*t,xp,xc,xD)
+        call bary_center_toroidal_y(gamma_y,t*t,yp,yc,yD)
 
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -1141,21 +1110,13 @@ subroutine integrate_NA_px_pz_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: dx    , dy    , dz
         double precision             :: xD    , yD    , zD
         double precision             :: Nax   , Nay   , NAz 
-
-
-        !xD   = datan((gamma_x*dsin(ax*xp)+t**2.d0*dsin(ax*xc))/(gamma_x*dcos(ax*xp)+t**2.d0*dcos(ax*xc)))/ax + 0.5d0 * Lx * Heaviside(-gamma_x*dcos(ax*xp)-t**2.d0*dcos(ax*xc))
-        !zD   = datan((gamma_z*dsin(az*zp)+t**2.d0*dsin(az*zc))/(gamma_z*dcos(az*zp)+t**2.d0*dcos(az*zc)))/az + 0.5d0 * Lz * Heaviside(-gamma_z*dcos(az*zp)-t**2.d0*dcos(az*zc))
         
-        call bary_center_toroidal(gamma_x,t*t,xp,xc,xD)
-        call bary_center_toroidal(gamma_z,t*t,zp,zc,zD)
+        call bary_center_toroidal_x(gamma_x,t*t,xp,xc,xD)
+        call bary_center_toroidal_y(gamma_z,t*t,zp,zc,zD)
 
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -1244,20 +1205,12 @@ subroutine integrate_NA_py_px_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: xD    , yD    , zD
         double precision             :: Nax   , Nay   , NAz 
 
-
-        !yD   = datan((gamma_y*dsin(ay*yp)+t**2.d0*dsin(ay*yc))/(gamma_y*dcos(ay*yp)+t**2.d0*dcos(ay*yc)))/ay + 0.5d0 * Ly * Heaviside(-gamma_y*dcos(ay*yp)-t**2.d0*dcos(ay*yc))
-        !xD   = datan((gamma_x*dsin(ax*xp)+t**2.d0*dsin(ax*xc))/(gamma_x*dcos(ax*xp)+t**2.d0*dcos(ax*xc)))/ax + 0.5*Lx * Heaviside(-gamma_x*dcos(ax*xp)-t**2.d0*dcos(ax*xc))
-
-        call bary_center_toroidal(gamma_y,t*t,yp,yc,yD)
-        call bary_center_toroidal(gamma_x,t*t,xp,xc,xD)
-        
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_center_toroidal_y(gamma_y,t*t,yp,yc,yD)
+        call bary_center_toroidal_x(gamma_x,t*t,xp,xc,xD)
+      
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -1346,19 +1299,11 @@ subroutine integrate_NA_py_py_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: xD    , yD    , zD
         double precision             :: Nax   , Nay   , NAz 
 
+        call bary_center_toroidal_y(gamma_y,t*t,yp,yc,yD)
 
-        !yD   = datan((gamma_y*dsin(ay*yp)+t**2.d0*dsin(ay*yc))/(gamma_y*dcos(ay*yp)+t**2.d0*dcos(ay*yc)))/ay + 0.5d0 * Ly * Heaviside(-gamma_y*dcos(ay*yp)-t**2.d0*dcos(ay*yc))
-
-        call bary_center_toroidal(gamma_y,t*t,yp,yc,yD)
-
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -1447,19 +1392,12 @@ subroutine integrate_NA_py_pz_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: Nax   , Nay   , NAz 
 
 
-        !yD   = datan((gamma_y*dsin(ay*yp)+t**2.d0*dsin(ay*yc))/(gamma_y*dcos(ay*yp)+t**2.d0*dcos(ay*yc)))/ay + 0.5d0 * Ly * Heaviside(-gamma_y*dcos(ay*yp)-t**2.d0*dcos(ay*yc))
-        !zD   = datan((gamma_z*dsin(az*zp)+t**2.d0*dsin(az*zc))/(gamma_z*dcos(az*zp)+t**2.d0*dcos(az*zc)))/az + 0.5d0 * Lz * Heaviside(-gamma_z*dcos(az*zp)-t**2.d0*dcos(az*zc))
+        call bary_center_toroidal_y(gamma_y,t*t,yp,yc,yD)
+        call bary_center_toroidal_z(gamma_z,t*t,zp,zc,zD)
 
-        call bary_center_toroidal(gamma_y,t*t,yp,yc,yD)
-        call bary_center_toroidal(gamma_z,t*t,zp,zc,zD)
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -1550,20 +1488,12 @@ subroutine integrate_NA_pz_px_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: Nax   , Nay   , NAz 
 
 
-        !xD   = datan((gamma_x*dsin(ax*xp)+t**2.d0*dsin(ax*xc))/(gamma_x*dcos(ax*xp)+t**2.d0*dcos(ax*xc)))/ax + 0.5d0 * Lx * Heaviside(-gamma_x*dcos(ax*xp)-t**2.d0*dcos(ax*xc))
-        !zD   = datan((gamma_z*dsin(az*zp)+t**2.d0*dsin(az*zc))/(gamma_z*dcos(az*zp)+t**2.d0*dcos(az*zc)))/az + 0.5d0 * Lz * Heaviside(-gamma_z*dcos(az*zp)-t**2.d0*dcos(az*zc))
+        call bary_center_toroidal_x(gamma_x,t*t,xp,xc,xD)
+        call bary_center_toroidal_z(gamma_z,t*t,zp,zc,zD)
 
-        call bary_center_toroidal(gamma_x,t*t,xp,xc,xD)
-        call bary_center_toroidal(gamma_z,t*t,zp,zc,zD)
-
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -1653,20 +1583,12 @@ subroutine integrate_NA_pz_py_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: xD    , yD    , zD
         double precision             :: Nax   , Nay   , NAz 
 
+        call bary_center_toroidal_y(gamma_y,t*t,yp,yc,yD)
+        call bary_center_toroidal_z(gamma_z,t*t,zp,zc,zD)
 
-        !yD   = datan((gamma_y*dsin(ay*yp)+t**2.d0*dsin(ay*yc))/(gamma_y*dcos(ay*yp)+t**2.d0*dcos(ay*yc)))/ay + 0.5d0 * Ly * Heaviside(-gamma_y*dcos(ay*yp)-t**2.d0*dcos(ay*yc))
-        !zD   = datan((gamma_z*dsin(az*zp)+t**2.d0*dsin(az*zc))/(gamma_z*dcos(az*zp)+t**2.d0*dcos(az*zc)))/az + 0.5d0 * Lz * Heaviside(-gamma_z*dcos(az*zp)-t**2.d0*dcos(az*zc))
-
-        call bary_center_toroidal(gamma_y,t*t,yp,yc,yD)
-        call bary_center_toroidal(gamma_z,t*t,zp,zc,zD)
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
@@ -1756,22 +1678,15 @@ subroutine integrate_NA_pz_pz_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: xD    , yD    , zD
         double precision             :: Nax   , Nay   , NAz 
 
-        !zD   = datan((gamma_z*dsin(az*zp)+t**2.d0*dsin(az*zc))/(gamma_z*dcos(az*zp)+t**2.d0*dcos(az*zc)))/az + 0.5d0 * Lz * Heaviside(-gamma_z*dcos(az*zp)-t**2.d0*dcos(az*zc))
+        call bary_center_toroidal_z(gamma_z,t*t,zp,zc,zD)
 
-        call bary_center_toroidal(gamma_z,t*t,zp,zc,zD)
-
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
-
-        call bary_exponent(gamma_x,t*t,XpC,dx)
-        call bary_exponent(gamma_y,t*t,YpC,dy)
-        call bary_exponent(gamma_z,t*t,ZpC,dz)
+        call bary_exponent_x(gamma_x,t*t,XpC,dx)
+        call bary_exponent_y(gamma_y,t*t,YpC,dy)
+        call bary_exponent_z(gamma_z,t*t,ZpC,dz)
 
         dx = 2.d0 * dx / (ax*ax)
         dy = 2.d0 * dy / (ay*ay)
         dz = 2.d0 * dz / (az*az)
-
 
         
         I_0_x = iv_scaled(0, dx)
