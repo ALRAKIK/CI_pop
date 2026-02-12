@@ -15,43 +15,30 @@ subroutine bary_center_toroidal(e1,e2,r1,r2,rp)
 
       ! ----------------------------------------------------------------!
 
-
-       !val = e1*dcos(ax*r1)+e2*dcos(ax*r2)
-
-       !rp  = datan((e1*dsin(ax*r1)+e2*dsin(ax*r2))/val)/ax + 0.5d0 * Lx * Heaviside(-val)
-
-        if (dabs(r1-r2) < 0.5*Lx + epsilon .and. dabs(r1-r2) > 0.5*Lx - epsilon) then
-         if (dabs(e1-e2) < 1.d-10) then 
-           rp = 0.5d0 * ( r1 + r2 )
-         else 
-           if (e1 > e2) then 
-             rp = r1 
-           else if (e2 > e1) then 
-             rp = r2 
-           else 
-             rp = 0.5d0 * ( r1 + r2 )
-           end if 
-         end if
-      
-       else if (dabs(e1-e2) < 1.d-10) then 
+      if (dabs(r1-r2) < 0.5*Lx + epsilon .and. dabs(r1-r2) > 0.5*Lx - epsilon) then
+        if (dabs(e1-e2) < 1.d-10) then 
+          rp = 0.5d0 * ( r1 + r2 )
+        else 
+          if (e1 > e2) then 
+            rp = r1 
+          else if (e2 > e1) then 
+            rp = r2 
+          else 
+            rp = 0.5d0 * ( r1 + r2 )
+          end if 
+        end if
+    
+      else if (dabs(e1-e2) < 1.d-10) then 
         if (dabs(r1-r2) > 0.5*Lx + epsilon ) then
           rp = 0.5d0 * ( r1 + r2 ) - 0.5 * Lx
         else 
           rp = 0.5d0 * ( r1 + r2 )
         end if 
-       else 
+      else 
         val = e1*dcos(ax*r1)+e2*dcos(ax*r2)
         rp = datan((e1*dsin(ax*r1)+e2*dsin(ax*r2))/val)/ax + 0.5d0 * Lx * Heaviside(-val)
-       end if
-
-      !rp = atan2((e1*dsin(ax*r1)+e2*dsin(ax*r2)), (e1*dcos(ax*r1)+e2*dcos(ax*r2))) / ax     
-       
-      ! print*, "e1    , e2        = ",  e1 , e2 
-      ! print*, "r1    , r2        = ",  r1 , r2 
-      ! print*, "rp                = ",  rp 
+      end if
     
-
-
 end subroutine bary_center_toroidal
 
 
@@ -77,16 +64,16 @@ subroutine bary_exponent(e1,e2,x,p)
       e22 = e2 * e2 
 
       
-       if (dabs(x) > 0.5d0*Lx-epsilon .and. dabs(x) < 0.5d0*Lx+epsilon) then 
-         if (dabs(e1 - e2) < 1.d-8) then
-           p = 0.d0 
-         else 
-           p = dabs(e1 - e2)
-         end if 
-       else 
-         p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
-         p = dsqrt(dabs(p))
-       end if
+      if (dabs(x) > 0.5d0*Lx-epsilon .and. dabs(x) < 0.5d0*Lx+epsilon) then 
+        if (dabs(e1 - e2) < 1.d-8) then
+          p = 0.d0 
+        else 
+          p = dabs(e1 - e2)
+        end if 
+      else 
+        p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
+        p = dsqrt(dabs(p))
+      end if
       
 
 end subroutine bary_exponent
