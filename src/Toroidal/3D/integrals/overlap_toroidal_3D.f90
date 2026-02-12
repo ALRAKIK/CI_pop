@@ -4,6 +4,7 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       use atom_basis
       use torus_init
       use classification_ERI
+      use keywords
 
 
       implicit none 
@@ -21,6 +22,9 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
       type(ERI_function)           :: AO1 , AO2
 
       double precision             :: r1(3) , r2(3)
+
+      double precision             :: diag_save(number_of_functions)
+
       
 
       ! output !
@@ -105,11 +109,23 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 
       call symmetry_of_integrals(number_of_functions,fpuc,overlap_tmp,overlap)
 
-      ! do i = 1 , number_of_functions - 1 
-      !   do j = 1 , number_of_functions
-      !     if (abs(overlap(i,j)) < 1e-15) overlap(i,j) = 0.d0 
-      !     overlap(j,i) = overlap(i,j)
-      !   end do 
-      ! end do 
+      if (c_OV) then 
+
+        open(1,file=trim(tmp_file_name)//"/OV.dat ")
+          do i = 1 , size(overlap,1)
+            do j = i , size(overlap,1)
+              if (abs(overlap(i,j)) > 1e-15 ) write(1,*) i , j , overlap(i,j)
+            end do 
+          end do 
+        close(1)
+
+        open(1,file=trim(tmp_file_name)//"/OV_matrix.dat")
+        write(1,'(15x,1000(i3,15x))') (i,i=1,size(overlap,1))
+        do i = 1 , size(overlap,1)
+          write(1,'(i3,6x,1000(f16.12,2x))') i ,  (overlap(i,j),j=1,size(overlap,1))
+        end do 
+        close(1)
+
+      end if 
 
 end subroutine overlap_matrix_toroidal_3D

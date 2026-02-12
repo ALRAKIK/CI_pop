@@ -389,6 +389,18 @@ subroutine read_keywords(keyword)
 
         if (trim(line) == 'MP2'      )   keyword(10) = 'MP2'
 
+        if (trim(line) == 'OV'       )   keyword(11) = 'OV'
+
+        if (trim(line) == 'K'        )   keyword(12) = 'K' 
+
+        if (trim(line) == 'NA'       )   keyword(13) = 'NA' 
+
+        if (trim(line) == 'ERI'      )   keyword(14) = 'ERI'
+
+        if (trim(line) == 'One'      )   keyword(15) = 'One'
+
+
+
 
       end do
 

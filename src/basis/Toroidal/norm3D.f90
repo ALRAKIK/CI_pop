@@ -111,7 +111,7 @@ end subroutine normalize_basis_tor_3D
 
 subroutine norm_orb_tor_3D(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
-      use gsl_bessel_mod
+      use bessel_functions
 
       implicit none 
 
@@ -150,9 +150,9 @@ subroutine norm_orb_tor_3D(n_gaussian , n_contraction, exponent, contraction  , 
       do n = 1 , n_contraction
         do i = 1 , n_gaussian
 
-        Norm(i) = 1.d0 / dsqrt( Lx * bessi_scaled(0,4.d0*exponent(i)/(ax2)) &
-                              * Ly * bessi_scaled(0,4.d0*exponent(i)/(ay2)) & 
-                              * Lz * bessi_scaled(0,4.d0*exponent(i)/(az2)) ) 
+        Norm(i) = 1.d0 / dsqrt( Lx * iv_scaled(0,4.d0*exponent(i)/(ax2)) &
+                              * Ly * iv_scaled(0,4.d0*exponent(i)/(ay2)) & 
+                              * Lz * iv_scaled(0,4.d0*exponent(i)/(az2)) ) 
 
         contractionN(i,n) =  contraction(i,n) * Norm(i) 
 
@@ -170,9 +170,9 @@ subroutine norm_orb_tor_3D(n_gaussian , n_contraction, exponent, contraction  , 
               beta  = exponent(j)
               gamma = alpha + beta
 
-              I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax2)
-              I_0_gamma_y = bessi_scaled(0,2.d0*gamma/ay2)
-              I_0_gamma_z = bessi_scaled(0,2.d0*gamma/az2)
+              I_0_gamma_x = iv_scaled(0,2.d0*gamma/ax2)
+              I_0_gamma_y = iv_scaled(0,2.d0*gamma/ay2)
+              I_0_gamma_z = iv_scaled(0,2.d0*gamma/az2)
 
 
               c1 = contractionN(i,n)
@@ -204,9 +204,9 @@ subroutine norm_orb_tor_3D(n_gaussian , n_contraction, exponent, contraction  , 
       do n = 1 , n_contraction
         do i = 1 , n_gaussian
 
-          Norm(i) = 1.d0 / dsqrt( Lx * bessi_scaled(1,4.d0*exponent(i)/(ax2)) * (1.d0/(4.d0*exponent(i))) &
-                                * Ly * bessi_scaled(0,4.d0*exponent(i)/(ay2))                             & 
-                                * Lz * bessi_scaled(0,4.d0*exponent(i)/(az2))  ) 
+          Norm(i) = 1.d0 / dsqrt( Lx * iv_scaled(1,4.d0*exponent(i)/(ax2)) * (1.d0/(4.d0*exponent(i))) &
+                                * Ly * iv_scaled(0,4.d0*exponent(i)/(ay2))                             & 
+                                * Lz * iv_scaled(0,4.d0*exponent(i)/(az2))  ) 
 
           contractionN(i,n) =  contraction(i,n) * Norm(i)
 
@@ -221,9 +221,9 @@ subroutine norm_orb_tor_3D(n_gaussian , n_contraction, exponent, contraction  , 
               beta  = exponent(j)
               gamma = alpha + beta
                 
-              I_1_gamma_x = bessi_scaled(1,2.d0*gamma/ax**2)
-              I_1_gamma_y = bessi_scaled(0,2.d0*gamma/ay**2)
-              I_1_gamma_z = bessi_scaled(0,2.d0*gamma/az**2)
+              I_1_gamma_x = iv_scaled(1,2.d0*gamma/ax**2)
+              I_1_gamma_y = iv_scaled(0,2.d0*gamma/ay**2)
+              I_1_gamma_z = iv_scaled(0,2.d0*gamma/az**2)
               
               c1 = contractionN(i,n)
               c2 = contractionN(j,n)
@@ -252,7 +252,8 @@ end subroutine  norm_orb_tor_3D
 
 subroutine norm_orb_tor_px_3D(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
-      use gsl_bessel_mod
+      use bessel_functions  
+
       implicit none 
 
       integer,intent(in)             :: n_contraction
@@ -296,9 +297,9 @@ subroutine norm_orb_tor_px_3D(n_gaussian , n_contraction, exponent, contraction 
               beta  = exponent(j)
               gamma = alpha + beta
 
-              I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax2)
-              I_0_gamma_y = bessi_scaled(0,2.d0*gamma/ay2)
-              I_0_gamma_z = bessi_scaled(0,2.d0*gamma/az2)
+              I_0_gamma_x = iv_scaled(0,2.d0*gamma/ax2)
+              I_0_gamma_y = iv_scaled(0,2.d0*gamma/ay2)
+              I_0_gamma_z = iv_scaled(0,2.d0*gamma/az2)
 
 
               c1 = contraction(i,n)
@@ -330,9 +331,9 @@ subroutine norm_orb_tor_px_3D(n_gaussian , n_contraction, exponent, contraction 
       do n = 1 , n_contraction
         do i = 1 , n_gaussian
 
-          Norm(i) = 1.d0 / dsqrt( Lx * bessi_scaled(1,4.d0*exponent(i)/(ax2)) * (1.d0/(4.d0*exponent(i))) &
-                                * Ly * bessi_scaled(0,4.d0*exponent(i)/(ay2))                             & 
-                                * Lz * bessi_scaled(0,4.d0*exponent(i)/(az2))                             ) 
+          Norm(i) = 1.d0 / dsqrt( Lx * iv_scaled(1,4.d0*exponent(i)/(ax2)) * (1.d0/(4.d0*exponent(i))) &
+                                * Ly * iv_scaled(0,4.d0*exponent(i)/(ay2))                             & 
+                                * Lz * iv_scaled(0,4.d0*exponent(i)/(az2))                             ) 
 
           contractionN(i,n) =  contraction(i,n) * Norm(i)
 
@@ -349,9 +350,9 @@ subroutine norm_orb_tor_px_3D(n_gaussian , n_contraction, exponent, contraction 
 
               if ( gamma == 0.d0 ) cycle
 
-              I_1_gamma_x = bessi_scaled(1,2.d0*gamma/ax2)
-              I_1_gamma_y = bessi_scaled(0,2.d0*gamma/ay2)
-              I_1_gamma_z = bessi_scaled(0,2.d0*gamma/az2)
+              I_1_gamma_x = iv_scaled(1,2.d0*gamma/ax2)
+              I_1_gamma_y = iv_scaled(0,2.d0*gamma/ay2)
+              I_1_gamma_z = iv_scaled(0,2.d0*gamma/az2)
 
               c1 = contractionN(i,n)
               c2 = contractionN(j,n)

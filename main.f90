@@ -6,6 +6,7 @@ program CI
       use atom_basis
       use classification_ERI
       use trexio
+      use keywords
 
       implicit none
 
@@ -25,7 +26,7 @@ program CI
       integer                         ::       number_of_functions
       integer                         ::      number_of_primitives
       integer                         ::          number_of_shells
-      character*(10)                  ::               keyword(10)
+      character*(10)                  ::               keyword(20)
 
       double precision  ,allocatable  ::             geometry(:,:)
       integer           ,allocatable  ::                 charge(:)
@@ -77,15 +78,20 @@ program CI
       ! --------------------------------------------------------------- !
 
       c_integral = any(keyword == 'Integrals')
-      c_read     = any(keyword == 'Read'    )
-      c_trexio   = any(keyword == 'Trexio'  )
-      c_Angstrom = any(keyword == 'Angstrom')
-      c_plot     = any(keyword == 'Plot')
-      c_details  = any(keyword == 'Details')
-      c_MO       = any(keyword == 'MO')
-      c_UHF      = any(keyword == 'UHF')
-      c_Huckel   = any(keyword == 'Huckel')
-      c_MP2      = any(keyword == 'MP2')
+      c_read     = any(keyword == 'Read'     )
+      c_trexio   = any(keyword == 'Trexio'   )
+      c_Angstrom = any(keyword == 'Angstrom' )
+      c_plot     = any(keyword == 'Plot'     )
+      c_details  = any(keyword == 'Details'  )
+      c_MO       = any(keyword == 'MO'       )
+      c_UHF      = any(keyword == 'UHF'      )
+      c_Huckel   = any(keyword == 'Huckel'   )
+      c_MP2      = any(keyword == 'MP2'      )
+      c_OV       = any(keyword == 'OV'       )
+      c_K        = any(keyword == 'K'        )
+      c_NA       = any(keyword == 'NA'       )
+      c_ERI      = any(keyword == 'ERI'      )
+      c_One      = any(keyword == 'One'      )
 
 
       ! --------------------------------------------------------------- !

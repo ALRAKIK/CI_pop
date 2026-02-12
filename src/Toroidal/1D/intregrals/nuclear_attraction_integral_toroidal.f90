@@ -1584,7 +1584,6 @@ subroutine integrate_NA_pz_pz_Toroidal(xpC,ypC,zpC, &
         t2 = t  * t 
         t4 = t2 * t2
 
-
         call bary_center_toroidal_x(gamma_x,t2,xp,xc,xD)
 
         call bary_exponent_x(gamma_x,t2,Xpc,dx)
