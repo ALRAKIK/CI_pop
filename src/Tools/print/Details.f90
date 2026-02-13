@@ -14,7 +14,6 @@ subroutine details_integrals(n_f,S,T,V,ERI)
 
       integer                      :: i, j, k, l 
 
-
       open(1,file=trim(tmp_file_name)//"/OV.dat ")
         do i = 1 , size(S,1)
           do j = i , size(S,1)

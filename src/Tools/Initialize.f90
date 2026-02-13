@@ -4,8 +4,6 @@ subroutine initialize_ff(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
 
       implicit none
 
-      ! --------------------------------------------------------------- !
-
       ! input ! 
 
       character(len=10) ,intent(in)     :: calculation_type 
@@ -23,8 +21,6 @@ subroutine initialize_ff(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
 
       write(label,'(100A)') (trim(label_tmp(i)), i = 1, n_atom_unitcell)
 
-
-
       write(tmp_file_name,'(A,A,A,A,A,I0,A)')    "tmp_",trim(calculation_type),"_",trim(label),"_",n_atoms,"/"
       write(command,'(A,A)') 'rm -r  ' , trim(tmp_file_name)
       call system(command)
@@ -32,6 +28,8 @@ subroutine initialize_ff(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
       call system(command)
       write(output_file_name,'(A,A,A,A,A,I0,A)') "results_",trim(calculation_type),"_",trim(label),"_",n_atoms,".out"
       open (outfile,file=trim(output_file_name))
+
+      ! --------------------------------------------------------------- !
 
 
 end subroutine initialize_ff

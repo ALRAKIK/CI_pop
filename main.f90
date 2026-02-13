@@ -53,12 +53,6 @@ program CI
       character(len=10)               ::          calculation_type 
       character(len=2),allocatable    ::                  label(:)
 
-      logical                         :: c_read, c_Integral, c_trexio
-      logical                         :: c_Angstrom, c_plot, c_details
-      logical                         :: c_MO      , c_UHF , c_Huckel
-      logical                         :: c_MP2
-
-
       integer                         :: io_stat
       character(len=100)              :: line
       integer                         :: n_alpha , n_beta
@@ -150,10 +144,10 @@ program CI
 
       ! --------------------------------------------------------------- !
 
-      allocate(geometry(n_atoms,3))
-      allocate(charge(n_atoms))
-      allocate(label(n_atoms))
-      allocate(atoms    (n_atoms))
+      allocate(geometry    (n_atoms,3))
+      allocate(charge        (n_atoms))
+      allocate(label         (n_atoms))
+      allocate(atoms         (n_atoms))
       allocate(norm_helper_px(n_atoms))
       allocate(norm_helper_py(n_atoms))
       allocate(norm_helper_pz(n_atoms))
@@ -166,9 +160,9 @@ program CI
         label(i)      =      label_tmp(i)
         charge    (i) =     charge_tmp(i)
         if (c_Angstrom) then 
-          geometry(i,1) = geometry_tmp(i,1) * 1.8897261249935897D00
-          geometry(i,2) = geometry_tmp(i,2) * 1.8897261249935897D00
-          geometry(i,3) = geometry_tmp(i,3) * 1.8897261249935897D00
+          geometry(i,1) = geometry_tmp(i,1) * Ang_par
+          geometry(i,2) = geometry_tmp(i,2) * Ang_par
+          geometry(i,3) = geometry_tmp(i,3) * Ang_par
         else
           geometry(i,1) = geometry_tmp(i,1)
           geometry(i,2) = geometry_tmp(i,2)
@@ -176,11 +170,23 @@ program CI
         end if
       end do 
 
-      ! --------------------------------------------------------------- !       
+
+
+      ! --------------------------------------------------------------- !
+      !                        Start Printing                           !
+      ! --------------------------------------------------------------- !
 
       Call Title()
+
       Call Print_the_input_file() 
-      ! --------------------------------------------------------------- ! 
+
+      call print_basis(n_atoms,charge)
+
+      ! --------------------------------------------------------------- !
+
+      ! --------------------------------------------------------------- !
+      !             Print the geometry of the supermolecule             !
+      ! --------------------------------------------------------------- !
 
       Call HEADER ('The Geometry',-1)
 
@@ -190,6 +196,8 @@ program CI
 
       write(outfile,*)
       write(outfile,*)
+
+      ! --------------------------------------------------------------- !
 
       ! --------------------------------------------------------------- !
       !                  build the atomic basis set                     !
@@ -269,26 +277,7 @@ program CI
       !           print  Informations from the Basis set                !
       ! --------------------------------------------------------------- !
 
-      write(outfile,'(A,I10)')'The number of AO functions            :',&
-      &                        number_of_functions 
-
-      write(outfile,'(A)')
-
-      write(outfile,'(A,I10)')'The number of the Gaussian primitives :',&
-      &                        number_of_primitives
-
-      write(outfile,'(A)')
-
-      write(outfile,'(A,I10)')'The number of shells                  :',&
-      &                        number_of_shells
-
-      write(outfile,'(A)')
-
-      write(outfile,'(A,I10)')'The number of atoms in the unitcell   :',&
-      &                     n_atom_unitcell
-
-      write(outfile,'(A)')
-      flush(outfile)
+      call basis_info(number_of_functions,number_of_primitives,number_of_shells,n_atom_unitcell)
 
       ! --------------------------------------------------------------- !
       !                    Nuclear repulsion energy                     !
@@ -340,9 +329,13 @@ program CI
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       if (c_read) then
+
         write(outfile,'(A)') 'The integrals will be read from file'
+
       else 
+
         write(outfile,'(A)') 'The integrals will be calculated'
+
         select case (trim(calculation_type))
           case ("OBC", "Ring", "OBC2D")
             call molecule(n_atoms,number_of_functions,atoms,geometry,S,T,V,ERI)            ! Molecule 
@@ -358,7 +351,8 @@ program CI
             write(outfile,'(A)') 'Unknown calculation type: ',          &
             &                     trim(calculation_type)
             stop
-        end select          
+        end select         
+
       end if
 
 

@@ -23,10 +23,6 @@ subroutine overlap_matrix_toroidal_3D(number_of_atoms,number_of_functions,atoms,
 
       double precision             :: r1(3) , r2(3)
 
-      double precision             :: diag_save(number_of_functions)
-
-      
-
       ! output !
 
       double precision             :: overlap_tmp(number_of_functions,number_of_functions)

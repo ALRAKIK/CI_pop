@@ -259,7 +259,7 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
 
               kc       = c1 * c2  * 2.d0 * dsqrt(pi) / ax * Lx * dexp(-mu * (Y*Y)) * dexp(-mu * (Z*Z))
                   
-              call integrate_NA_spx_Toroidal(gamma_x,xp_C,xc,x2,yp_R-yc,zp_R-zc,alpha+beta,NA)
+              call integrate_NA_spx_Toroidal(gamma_x,xp_C,xc,x2,yp_R-yc,zp_R-zc,albe,NA)
               
             end if 
 
@@ -544,9 +544,7 @@ subroutine nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atom
 
           !  Clifford Gaussian ! 
             
-          !gamma_x  = dsqrt(dabs(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X))))
           call bary_exponent_x(alpha,beta,X,gamma_x)
-          !xp_C     = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
           call bary_center_toroidal_x(alpha,beta,x1,x2,xp_C)
 
           !   Real Gaussian    !
