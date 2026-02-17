@@ -7,6 +7,7 @@ program CI
       use classification_ERI
       use trexio
       use keywords
+      use table_lookup_module
 
       implicit none
 
@@ -90,6 +91,9 @@ program CI
 
       ! --------------------------------------------------------------- !
       ! *************************************************************** !
+
+      call load_table('table.bin')
+      !call print_table_info()
 
 
       if (c_UHF) then 

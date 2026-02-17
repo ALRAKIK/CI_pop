@@ -63,53 +63,6 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
         open(HFfile,file=trim(tmp_file_name)//"/RHF.out")
       end if 
 
-      ! write(outfile,*)
-      ! write(outfile,*)'******************************************************************************************'
-      ! write(outfile,*)'|                          One electron integrals  calculation                           |'
-      ! write(outfile,*)'******************************************************************************************'
-      ! write(outfile,*)
-
-      ! write(outfile,*)
-      ! write(outfile,*) ' Overlap integral'
-      ! write(outfile,*) '------------------'
-      ! write(outfile,*)
-      ! do mu = 1 , size(S,1)
-      !   do nu = mu , size(S,1)
-      !     write(outfile,'(I3,I3,f24.16)') mu , nu , S(mu,nu)
-      !   end do 
-      ! end do
-
-      ! write(outfile,*)
-      ! write(outfile,*) "---------------------------------"
-
-      ! write(outfile,*)
-      ! write(outfile,*) ' Kinetic integral'
-      ! write(outfile,*) '------------------'
-      ! write(outfile,*)
-
-      ! do mu = 1 , size(T,1)
-      !   do nu = mu , size(T,1)
-      !     write(outfile,'(I3,I3,f24.16)') mu , nu , T(mu,nu)
-      !   end do 
-      ! end do
-
-      ! write(outfile,*)
-      ! write(outfile,*) "---------------------------------"
-
-      ! write(outfile,*)
-      ! write(outfile,*) ' Nuclear attraction integral'
-      ! write(outfile,*) '-----------------------------'
-      ! write(outfile,*)
-
-      ! do mu = 1 , size(V,1)
-      !   do nu = mu , size(V,1)
-      !     write(outfile,'(I3,I3,f24.16)') mu , nu , V(mu,nu)
-      !   end do 
-      ! end do
-
-      ! write(outfile,*)
-      ! write(outfile,*) "---------------------------------"
-
       write(outfile,*)
       write(outfile,*)'******************************************************************************************'
       write(outfile,*)'|                          Restricted Hartree-Fock calculation                           |'
@@ -372,7 +325,7 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       !   Dump results
    
       write(outfile,"(1x,a1,i2,1x,a1,f16.8,1x,a1,f10.6,1x,a1,f10.6,1x,a1,f16.8,4x,a1,f16.8,4x,a1,f16.8,4x,a1)")      & 
-      "|",nSCF,"|",EHF+ENuc,"|",Conv,"|",Gap,"|",ET,"|",EV,"|",Ej+EK,"|"
+      "|",nSCF,"|",EHF+ENuc,"|",Conv,"|",Gap,"|",ET,"|",EV,"|",EJ+EK,"|"
       write(outfile,*) repeat('-', 110)
       
       enddo
@@ -399,7 +352,7 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       endif
   
-      ! Compute final HF energy
+        ! Compute final HF energy
 
         call print_RHF(nBas,nO,e,C,ENuc,ET,EV,EJ,EK,EHF)
   

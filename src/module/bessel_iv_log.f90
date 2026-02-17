@@ -265,7 +265,7 @@ module bessel_functions
         ! Method 7: Sum definition (default)
         else
             
-            log_x2_over_4 = 2.0d0 * log_x - log(4.0d0)
+            log_x2_over_4 = 2.0d0 * log_x - 1.38629436111989062d0
             x2_over_4 = x * x / 4.0d0
             inv_x2_over_4 = 1.0d0 / x2_over_4
             v_inv_x2_over_4 = v * inv_x2_over_4
@@ -298,8 +298,7 @@ module bessel_functions
         integer, intent(in)          :: v_in
         double precision             :: Iv
         
-          Iv = iv_log(dble(v_in),x)
-          Iv = dexp(Iv)
+          Iv = dexp(iv_log(dble(v_in),x))
           
       end function iv_scaled
 
