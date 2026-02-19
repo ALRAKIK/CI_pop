@@ -4588,7 +4588,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -4652,8 +4652,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpa * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -4702,7 +4702,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -4753,7 +4753,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = I_A_z(n) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = I_A_z(n)
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -4804,8 +4808,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpa * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -4904,7 +4908,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -4918,8 +4922,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpa * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -4957,7 +4961,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = inv_ax * 0.5d0 * (sxpa * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -4994,8 +5002,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpa * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -5032,8 +5040,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpa * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -5056,7 +5064,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -5108,8 +5116,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpa * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -5159,7 +5167,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = I_A_y(n) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
         termAn  = I_A_y(n)
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -5208,7 +5220,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -5246,7 +5258,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -5260,8 +5272,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpa * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpa * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpa * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -5284,7 +5296,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -5322,7 +5334,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -5361,7 +5373,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -5462,7 +5478,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -5565,7 +5581,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = I_A_x(n) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = I_A_x(n)
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -5614,7 +5634,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -5690,7 +5710,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -5728,7 +5748,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -5767,7 +5787,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
         termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -5804,7 +5828,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -5918,7 +5942,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -5969,7 +5993,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = I_A_z(n) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = I_A_z(n)
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -6020,8 +6048,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -6070,7 +6098,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6134,8 +6162,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -6173,7 +6201,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -6210,8 +6242,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -6222,7 +6254,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6248,8 +6280,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -6298,7 +6330,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6324,8 +6356,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -6336,7 +6368,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6375,7 +6407,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
         termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -6412,7 +6448,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6476,8 +6512,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -6526,7 +6562,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6577,7 +6613,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = I_A_z(n) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = I_A_z(n)
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -6602,7 +6642,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if 
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6640,7 +6684,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if        
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6678,7 +6726,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
+      if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6716,7 +6768,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6754,7 +6810,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6781,7 +6841,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = I_A_x(n) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = I_A_x(n)
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -6792,7 +6856,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6830,7 +6898,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6868,7 +6940,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6906,7 +6982,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6944,7 +7024,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -6982,8 +7066,16 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -7020,7 +7112,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7058,7 +7154,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7096,7 +7196,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7134,7 +7238,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7172,7 +7280,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))) * I_B_y(n) * I_C_y(n) 
       do n      = 1 , Nmax_y
+        if (dabs(AAy) < 1.d-300) then 
+        termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2))))
+        else 
         termAn  = inv_ay2 * (cypa*cypb*I_A_y(n)- c2ypab * (0.25d0*(I_A_y(abs(n-2))+2.d0*I_A_y(n)+I_A_y(n+2)))+I_dp/AAy*n * s2ypab * (0.5d0*(I_A_y(abs(n-1))+I_A_y(n+1))))
+        end if
         termBn  = I_B_y(n)
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7185,7 +7297,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = I_A_z(n) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = I_A_z(n)
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -7286,7 +7402,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7336,7 +7452,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -7389,7 +7505,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = I_A_x(n) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = I_A_x(n)
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -7438,7 +7558,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7488,7 +7608,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -7514,7 +7634,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7552,7 +7672,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7591,7 +7711,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
         termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -7628,7 +7752,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n)  
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7640,7 +7764,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -7678,7 +7802,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -7716,7 +7840,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -7742,7 +7866,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypa * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypa * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypa * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -7754,7 +7878,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpb * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -7793,7 +7917,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = inv_az * 0.5d0 * (szpb * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = inv_az * 0.5d0 * (I_dp * czpb *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpb * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -7944,7 +8072,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -7997,7 +8125,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = I_A_x(n) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = I_A_x(n)
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -8199,7 +8331,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = I_A_y(n) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
         termAn  = I_A_y(n)
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -8248,7 +8384,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8286,7 +8422,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * (I_dp * czpa  * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8324,7 +8460,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8362,7 +8498,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8401,7 +8537,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -8452,8 +8592,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -8552,7 +8692,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8566,8 +8706,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -8605,7 +8745,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -8642,8 +8786,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -8680,8 +8824,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqc * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqc * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqc * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -8704,7 +8848,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8756,8 +8900,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -8807,7 +8951,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = I_A_y(n) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
         termAn  = I_A_y(n)
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -8856,7 +9004,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8894,7 +9042,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8908,8 +9056,8 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum1      = inv_ax * 0.5d0 * (sxpb * (I_A_x(abs(n-1))+I_A_x(n+1))) * inv_ax * 0.5d0 * (sxqd * (I_B_x(abs(n-1))+I_B_x(n+1))) * I_C_x(n) 
       do n      = 1 , Nmax_x
-        termAn  = inv_ax * 0.5d0 * (I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
-        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1))-I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
+        termAn  = inv_ax * 0.5d0 * ( I_dp * cxpb * (I_A_x(abs(n-1)) - I_A_x(n+1)) + sxpb * (I_A_x(abs(n-1))+I_A_x(n+1)))
+        termBn  = inv_ax * 0.5d0 * (-I_dp * cxqd * (I_B_x(abs(n-1)) - I_B_x(n+1)) + sxqd * (I_B_x(abs(n-1))+I_B_x(n+1)))
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -8932,7 +9080,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -8970,7 +9118,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9009,7 +9157,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -9110,7 +9262,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -9160,7 +9312,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9213,7 +9365,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = I_A_x(n) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = I_A_x(n)
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -9262,7 +9418,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -9312,7 +9468,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9338,7 +9494,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -9376,7 +9532,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -9415,7 +9571,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
         termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -9452,7 +9612,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqc * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqc * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqc * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -9464,7 +9624,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9502,7 +9662,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9540,7 +9700,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9566,7 +9726,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum2      = inv_ay * 0.5d0 * (sypb * (I_A_y(abs(n-1))+I_A_y(n+1))) * inv_ay * 0.5d0 * (syqd * (I_B_y(abs(n-1))+I_B_y(n+1))) * I_C_y(n) 
       do n      = 1 , Nmax_y
-        termAn  = inv_ay * 0.5d0 * (I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
+        termAn  = inv_ay * 0.5d0 * ( I_dp * cypb * (I_A_y(abs(n-1))-I_A_y(n+1)) + sypb * (I_A_y(abs(n-1))+I_A_y(n+1)))
         termBn  = inv_ay * 0.5d0 * (-I_dp * cyqd * (I_B_y(abs(n-1))-I_B_y(n+1)) + syqd * (I_B_y(abs(n-1))+I_B_y(n+1)))
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
@@ -9578,7 +9738,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
-        termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        termAn  = inv_az * 0.5d0 * ( I_dp * czpa * (I_A_z(abs(n-1))-I_A_z(n+1)) + szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9617,7 +9777,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum3      = inv_az * 0.5d0 * (szpa * (I_A_z(abs(n-1))+I_A_z(n+1))) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n) 
       do n      = 1 , Nmax_z
         termAn  = inv_az * 0.5d0 * (I_dp * czpa *(I_A_z(abs(n-1))-I_A_z(n+1))+ szpa * (I_A_z(abs(n-1))+I_A_z(n+1)))
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
@@ -9654,7 +9818,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if 
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9692,7 +9860,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9730,7 +9902,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9768,7 +9944,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9806,7 +9986,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9821,7 +10005,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum1      = I_A_x(n) * inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))) * I_C_x(n) 
       do n      = 1 , Nmax_x
         termAn  = I_A_x(n)
+        if (dabs(BBx) < 1.d-300) then 
+        termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2))))
+        else 
         termBn  = inv_ax2 * (cxqc * cxqd * I_B_x(n)-c2xqcd*(0.25d0*(I_B_x(abs(n-2))+2.d0*I_B_x(n)+I_B_x(n+2)))-I_dp/BBx*n * s2xqcd * (0.5d0*(I_B_x(abs(n-1))+I_B_x(n+1))))
+        end if 
         termc   = I_C_x(n) 
         term    = current_term_x * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum1) ) exit
@@ -9844,7 +10032,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9882,7 +10074,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9920,7 +10116,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9958,7 +10158,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -9996,7 +10200,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -10023,7 +10231,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = I_A_y(n) * inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))) * I_C_y(n) 
       do n      = 1 , Nmax_y
         termAn  = I_A_y(n)
+        if (dabs(BBy) < 1.d-300) then 
+        termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2))))
+        else 
         termBn  = inv_ay2 * (cyqc*cyqd*I_B_y(n)- c2yqcd * (0.25d0*(I_B_y(abs(n-2))+2.d0*I_B_y(n)+I_B_y(n+2)))-I_dp/BBy*n * s2yqcd * (0.5d0*(I_B_y(abs(n-1))+I_B_y(n+1))))
+        end if 
         termc   = I_C_y(n) 
         term    = current_term_y * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum2) ) exit
@@ -10034,7 +10246,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * I_B_z(n) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = I_B_z(n)
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -10072,7 +10288,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * inv_az * 0.5d0 * (szqd * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = inv_az * 0.5d0 * (-I_dp * czqd * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqd * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -10110,7 +10330,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -10148,7 +10372,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -10186,7 +10414,11 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * inv_az * 0.5d0 * (szqc * (I_B_z(abs(n-1))+I_B_z(n+1))) * I_C_z(n) 
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
         termBn  = inv_az * 0.5d0 * (-I_dp * czqc * (I_B_z(abs(n-1))-I_B_z(n+1)) + szqc * (I_B_z(abs(n-1))+I_B_z(n+1)))
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
@@ -10224,15 +10456,22 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       n         = 0
       sum3      = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))) * inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))) * I_C_z(n)
       do n      = 1 , Nmax_z
+        if (dabs(AAz) < 1.d-300) then 
+        termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2))))
+        else 
         termAn  = inv_az2 * (czpa*czpb*I_A_z(n)-c2zpab*(0.25d0*(I_A_z(abs(n-2))+2.d0*I_A_z(n)+I_A_z(n+2)))+I_dp/AAz*n * s2zpab * (0.5d0*(I_A_z(abs(n-1))+I_A_z(n+1))))
+        end if
+        if (dabs(BBz) < 1.d-300) then 
+        termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2))))
+        else 
         termBn  = inv_az2 * (czqc*czqd*I_B_z(n)-c2zqcd*(0.25d0*(I_B_z(abs(n-2))+2.d0*I_B_z(n)+I_B_z(n+2)))-I_dp/BBz*n*s2zqcd*(0.5d0*(I_B_z(abs(n-1))+I_B_z(n+1))))
+        end if 
         termc   = I_C_z(n) 
         term    = current_term_z * termC * termAn * termBn
         if (abs(term) < eps * dabs(sum3) ) exit
           sum3 = sum3 + 2.d0 * real(term)
           current_term_z = current_term_z * expo_term_z
       end do
-
 
 
       case default
