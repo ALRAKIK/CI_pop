@@ -240,9 +240,9 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       c2xqcd = dcos(ax*(2.d0*xq-xC-xD)) ; c2yqcd = dcos(ay*(2.d0*yq-yC-yD)) ; c2zqcd = dcos(az*(2.d0*zq-zC-zD)) 
       s2xqcd = dsin(ax*(2.d0*xq-xC-xD)) ; s2yqcd = dsin(ay*(2.d0*yq-yC-yD)) ; s2zqcd = dsin(az*(2.d0*zq-zC-zD)) 
       
-      call dqagi(f_decay , bound, inf , epsabs, epsrel, result, abserr, neval, ier,Limit,Lenw,Last,Iwork,Work)
+      !call dqagi(f_decay , bound, inf , epsabs, epsrel, result, abserr, neval, ier,Limit,Lenw,Last,Iwork,Work)
 
-      !call dqags(f_decay_transformed, 0.0d0, 1.0d0, epsabs, epsrel, result, abserr, neval, ier, Limit, Lenw, Last, Iwork, Work)
+      call dqags(transformed_integrand, 0.0d0, 1.0d0, epsabs, epsrel, result, abserr, neval, ier, Limit, Lenw, Last, Iwork, Work)
 
       if (ier /= 0) then
         write(*,'(A,I8,A)') 'Error code = ', ier
@@ -254,40 +254,32 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
         double precision, intent(in) :: t
         double precision             :: ft
 
-        CCx   = inv_ax2 * 2.d0 * t * t 
-        CCy   = inv_ay2 * 2.d0 * t * t 
-        CCz   = inv_az2 * 2.d0 * t * t 
-
         ft    =  S(t)
 
       end function f_decay
 
-      function f_decay_transformed(u) result(y)
-
+      function transformed_integrand(u) result(y)
         double precision, intent(in) :: u
-        double precision             :: y , t 
-
+        double precision :: y, t
+        
         if (u >= 1.0d0) then
           y = 0.0d0
           return
         endif
-    
-        ! Transform u -> t
+        
+        ! Transformation: t = u/(1-u)
         t = u / (1.0d0 - u)
-
-        ! Jacobian factor
+        
+        ! Jacobian: dt/du = 1/(1-u)²
         y = S(t) / ((1.0d0 - u) * (1.0d0 - u))
-
+        
         ! Check for numerical issues
         if (.not. ieee_is_finite(y)) then
           y = 0.0d0
         endif
+
+      end function transformed_integrand
       
-        CCx = 2.0d0 * u**2 / (ax * ax * (1.0d0 - u)**2)
-        CCy = 2.0d0 * u**2 / (ay * ay * (1.0d0 - u)**2)
-        CCz = 2.0d0 * u**2 / (az * az * (1.0d0 - u)**2)
-    
-      end function f_decay_transformed
 
 
       double precision function S(t) result(sum)
@@ -311,15 +303,15 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       COMPLEX(KIND=KIND(1.0D0))            :: current_term_x , current_term_y , current_term_z
       double precision,parameter           :: eps = 2.22d-16
       ! --------------------------------------------------------------- !
-      double precision                     :: I_A_x(0:10000)
-      double precision                     :: I_B_x(0:10000)
-      double precision                     :: I_C_x(0:10000)
-      double precision                     :: I_A_y(0:10000)
-      double precision                     :: I_B_y(0:10000)
-      double precision                     :: I_C_y(0:10000)
-      double precision                     :: I_A_z(0:10000)
-      double precision                     :: I_B_z(0:10000)
-      double precision                     :: I_C_z(0:10000)
+      double precision,save                :: I_A_x(0:10000)
+      double precision,save                :: I_B_x(0:10000)
+      double precision,save                :: I_C_x(0:10000)
+      double precision,save                :: I_A_y(0:10000)
+      double precision,save                :: I_B_y(0:10000)
+      double precision,save                :: I_C_y(0:10000)
+      double precision,save                :: I_A_z(0:10000)
+      double precision,save                :: I_B_z(0:10000)
+      double precision,save                :: I_C_z(0:10000)
       ! --------------------------------------------------------------- !
 
       ! Peak_x         = ceiling(min(AAx,BBx,CCx))
@@ -329,6 +321,10 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       ! Nmax_x         = Peak_x + 10
       ! Nmax_y         = Peak_y + 10
       ! Nmax_z         = Peak_z + 10
+
+      CCx   = inv_ax2 * 2.d0 * t * t 
+      CCy   = inv_ay2 * 2.d0 * t * t 
+      CCz   = inv_az2 * 2.d0 * t * t 
 
       Nmax_x = get_Nmax(AAx, BBx, CCx, Phi_x) + 5
       Nmax_y = get_Nmax(AAy, BBy, CCy, Phi_y) + 5

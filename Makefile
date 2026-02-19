@@ -9,7 +9,7 @@ $(shell mkdir -p $(BDIR) $(ODIR)/module)
 
 # Compiler and flags
 FC = gfortran
-FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3  -g -fbacktrace  -fcheck=all -fimplicit-none -fopenmp  -funroll-loops -ftree-vectorize -ffast-math
+FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3  -g -fbacktrace  -fcheck=all -fimplicit-none -fopenmp  -funroll-loops -ftree-vectorize -ffast-math -frecursive
 MODDIR = -J$(ODIR) -I$(ODIR)  -I/usr/local/include  # Put and find modules in obj directory
 LIBS   = src/lib/libquadpack.a -lblas -llapack \
         -L/opt/homebrew/Cellar/gsl/2.8/lib -lgsl -lgslcblas \
@@ -18,7 +18,7 @@ LIBS   = src/lib/libquadpack.a -lblas -llapack \
 
 LIBS_CLUSTER   = -fopenmp src/lib/libquadpack.a   /nfs/home/aalrakik/gsl/lib64/libgsl.a  src/lib/liblapack.a src/lib/librefblas.a -ltrexio
 
-FFLAGS_CLUSTER = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -lblas -g -fbacktrace  -fcheck=all -fimplicit-none  -lgsl -lgslcblas -lm -ffree-line-length-none  -fopenmp -ftree-vectorize -ffast-math
+FFLAGS_CLUSTER = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -lblas -g -fbacktrace  -fcheck=all -fimplicit-none  -lgsl -lgslcblas -lm -ffree-line-length-none  -fopenmp -ftree-vectorize -ffast-math -frecursive
 
 # Find all module files
 MODULE_SRC = $(wildcard $(MODULE_DIR)/*.f90)
