@@ -222,6 +222,14 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       AAz   = inv_az2 * 2.d0 * p_z 
       BBz   = inv_az2 * 2.d0 * q_z
 
+      AAx = max(1.d-300,AAx)
+      AAy = max(1.d-300,AAy)
+      AAz = max(1.d-300,AAz)
+
+      BBx = max(1.d-300,BBx)
+      BBy = max(1.d-300,BBy)
+      BBz = max(1.d-300,BBz)
+
       cxpa  = dcos(xpA) ; cypa  = dcos(ypA) ; czpa  = dcos(zpA) 
       sxpa  = dsin(xpA) ; sypa  = dsin(ypA) ; szpa  = dsin(zpA) 
 
@@ -360,44 +368,6 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       call bessel_I_scaled_backward(Nmax_z, CCz, I_C_z)
 
       select case(pattern_id)
-
-      ! case (0000) ! | s   s   s   s    ( 1 ) 
-
-      ! n         = 0
-      ! sum1      = I_A_x(n) * I_B_x(n) * I_C_x(n) 
-      ! do n      = 1 , Nmax_x
-      !   termAn  = I_A_x(n)
-      !   termBn  = I_B_x(n)
-      !   termc   = I_C_x(n)
-      !   term    = current_term_x * termC * termAn * termBn
-      !   if (abs(term) < eps * dabs(sum1) ) exit
-      !     sum1 = sum1 + 2.d0 * real(term)
-      !     current_term_x = current_term_x * expo_term_x
-      ! end do
-
-      ! n         = 0
-      ! sum2      = I_A_y(n) * I_B_y(n) * I_C_y(n)
-      ! do n      = 1 , Nmax_y
-      !   termAn  = I_A_y(n)
-      !   termBn  = I_B_y(n)
-      !   termc   = I_C_y(n)
-      !   term    = current_term_y * termC * termAn * termBn
-      !   if (abs(term) < eps * dabs(sum2) ) exit
-      !     sum2 = sum2 + 2.d0 * real(term)
-      !     current_term_y = current_term_y * expo_term_y
-      ! end do
-
-      ! n         = 0
-      ! sum3      =  I_A_z(n) *  I_B_z(n) *  I_C_z(n)
-      ! do n      = 1 , Nmax_z
-      !   termAn  = I_A_z(n)
-      !   termBn  = I_B_z(n)
-      !   termc   = I_C_z(n)
-      !   term    = current_term_z * termC * termAn * termBn
-      !   if (abs(term) < eps * dabs(sum3) ) exit
-      !     sum3 = sum3 + 2.d0 * real(term)
-      !     current_term_z = current_term_z * expo_term_z
-      ! end do
 
       case (0000) ! | s   s   s   s    ( 1 ) 
 
