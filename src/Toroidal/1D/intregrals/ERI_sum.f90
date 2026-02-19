@@ -51,7 +51,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       double precision                   :: c2xqcd , s2xqcd
 
       double precision                   :: A , B , C
-      integer                            :: Peak
+      !integer                            :: Peak
 
       inv_ax  = 1.d0/ax 
       inv_ax2 = inv_ax * inv_ax 
@@ -198,22 +198,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
         sum     = sum + 2.d0 * real(term) * const
         current_term = current_term * expo_term
       end do
-
-
-      ! case (0000) ! | s   s   s   s    ( 1 ) 
-      ! n           = 0
-      ! const       =  (pi * D)  *  (pi * D)
-      ! sum         = I_A(n) * I_B(n) * I_C(n) * const
-      ! do n = 1 , Nmax
-      !   termAn  = I_A(n)
-      !   termBn  = I_B(n)
-      !   termC   = I_C(n)
-      !   term    = current_term * termC * termAn * termBn
-      !   if (abs(term) < eps * dabs(sum) ) exit
-      !   sum     = sum + 2.d0 * real(term) * const
-      !   current_term = current_term * expo_term
-      ! end do
-
 
       case (0001) ! | s   s   s   px   ( 2 ) 
       n           = 0
