@@ -1,6 +1,6 @@
 subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,result)
       
-      use quadpack , only : dqagi , dqags , dqag
+      use quadpack , only : dqagi , dqags
       use iso_c_binding
       use torus_init
       use gsl_bessel_mod

@@ -93,8 +93,6 @@ program CI
       ! *************************************************************** !
 
       call load_table('table.bin')
-      !call print_table_info()
-
 
       if (c_UHF) then 
         n_alpha = 0 

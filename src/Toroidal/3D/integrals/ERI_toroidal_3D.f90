@@ -11,7 +11,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
       !-----------------------------------------------------------------!
 
-      integer                        :: i , j , k , l , num_total_int
+      integer                        :: i , j , k , l
       integer                        :: number_of_atoms
       integer                        :: number_of_functions
       type(atom)                     :: atoms(number_of_atoms)
@@ -19,6 +19,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
       double precision               :: geometry(number_of_atoms,3)
       double precision,allocatable   :: two_electron(:,:,:,:)
+      double precision               :: num_total_int
       integer                        :: fpuc
 
       double precision,intent(out)   :: two_electron_integrals(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
@@ -105,14 +106,14 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       end do
 
 
-      num_total_int = 0
+      num_total_int = 0.d0
       do ij_index = 1, total_ij_pairs
         i = i_index(ij_index)
         j = j_index(ij_index)
         do k = 1, number_of_functions
           do l = k, number_of_functions    
             if (i <= k .or. (i == k .and. j <= l)) then
-              num_total_int = num_total_int + 1
+              num_total_int = num_total_int + 1.d0
             end if
           end do
         end do
