@@ -514,12 +514,14 @@ subroutine check_the_overlap(N,over)
 
       ! local !
 
-      integer                       :: i , o
+      integer                       :: i
       double precision              :: Evec(N,N)
       double precision              :: Eval(N)
       double precision,parameter    :: thresh = 1d-6
+      double precision,parameter    :: machine_eps = 2.22E-16
+      double precision              :: cond
+      double precision              :: double_digits, digits_lost, reliable_digits
 
-      double precision              :: Xt(N,N)
 
       ! output !
       
@@ -527,15 +529,34 @@ subroutine check_the_overlap(N,over)
 
       call diagonalize_matrix(N,Evec,Eval)
 
-      ! //////////////////////////////////////////////////////////////// !
+      ! /////////////////////////////////////////////////////////////// !
+
       call header_under("The Overlap Eigenvalues",-1)
 
       write(outfile, "(5f16.8)") (Eval(i), i=1,n)
 
+      ! \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ !
+
+      cond            = MAXVAL(Eval)/MINVAL(Eval)
+      double_digits   = log10(1.0 / machine_eps)
+      digits_lost     = log10(cond)
+      reliable_digits = double_digits - digits_lost
+
+
       write(outfile,*) ""
       write(outfile,*) ""
-      write(outfile,'(a,g16.8)') " The smallest eigenvalue : " , MINVAL(Eval)
+      write(outfile,'(5X,a,f16.8)') " The smallest eigenvalue   : " , MINVAL(Eval)
+      write(outfile,'(5X,a,f16.8)') " The Largest  eigenvalue   : " , MAXVAL(Eval)
+      write(outfile,'(5X,a,f16.8)') " The conditional number    : " , cond
+      write(outfile,'(5X,a,f16.4)') " Estimated digits lost     : " , digits_lost
+      write(outfile,'(5X,a,f16.4)') " Estimated reliable digits : " , reliable_digits
       write(outfile,*) ""
+      if (cond > 1.0E12) then
+        write(outfile,'(a)') " *** WARNING: Matrix is ill-conditioned! Results may be inaccurate. ***"
+      end if
+      if (cond > 1.0E15) then
+        write(outfile,'(a)') " *** CRITICAL: Matrix is numerically singular! Results are likely garbage. ***"
+      end if
       FLUSH(outfile)
 
       if (Minval(Eval) < 0.d0) then 
