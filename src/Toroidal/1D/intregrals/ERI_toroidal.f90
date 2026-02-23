@@ -450,8 +450,8 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
         end do
       end do
 
-      write(outfile,*) 'Need to  compute ', num_total_int, ' unique integrals (Two electron Integrals)'
-      write(*,*)       'Need to  compute ', num_total_int, ' unique integrals (Two electron Integrals)'
+      write(outfile,'(a,I0,a)') 'Need to  compute ', int(num_total_int,16), ' unique integrals (Two electron Integrals)'
+      write(*      ,'(a,I0,a)') 'Need to  compute ', int(num_total_int,16), ' unique integrals (Two electron Integrals)'
       write(outfile,*) ''
       flush(outfile)
 
