@@ -138,7 +138,7 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
         if (AO1%orbital(:1) =="p" .and. AO2%orbital(:1) == "p") then
           do k = 1 , size(AO1%exponent)
             do l = 1 , size(AO2%exponent)
-              call nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA_tmp(i,j))
+              call nuclear_attraction_integral_pp_toroidal_3D(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA_tmp(i,j))
             end do 
           end do
         end if
