@@ -33,6 +33,10 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       integer                        :: num_threads, optimal_chunk_size
       !-----------------------------------------------------------------!
 
+      
+      !-----------------------------------------------------------------!
+
+
       ! functions_per_unitcell ! 
 
       fpuc = 0 
@@ -139,6 +143,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       end do
       
       !$omp end parallel do
+
 
       deallocate(i_index, j_index)
 

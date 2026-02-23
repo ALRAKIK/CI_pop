@@ -369,7 +369,6 @@ subroutine ERI_integral_toroidal_new(number_of_atoms,geometry,number_of_function
       integer                        :: num_threads, optimal_chunk_size
       !-----------------------------------------------------------------!
 
-
       !-----------------------------------------------------------------!
 
       ! functions_per_unitcell ! 
