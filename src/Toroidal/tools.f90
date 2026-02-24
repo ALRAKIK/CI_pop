@@ -169,7 +169,10 @@ subroutine bary_exponent_x(e1,e2,x,p)
         p = e12 + e22 + 2.d0 * e1 * e2 * dcos(ax*x)
         p = dsqrt(dabs(p))
       end if
-      
+
+      if (p > e1 + e2) p = e1+e2
+
+      if (e1+e2-p < 1.d-14) p = e1 + e2 
 
 end subroutine bary_exponent_x
 

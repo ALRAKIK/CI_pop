@@ -32,7 +32,6 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
       double precision               :: const
       double precision               :: D00x , D00y , D00z
       double precision               :: S00x , S00y , S00z
-      double precision                 :: theta , theta2 , cos_theta , sum_ab
 
       
       !-----------------------------------------------------------------!
@@ -58,8 +57,11 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
 
-          const       = Lx*c1*c2
-          
+          const       = c1 * c2
+
+
+          ! /////////////////////////////////////////////////////////// !
+
           ! Clifford Gaussian ! 
 
           call bary_exponent_x(alpha,beta,X,gamma_x)
@@ -70,6 +72,8 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
           call bary_center_toroidal_x(alpha,beta,x1,x2,xp_C)
 
+          ! \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ !
+
           !   Real Gaussian   !
 
           albe        = alpha + beta 
@@ -79,15 +83,26 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           yp_R        = ( alpha * y1 + beta * y2 ) * inv_albe
           zp_R        = ( alpha * z1 + beta * z2 ) * inv_albe
 
+          ! /////////////////////////////////////////////////////////// !
+
           ! ----------------------------------------------------------- !
 
-          D00x = -2.d0 * beta * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * ( dcos(ax*(xp_C-x2))       * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
-          D00y =                     dexp(- mu * (Y * Y))                 * ( 4.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe) 
-          D00z =                     dexp(- mu * (Z * Z))                 * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe) 
+          D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * ( dcos(ax*(xp_C-x2))       * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
 
-          S00x =      dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x
-          S00y =      dexp(- mu * (Y * Y))                   * dsqrt(pi*inv_albe)
-          S00z =      dexp(- mu * (Z * Z))                   * dsqrt(pi*inv_albe)
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          ! follow the equation p.128 in amer ircamc file in yellow !
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
+                ! ------------------------------------------------------------------------------------ !   ! ------------------------------------- !
+                !             this part the the kinetic part related the the derivative                !   !      This is the overlap S_00         !
+                ! ------------------------------------------------------------------------------------ !   ! ------------------------------------- !
+                                                         !                                                                      ! 
+          D00y = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
+          D00z = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
+
+          S00x =   Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x
+          S00y =        dexp(- mu * (Y * Y))                   * dsqrt(pi*inv_albe)
+          S00z =        dexp(- mu * (Z * Z))                   * dsqrt(pi*inv_albe)
 
           X_k = D00x * S00y * S00z 
           Y_k = S00x * D00y * S00z 
@@ -132,11 +147,13 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       double precision               :: albe , inv_albe
       double precision               :: mu
       double precision               :: yp_R , zp_R
+      double precision               :: ax2
 
       double precision               :: D01x , S01x , D01y , S01y , D01z , S01z
       double precision               :: S00x , D00x
       double precision               :: S00y , D00y
       double precision               :: S00z , D00z
+
 
       !-----------------------------------------------------------------!
 
@@ -147,6 +164,8 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       X            = (x1 - x2)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
+
+      ax2 = ax * ax
 
       !-----------------------------------------------------------------!
 
@@ -160,7 +179,7 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
           c2   =   AO2%coefficient(j)
 
 
-          const       =  c1*c2
+          const       =  c1 * c2
 
           ! Clifford Gaussian !
 
@@ -169,10 +188,10 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
           call bary_center_toroidal_x(alpha,beta,x1,x2,xp_C)
 
 
-          I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax**2))
-          I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax**2))
-          I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax**2))
-          I_3_gamma_x = iv_scaled(3, 2.d0*gamma_x/(ax**2))
+          I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax2))
+          I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax2))
+          I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax2))
+          I_3_gamma_x = iv_scaled(3, 2.d0*gamma_x/(ax2))
 
           !   Real Gaussian  !
 
@@ -190,15 +209,24 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
           if (AO2%orbital=="px") then 
 
           D01x = - ax*ax*dsin(ax * (xp_C-x2)) * I_1_gamma_x - 3.0d0 * beta * dsin(2.0d0 * ax * (xp_C-x2)) * I_2_gamma_x + (2.d0*beta/ax)**2 * (0.25d0) * ( 3.0d0 * dsin(ax * (xp_C-x2)) * I_1_gamma_x - dsin(3.0d0 * ax * (xp_C-x2)) * I_3_gamma_x)
-          D01x = D01x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) / ax 
+          D01x = D01x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2) / ax 
+
+          S01x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_1_gamma_x  * (dsin(ax*(xp_C-x2))/ax) 
 
 
-          S01x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_1_gamma_x            * (dsin(ax*(xp_C-x2))/ax) 
 
-          D00y = dexp(- mu * (Y * Y)) * ( 4.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe) 
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          ! follow the equation p.128 in amer ircamc file in yellow !
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
+                ! ------------------------------------------------------------------------------------ !   ! ------------------------------------- !
+                !             this part the the kinetic part related the the derivative                !   !      This is the overlap S_00         !
+                ! ------------------------------------------------------------------------------------ !   ! ------------------------------------- !
+                                                         !                                                                      ! 
+          D00y = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
+          D00z = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
+
           S00y = dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
-
-          D00z = dexp(- mu * (Z * Z)) * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe)
           S00z = dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
 
           X_K = D01x * S00y * S00z
@@ -209,13 +237,21 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
           if (AO2%orbital=="py")  then 
             
-            D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * ( dcos(ax*(xp_C-x2)) * I_1_gamma_x + (beta/ax**2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
-            S00x = Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x
+            D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * ( dcos(ax*(xp_C-x2)) * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+            S00x = Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2) * I_0_gamma_x
 
-            D01y = dexp(- mu * (Y*Y))   * dsqrt(pi*inv_albe) * (yp_R-y2) * ( 4.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe )  - 2.d0 * beta )
-            S01y = dexp(- mu * (Y*Y))   * dsqrt(pi*inv_albe) * (yp_R-y2)
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          ! follow the equation p.130 in amer ircamc file in yellow !
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 
-            D00z = dexp(- mu * (Z * Z)) * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe)
+                    ! ------------------------------------------------------------------------------------ !            ! ------------------------------------- !    ! ------------------------- !          ! ------------------------------------ !
+                    !             this part the the kinetic part related the the derivative                !            !      This is the overlap S_00         !    !  This part is derivitive  !          !     This part is the overlap S_01    !
+                    ! ------------------------------------------------------------------------------------ !            ! ------------------------------------- !    ! ------------------------- !          ! ------------------------------------ !
+                                                                  !                                                                          !                                     !                                            !          
+            D01y = - 2.d0 * (yp_R-y2) * ( beta - 2.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)  - 4.d0 * alpha * beta * inv_albe * dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe) * (yp_R-y2)
+            S01y = dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe) * (yp_R-y2)
+
+            D00z = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
             S00z = dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
 
             X_k  = D00x * S01y * S00z
@@ -226,8 +262,23 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
           if (AO2%orbital=="pz") then 
 
-            D01z = dexp(- mu * (Z * Z))   * dsqrt(pi*inv_albe) * (zp_R-z2) * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta )
-            S01z = dexp(- mu * (Z * Z))   * dsqrt(pi*inv_albe) * (zp_R-z2)
+            D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * ( dcos(ax*(xp_C-x2)) * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+            S00x = Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2) * I_0_gamma_x
+
+            D00y = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
+            S00y = dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
+
+
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          ! follow the equation p.130 in amer ircamc file in yellow !
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
+                    ! ------------------------------------------------------------------------------------ !            ! ------------------------------------- !    ! ------------------------- !          ! ------------------------------------ !
+                    !             this part the the kinetic part related the the derivative                !            !      This is the overlap S_00         !    !  This part is derivitive  !          !     This part is the overlap S_01    !
+                    ! ------------------------------------------------------------------------------------ !            ! ------------------------------------- !    ! ------------------------- !          ! ------------------------------------ !
+                                                                  !                                                                          !                                     !                                            !          
+            D01z = - 2.d0 * (zp_R-z2) * ( beta - 2.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)  - 4.d0 * alpha * beta * inv_albe * dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe) * (zp_R-z2)
+            S01z = dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe) * (zp_R-z2)
 
             X_k  = D00x * S00y * S01z
             Y_k  = S00x * D00y * S01z
@@ -281,6 +332,7 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
       double precision               :: albe , inv_albe
       double precision               :: mu
       double precision               :: yp_R , zp_R
+      double precision               :: ax2
 
       double precision               :: D11x , D11y , D11z
       double precision               :: S11x , S11y , S11z
@@ -302,6 +354,8 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
       Y            = (y1 - y2)
       Z            = (z1 - z2)
 
+      ax2 = ax * ax
+
       !-----------------------------------------------------------------!
 
       S_pp_normal = 0.d0
@@ -321,11 +375,11 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           call bary_center_toroidal_x(alpha,beta,x1,x2,xp_C)
 
-          I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax**2))
-          I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax**2))
-          I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax**2))
-          I_3_gamma_X = iv_scaled(3, 2.d0*gamma_x/(ax**2))
-          I_4_gamma_X = iv_scaled(4, 2.d0*gamma_x/(ax**2))
+          I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax2))
+          I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax2))
+          I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax2))
+          I_3_gamma_X = iv_scaled(3, 2.d0*gamma_x/(ax2))
+          I_4_gamma_X = iv_scaled(4, 2.d0*gamma_x/(ax2))
 
           !   Real Gaussian  !
 
@@ -337,8 +391,8 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           ! --------------------------------------------------------- !
 
-          S11x = ( (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x +  0.5d0 * dcos(ax*(2.d0*xp_C-x1-x2))* (I_0_gamma_x - I_2_gamma_x) ) /ax**2
-          S11x = S11x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2)
+          S11x = ( (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x +  0.5d0 * dcos(ax*(2.d0*xp_C-x1-x2))* (I_0_gamma_x - I_2_gamma_x) ) /ax2
+          S11x = S11x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2)
 
           S11y = dexp(- mu * (Y*Y) ) * dsqrt(pi*inv_albe) * ( (yp_R-y1)*(yp_R-y2) + 0.5d0 * inv_albe )
           S11z = dexp(- mu * (Z*Z) ) * dsqrt(pi*inv_albe) * ( (zp_R-z1)*(zp_R-z2) + 0.5d0 * inv_albe )
@@ -352,6 +406,7 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           S10z = dexp(- mu * (Z*Z))   * dsqrt(pi*inv_albe) * (zp_R-z1)
 
           S00x = Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x
+
           S00y = dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
           S00z = dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
 
@@ -374,8 +429,8 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           D10z = dexp(- mu * (Z*Z))   * dsqrt(pi*inv_albe) * (zp_R-z1) * ( 4.d0 * alpha * alpha * ( (zp_R-z1) * (zp_R-z1) + 0.5d0 * inv_albe )  - 2.d0 * alpha )
 
           D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (dcos(ax*(xp_C-x2)) * I_1_gamma_x + (beta/ax**2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
-          D00y = dexp(- mu * (Y * Y)) * ( 4.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe)
-          D00z = dexp(- mu * (Z * Z)) * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) * dsqrt(pi*inv_albe)
+          D00y = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
+          D00z = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
 
 
           if (AO1%orbital == "px" .and. AO2%orbital == "px") then 

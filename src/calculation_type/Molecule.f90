@@ -3,6 +3,7 @@ subroutine molecule(n_atoms,number_of_functions,atoms,geometry,OV,K,NA,ERI)
       use files
       use torus_init
       use atom_basis
+      use keywords
 
       implicit none
 
@@ -37,7 +38,7 @@ subroutine molecule(n_atoms,number_of_functions,atoms,geometry,OV,K,NA,ERI)
         call check_the_overlap          (number_of_functions,OV)
         call kinetic_matrix             (n_atoms,number_of_functions,geometry,atoms,K)
         call nuclear_attraction_matrix  (n_atoms,number_of_functions,geometry,atoms,NA)  
-        call ERI_integral               (n_atoms,number_of_functions,geometry,atoms,ERI)
+        if (.not. c_One) call ERI_integral               (n_atoms,number_of_functions,geometry,atoms,ERI)
 
       call cpu_time(end)
 

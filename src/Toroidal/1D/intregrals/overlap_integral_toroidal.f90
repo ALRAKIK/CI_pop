@@ -47,7 +47,7 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
           beta = AO2%exponent(j)
           c2   = AO2%coefficient(j)
 
-            const       = Lx*c1*c2
+            const       =  c1 * c2
 
               call bary_exponent_x(alpha,beta,X,gamma_x)
 
@@ -55,11 +55,11 @@ subroutine overlap_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
                
               I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/ax2)
               
-              overlap_x   = const * dexp(-2.d0 * (alpha + beta - gamma_x ) / ax2) * I_0_gamma_x
+              overlap_x   = Lx * dexp(-2.d0 * (alpha + beta - gamma_x ) / ax2) * I_0_gamma_x
               overlap_y   = dexp(- mu * (Y*Y)) * dsqrt(pi/(alpha+beta))
               overlap_z   = dexp(- mu * (Z*Z)) * dsqrt(pi/(alpha+beta))
 
-              S_ss_normal =  S_ss_normal + overlap_x * overlap_y * overlap_z
+              S_ss_normal =  S_ss_normal + const * overlap_x * overlap_y * overlap_z
 
         end do 
       end do
@@ -197,6 +197,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
       double precision                 :: gamma_x
       double precision                 :: xp_C
       double precision                 :: yp_R         ,zp_R
+      double precision                 :: ax2
       double precision                 :: I_0_gamma_x
       double precision                 :: I_1_gamma_x
       double precision                 :: I_2_gamma_x
@@ -212,6 +213,8 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
       Y        = (y1 - y2)
       Z        = (z1 - z2)
 
+      ax2 = ax * ax 
+
       !-----------------------------------------------------------------!
 
       S_pp_normal = 0.d0
@@ -223,7 +226,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           beta = AO2%exponent(j)
           c2   = AO2%coefficient(j)
 
-          const       = c1*c2
+          const       = c1 * c2
 
           ! Clifford Gaussian !
 
@@ -231,9 +234,9 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           call bary_center_toroidal_x(alpha,beta,x1,x2,xp_C)
 
-          I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax*ax))
-          I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax*ax))
-          I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax*ax))
+          I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax2))
+          I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax2))
+          I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax2))
  
 
           !   Real Gaussian   !
@@ -250,8 +253,8 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           
           if (AO1%orbital == "px" .and. AO2%orbital == "px") then 
 
-          term        = ( (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x +  0.5d0 * dcos(ax*(2*xp_C-x1-x2))* (I_0_gamma_x - I_2_gamma_x)  ) /(ax*ax)
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * term 
+          term        = ( (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x +  0.5d0 * dcos(ax*(2.d0*xp_C-x1-x2))* (I_0_gamma_x - I_2_gamma_x)  ) / ax2
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * term 
           overlap_y   =      dexp(- mu * (Y*Y) )                    * dsqrt(pi*inv_albe)
           overlap_z   =      dexp(- mu * (Z*Z) )                    * dsqrt(pi*inv_albe)
 

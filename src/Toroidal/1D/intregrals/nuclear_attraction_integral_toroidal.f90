@@ -244,8 +244,6 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
 
           gamma_y  = alpha+beta
           gamma_z  = alpha+beta
-
-          kc       = c1 * c2  * 2.d0 * dsqrt(pi) / ax * Lx * dexp(-mu * (Y*Y)) * dexp(-mu * (Z*Z))
   
           do k = 1 , number_of_atoms
 
@@ -257,7 +255,7 @@ subroutine nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atom
 
             if (AO2%orbital=="px") then 
 
-              kc       = c1 * c2  * 2.d0 * dsqrt(pi) / ax * Lx * dexp(-mu * (Y*Y)) * dexp(-mu * (Z*Z))
+              kc       = c1 * c2  * 2.d0 * dsqrt(pi) * Lx * dexp(-mu * (Y*Y)) * dexp(-mu * (Z*Z)) / ax
                   
               call integrate_NA_spx_Toroidal(gamma_x,xp_C,xc,x2,yp_R-yc,zp_R-zc,albe,NA)
               
@@ -344,7 +342,7 @@ subroutine integrate_NA_spx_Toroidal(gamma_x,xP,xc,xb,yPC,zPC,albe, result)
 
         I_1_x = iv_scaled(1, 2.d0*nu_x/ax**2)
 
-        ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe-nu_x)/ax**2) * dsin(ax*(xD-xB)) * I_1_x * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) + (zPC*zPC) )
+        ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe-nu_x)/ax**2) * dsin(ax*(xD-xB)) * I_1_x * dexp(-(albe*t2)/(albe+t2) * ( (yPC*yPC) + (zPC*zPC) ) )
 
       end function f_decay
     
@@ -405,7 +403,7 @@ subroutine integrate_NA_spy_Toroidal(gamma_x,xPc,yPC,yPB,zPC,albe, result)
 
         I_0_x = iv_scaled(0, dx)
         
-        ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) + (zPC*zPC) )  *  I_0_x * (yPB - t2/(albe+t2) * (yPC))
+        ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * ( (yPC*yPC) + (zPC*zPC) ) )  *  I_0_x * (yPB - t2/(albe+t2) * (yPC))
 
       end function f_decay
     
@@ -467,7 +465,7 @@ subroutine integrate_NA_spz_Toroidal(gamma_x,xPc,yPC,zPC,zPB,albe, result)
 
         I_0_x = iv_scaled(0, dx)
         
-        ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * (yPC*yPC) + (zPC*zPC) )  *  I_0_x * (zPB - t2/(albe+t2) * (zPC)) 
+        ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * ( (yPC*yPC) + (zPC*zPC) ) )  *  I_0_x * (zPB - t2/(albe+t2) * (zPC)) 
 
       end function f_decay
     
