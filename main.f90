@@ -32,9 +32,6 @@ program CI
       double precision  ,allocatable  ::             geometry(:,:)
       integer           ,allocatable  ::                 charge(:)
       type(atom)        ,allocatable  ::                  atoms(:)
-      type(atom)        ,allocatable  ::         norm_helper_px(:)
-      type(atom)        ,allocatable  ::         norm_helper_py(:)
-      type(atom)        ,allocatable  ::         norm_helper_pz(:)
       type(ERI_function),allocatable  ::                    AO (:)
 
       double precision,allocatable    ::                    S(:,:)
@@ -103,7 +100,7 @@ program CI
         if (io_stat /= 0) then
           write(*,'(a)') ""
           write(*,'(a)')'Error: Reached end of file without finding'
-          write(*,'(a)')'              UHF keyword in your unitcell'
+          write(*,'(a)')'             UHF keywords in your unitcell'
           write(*,'(a)') ""
           close(1)
           stop
@@ -150,9 +147,6 @@ program CI
       allocate(charge        (n_atoms))
       allocate(label         (n_atoms))
       allocate(atoms         (n_atoms))
-      allocate(norm_helper_px(n_atoms))
-      allocate(norm_helper_py(n_atoms))
-      allocate(norm_helper_pz(n_atoms))
 
       ! --------------------------------------------------------------- !
       !        Convert the geometry to Bohr if in Angstrom              !
@@ -171,8 +165,6 @@ program CI
           geometry(i,3) = geometry_tmp(i,3)
         end if
       end do 
-
-
 
       ! --------------------------------------------------------------- !
       !                        Start Printing                           !
@@ -209,7 +201,7 @@ program CI
       &   calculation_type == "Tori2D" .or. &
           calculation_type == "Tori3D" ) then 
 
-        call basis_tor(n_atoms,charge,atoms,norm_helper_px,norm_helper_py,norm_helper_pz,calculation_type)
+        call basis_tor(n_atoms,charge,atoms,calculation_type)
 
       else
 
@@ -266,15 +258,14 @@ program CI
       &   calculation_type == "Tori2D" .or.                             & 
       &   calculation_type == "Tori3D") then 
         call classification_orbital_tor(n_atoms,number_of_functions,    &
-        &                               geometry,atoms,norm_helper_px,norm_helper_py,norm_helper_pz,AO)
+        &                               geometry,atoms,AO)
       else
         call classification_orbital(n_atoms,number_of_functions,        &
         &                               geometry,atoms,AO)
       end if
 
       call print_orbital_table(AO,number_of_functions)
-
-
+      
       ! --------------------------------------------------------------- !
       !           print  Informations from the Basis set                !
       ! --------------------------------------------------------------- !

@@ -32,10 +32,14 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
       double precision                :: value_s 
       double precision                :: mu_x, mu_y , mu_z
       double precision                :: nu_x, nu_y , nu_z
-      double precision                :: mu  , nu 
       double precision                :: xpA , xpB , xqC , xqD , phi 
       double precision                :: test 
       integer                         :: pattern_id, encode_orbital_pattern
+
+      ! --------------------------------------------------------------- !
+      double precision                :: albe     , gade
+      double precision                :: inv_albe , inv_gade
+      double precision                :: reduced_mu , reduced_nu
 
 
 
@@ -63,17 +67,22 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
           c2    = two%coefficient(j)
           o2    = two%orbital
 
-          !mu_x  = dsqrt(dabs(alpha*alpha + beta*beta + 2.d0*alpha*beta*dcos(ax*(XAB))))
           call bary_exponent_x(alpha,beta,XAB,mu_x)
           mu_y  = alpha + beta
           mu_z  = alpha + beta
 
           call bary_center_toroidal_x(alpha,beta,xa,xb,xp)
-          yp    = 0.d0
-          zp    = 0.d0
 
-          mu = alpha+beta 
-          
+
+          !   Real Gaussian   !
+      
+          albe                = alpha + beta 
+          inv_albe            = 1.d0 / albe 
+          reduced_mu          = alpha * beta * inv_albe
+
+          yp    = ( alpha * ya + beta * yb ) * inv_albe
+          zp    = ( alpha * za + beta * zb ) * inv_albe
+                    
           do k = 1 , size(three%exponent)
             gamma = three%exponent(k)
             c3    = three%coefficient(k)
@@ -83,18 +92,24 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               c4    = four%coefficient(l)
               o4    = four%orbital
 
-              !nu_x  = dsqrt(dabs(gamma*gamma + delta*delta + 2.d0*gamma*delta*dcos(ax*(XCD))))
               call bary_exponent_x(gamma,delta,XCD,nu_x)
               nu_y  =  gamma+delta
               nu_z  =  gamma+delta
 
               call bary_center_toroidal_x(gamma,delta,xc,xd,xq)
-              yq     = 0.d0 
-              zq     = 0.d0
 
-              nu     = gamma + delta
+              !   Real Gaussian   !
+      
+              gade                = gamma + delta 
+              inv_gade            = 1.d0 / gade 
+              reduced_nu          = gamma * delta * inv_gade
 
-              const  = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi) * (Lx * Lx)
+              yq     = (gamma * yc + delta * yd) * inv_gade
+              zq     = (gamma * zc + delta * zd) * inv_gade
+
+              
+
+              const  = (c1*c2*c3*c4) * 2.d0 /dsqrt(pi) * (Lx * Lx) * dexp(- reduced_mu * (Yab*Yab) ) * dexp(- reduced_nu * (Ycd*Ycd) ) * dexp(- reduced_mu * (Zab*Zab) ) * dexp(- reduced_nu * (Zcd*Zcd) )
 
               test = dexp(-0.5d0*(alpha+beta+gamma+delta-mu_x-nu_x)*(Lx*Lx)/(pi*pi)) * const
 
@@ -108,7 +123,9 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
               if ( dabs(test) <= 2.22d-16 ) cycle
 
-                call integrate_ERI_sum(pattern_id,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)
+                call integrate_ERI_sum(pattern_id,albe,gade,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq&
+                &                                                                    ,ya,yb,yc,yd,yp,yq&
+                &                                                                    ,za,zb,zc,zd,zp,zq,value_s)
                 value  = value    + test * value_s
 
               !call integrate_ERI_integral(pattern_id,px_count,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)

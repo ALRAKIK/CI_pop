@@ -11,9 +11,9 @@ module torus_init
 
       subroutine Torus_def()
 
+        use constants_module
+        
         implicit none
-
-        double precision,parameter   :: pi = 3.14159265358979323846D00
 
         open(50,file="torus_parameters.inp")
           read(50,*) Lx , Ly , Lz 

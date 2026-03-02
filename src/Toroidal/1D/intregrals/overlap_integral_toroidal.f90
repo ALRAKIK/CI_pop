@@ -253,7 +253,12 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           
           if (AO1%orbital == "px" .and. AO2%orbital == "px") then 
 
-          term        = ( (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x +  0.5d0 * dcos(ax*(2.d0*xp_C-x1-x2))* (I_0_gamma_x - I_2_gamma_x)  ) / ax2
+          if (gamma_x < 1.d-300) then 
+          term        = (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x / ax2 
+          else 
+          term        = (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x / ax2  + 0.5d0 / gamma_x  *  dcos(ax*(2.d0*xp_C-x1-x2))* I_1_gamma_x 
+          end if 
+          
           overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * term 
           overlap_y   =      dexp(- mu * (Y*Y) )                    * dsqrt(pi*inv_albe)
           overlap_z   =      dexp(- mu * (Z*Z) )                    * dsqrt(pi*inv_albe)

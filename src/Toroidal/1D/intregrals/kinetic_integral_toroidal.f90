@@ -87,7 +87,7 @@ subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
           ! ----------------------------------------------------------- !
 
-          D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * ( dcos(ax*(xp_C-x2))       * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+          D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * ( dcos(ax*(xp_C-x2))  * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
 
           !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           ! follow the equation p.128 in amer ircamc file in yellow !
@@ -211,7 +211,7 @@ subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
           D01x = - ax*ax*dsin(ax * (xp_C-x2)) * I_1_gamma_x - 3.0d0 * beta * dsin(2.0d0 * ax * (xp_C-x2)) * I_2_gamma_x + (2.d0*beta/ax)**2 * (0.25d0) * ( 3.0d0 * dsin(ax * (xp_C-x2)) * I_1_gamma_x - dsin(3.0d0 * ax * (xp_C-x2)) * I_3_gamma_x)
           D01x = D01x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2) / ax 
 
-          S01x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_1_gamma_x  * (dsin(ax*(xp_C-x2))/ax) 
+          S01x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_1_gamma_x  * (dsin(ax*(xp_C-x2))/ax) 
 
 
 
@@ -378,8 +378,8 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           I_0_gamma_x = iv_scaled(0, 2.d0*gamma_x/(ax2))
           I_1_gamma_x = iv_scaled(1, 2.d0*gamma_x/(ax2))
           I_2_gamma_x = iv_scaled(2, 2.d0*gamma_x/(ax2))
-          I_3_gamma_X = iv_scaled(3, 2.d0*gamma_x/(ax2))
-          I_4_gamma_X = iv_scaled(4, 2.d0*gamma_x/(ax2))
+          I_3_gamma_x = iv_scaled(3, 2.d0*gamma_x/(ax2))
+          I_4_gamma_x = iv_scaled(4, 2.d0*gamma_x/(ax2))
 
           !   Real Gaussian  !
 
@@ -390,8 +390,12 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           zp_R     = ( alpha * z1 + beta * z2 ) * inv_albe
 
           ! --------------------------------------------------------- !
-
-          S11x = ( (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x +  0.5d0 * dcos(ax*(2.d0*xp_C-x1-x2))* (I_0_gamma_x - I_2_gamma_x) ) /ax2
+          
+          if (gamma_x < 1.d-300) then 
+          S11x        = (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x / ax2 
+          else 
+          S11x        = (dsin(ax*(xp_C-x2))) * (dsin(ax*(xp_C-x1))) * I_0_gamma_x / ax2  + 0.5d0 / gamma_x  *  dcos(ax*(2.d0*xp_C-x1-x2))* I_1_gamma_x 
+          end if 
           S11x = S11x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2)
 
           S11y = dexp(- mu * (Y*Y) ) * dsqrt(pi*inv_albe) * ( (yp_R-y1)*(yp_R-y2) + 0.5d0 * inv_albe )
@@ -410,9 +414,14 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           S00y = dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
           S00z = dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
 
-          D11x = dcos(ax*(x2-x1))*I_0_gamma_x - dcos(ax*(2.d0*xp_C-x1-x2))*I_2_gamma_x + (3.d0*beta/ax**2) * ( dcos(ax*(xp_C-2.d0*x2+x1)) * I_1_gamma_x - dcos(ax*(3.d0*xp_C-2.d0*x2-x1)) * I_3_gamma_x ) - 0.25d0 * (1.d0 /(ax*ax)) * (2.d0*beta/ax)**2 * ( 3.d0 * dcos(ax*(x2-x1))*I_0_gamma_x - 3.d0*dcos(ax*(2.d0*xp_C-x1-x2))*I_2_gamma_x - dcos(ax*(2.d0*xp_C-3.d0*x2+x1)) * I_2_gamma_x + dcos(ax*(4.d0*xp_C-3.d0*x2-x1)) * I_4_gamma_x  )
-          D11x = D11x * (- 0.5d0) * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2)
-
+          if (x1 == 0 .and. x2 == 0 ) then 
+          D11x = ax2 / gamma_x * I_1_gamma_x + 6.d0 * (beta/gamma_x) * I_2_gamma_x - 6.0d0 * (beta/gamma_x) * (beta/gamma_x) *  I_2_gamma_x
+          D11x = D11x * (- 0.5d0) * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2)
+          else 
+          D11x = dcos(ax*(x2-x1)) * I_0_gamma_x - dcos(ax*(2.d0*xp_C-x1-x2)) * I_2_gamma_x + (3.d0*beta/ax2) * ( dcos(ax*(xp_C-2.d0*x2+x1)) * I_1_gamma_x - dcos(ax*(3.d0*xp_C-2.d0*x2-x1)) * I_3_gamma_x ) - 0.25d0 * (1.d0 /(ax*ax)) * (2.d0*beta/ax)**2 * ( 3.d0 * dcos(ax*(x2-x1))*I_0_gamma_x - 3.d0*dcos(ax*(2.d0*xp_C-x1-x2))*I_2_gamma_x - dcos(ax*(2.d0*xp_C-3.d0*x2+x1)) * I_2_gamma_x + dcos(ax*(4.d0*xp_C-3.d0*x2-x1)) * I_4_gamma_x  )
+          D11x = D11x * (- 0.5d0) * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2)
+          end if 
+          
           D11y = dexp(- mu * (Y*Y))   * dsqrt(pi*inv_albe) * ( (yp_R-y1)*(yp_R-y2) + 0.5d0 * inv_albe ) * ( 4.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) - 4.d0 * alpha * beta * inv_albe * (yp_R-y2 * s01y  + (s11y) ) 
           D11z = dexp(- mu * (Z*Z))   * dsqrt(pi*inv_albe) * ( (zp_R-z1)*(zp_R-z2) + 0.5d0 * inv_albe ) * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) - 4.d0 * alpha * beta * inv_albe * (zp_R-z2 * s01z  + (s11z) )
 
@@ -433,7 +442,7 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           D00z = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
 
 
-          if (AO1%orbital == "px" .and. AO2%orbital == "px") then 
+            if (AO1%orbital == "px" .and. AO2%orbital == "px") then 
 
               X_k  = D11x * S00y * S00z
               Y_k  = S11x * D00y * S00z

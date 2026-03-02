@@ -101,6 +101,7 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
         
         AO1 = AO(i)
         AO2 = AO(j)
+        
         r1(1) = AO1%x ; r2(1) = AO2%x
         r1(2) = AO1%y ; r2(2) = AO2%y
         r1(3) = AO1%z ; r2(3) = AO2%z
@@ -142,58 +143,7 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
       
       deallocate(i_index, j_index)
 
-      ! do i = 1 , index_unitcell 
-      !   do j = 1 , number_of_functions
-        
-      !     AO1 = AO(i)
-      !     AO2 = AO(j)
-
-      !     r1(1) = AO1%x ; r2(1) = AO2%x
-      !     r1(2) = AO1%y ; r2(2) = AO2%y
-      !     r1(3) = AO1%z ; r2(3) = AO2%z
       
-      !     if (AO1%orbital =="s" .and. AO2%orbital == "s") then
-            
-      !       do k = 1 , size  (AO1%exponent)
-      !         do l = 1 , size  (AO2%exponent)
-      !           call nuclear_attraction_integral_ss_toroidal(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
-      !         end do 
-      !       end do 
-
-      !     end if 
-
-      !     if (AO1%orbital =="s" .and. AO2%orbital(:1) == "p") then
-            
-      !         do k = 1 , size  (AO1%exponent)
-      !           do l = 1 , size  (AO2%exponent)
-      !             call nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
-      !           end do 
-      !         end do
-
-      !     end if
-
-      !     if (AO1%orbital(:1) =="p" .and. AO2%orbital == "s") then
-            
-      !       do k = 1 , size  (AO1%exponent)
-      !         do l = 1 , size  (AO2%exponent)
-      !           call nuclear_attraction_integral_sp_toroidal(number_of_atoms,geometry,atoms,r2,r1,AO2,AO1,NA(i,j))
-      !         end do 
-      !       end do
-      !     end if
-
-      !     if (AO1%orbital(:1) =="p" .and. AO2%orbital(:1) == "p") then
-          
-            
-      !       do k = 1 , size  (AO1%exponent)
-      !         do l = 1 , size  (AO2%exponent)
-      !           call nuclear_attraction_integral_pp_toroidal(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
-      !         end do 
-      !       end do
-          
-      !     end if
-
-      !   end do 
-      ! end do 
 
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
       !                    symmetry of the integrals                    !
