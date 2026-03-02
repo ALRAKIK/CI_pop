@@ -4,6 +4,8 @@ subroutine normalize_basis_tor_1D()
 
       implicit none 
 
+      ! input ! 
+
       ! local ! 
 
       integer                       :: n_gaussian , n_contraction

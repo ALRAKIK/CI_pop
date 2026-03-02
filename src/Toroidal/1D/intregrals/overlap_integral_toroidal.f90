@@ -119,6 +119,7 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
           c2   = AO2%coefficient(j)
 
             const       = c1*c2
+            
 
             ! Clifford Gaussian !
 

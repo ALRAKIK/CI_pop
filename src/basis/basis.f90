@@ -36,7 +36,7 @@ subroutine basis_tor(number_of_atoms,charge,atoms,calculation_type)
 
       integer                        :: i 
 
-      call extract_basis_tor   (number_of_atoms,charge)
+      call extract_basis   (number_of_atoms,charge)
 
       if (calculation_type == 'torus' .or. calculation_type == 'Tori1D' ) then
         call normalize_basis_tor_1D()
@@ -48,7 +48,6 @@ subroutine basis_tor(number_of_atoms,charge,atoms,calculation_type)
         print *, "Unknown calculation type"
         stop
       end if
-      
 
       do i = 1, number_of_atoms
         atoms(i)%charge = charge(i)

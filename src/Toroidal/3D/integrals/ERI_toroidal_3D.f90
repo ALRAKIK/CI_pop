@@ -54,7 +54,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       allocate(ERI(number_of_functions))
       allocate(two_electron(fpuc,number_of_functions,number_of_functions,number_of_functions))
 
-      call classification(number_of_atoms,number_of_functions,geometry,atoms,ERI)
+      call classification_tor(number_of_atoms,number_of_functions,geometry,atoms,ERI)
 
       !$omp parallel
       if (omp_get_thread_num() == 0) then

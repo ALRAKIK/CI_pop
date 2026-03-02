@@ -22,20 +22,17 @@ subroutine normalize_basis_tor_3D()
 
       open(1,file=trim(tmp_file_name)//"/Basis_scratch")
       open(2,file=trim(tmp_file_name)//"/Basis_normalized")
-      open(3,file=trim(tmp_file_name)//"/Basis_normalized_px")
-      open(4,file=trim(tmp_file_name)//"/Basis_normalized_py")
-      open(5,file=trim(tmp_file_name)//"/Basis_normalized_pz")
 
       do
       
         read(1,'(A)',end=3) lines
 
-        write(2,'(A)') trim(lines)
-        write(3,'(A)') trim(lines)
-        write(4,'(A)') trim(lines)
-        write(5,'(A)') trim(lines)
+        !------------------------------------------------------
+        ! S-TYPE
+        !------------------------------------------------------
       
-        if (lines == "$ S-TYPE FUNCTIONS") then  
+        if (lines == "$ S-TYPE FUNCTIONS") then
+          write(2,'(A)') trim(lines)
           read(1,*) n_gaussian , n_contraction
           allocate(exponent(n_gaussian),contraction(n_gaussian,n_contraction),contractionN(n_gaussian,n_contraction))
           do i = 1 , n_gaussian
@@ -44,54 +41,48 @@ subroutine normalize_basis_tor_3D()
           n_type = 1 
           call norm_orb_tor_3D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
           write(2,'(4I4)') n_gaussian ,  n_contraction
-          write(3,'(4I4)') n_gaussian ,  n_contraction
-          write(4,'(4I4)') n_gaussian ,  n_contraction
-          write(5,'(4I4)') n_gaussian ,  n_contraction
+
           do i = 1 , n_gaussian
             write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
-          end do
-          do i = 1 , n_gaussian
-            write(3,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
-          end do
-          do i = 1 , n_gaussian
-            write(4,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
-          end do
-          do i = 1 , n_gaussian
-            write(5,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
+
           end do
           deallocate(exponent,contraction,contractionN)
-        end if
 
-        ! P function ! 
+        !------------------------------------------------------
+        ! P-TYPE
+        !------------------------------------------------------
       
-        if (lines == "$ P-TYPE FUNCTIONS") then 
+        else if (lines == "$ P-TYPE FUNCTIONS") then 
           read(1,*) n_gaussian , n_contraction
           allocate(exponent(n_gaussian),contraction(n_gaussian,n_contraction),contractionN(n_gaussian,n_contraction))
           do i = 1 , n_gaussian
             read(1,*) exponent(i) , (contraction(i,j),j=1,n_contraction)
           end do 
           n_type = 2 
-          call norm_orb_tor_3D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
+	        ! --- Px --- ! 
+          write(2,'(A)') "$ PX-TYPE FUNCTIONS"
+          call norm_orb_tor_px_3D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz) 
+          write(2,'(4I4)') n_gaussian ,  n_contraction
+          do i = 1 , n_gaussian
+          write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
+          end do
+          ! --- Py --- ! 
+          write(2,'(A)') "$ PY-TYPE FUNCTIONS"
+          call norm_orb_tor_py_3D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
           write(2,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
             write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
-          call norm_orb_tor_px_3D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
-          write(3,'(4I4)') n_gaussian ,  n_contraction
-          do i = 1 , n_gaussian
-            write(3,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
-          end do
-          call norm_orb_tor_py_3D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
-          write(4,'(4I4)') n_gaussian ,  n_contraction
-          do i = 1 , n_gaussian
-            write(4,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
-          end do
+	       ! --- Pz --- !
+          write(2,'(A)') "$ PZ-TYPE FUNCTIONS"
           call norm_orb_tor_pz_3D(n_gaussian,n_contraction,exponent,contraction,n_type,contractionN,Lx,Ly,Lz)
-          write(5,'(4I4)') n_gaussian ,  n_contraction
+          write(2,'(4I4)') n_gaussian ,  n_contraction
           do i = 1 , n_gaussian
-            write(5,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
+            write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
           deallocate(exponent,contraction,contractionN)
+        else
+          write(2,'(A)') trim(lines)
         end if
       
       end do 
@@ -100,11 +91,6 @@ subroutine normalize_basis_tor_3D()
 
       close(2)
 
-      close(3)
-
-      close(4)
-
-      close(5)
 
 end subroutine normalize_basis_tor_3D
 
