@@ -401,15 +401,15 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           S11y = dexp(- mu * (Y*Y) ) * dsqrt(pi*inv_albe) * ( (yp_R-y1)*(yp_R-y2) + 0.5d0 * inv_albe )
           S11z = dexp(- mu * (Z*Z) ) * dsqrt(pi*inv_albe) * ( (zp_R-z1)*(zp_R-z2) + 0.5d0 * inv_albe )
 
-          S01x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (dsin(ax*(xp_C-x2))/ax) * I_1_gamma_x
+          S01x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * (dsin(ax*(xp_C-x2))/ax) * I_1_gamma_x
           S01y = dexp(- mu * (Y*Y))   * dsqrt(pi*inv_albe) * (yp_R-y2)
           S01z = dexp(- mu * (Z*Z))   * dsqrt(pi*inv_albe) * (zp_R-z2)
 
-          S10x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (dsin(ax*(xp_C-x1))/ax) * I_1_gamma_x
+          S10x = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * (dsin(ax*(xp_C-x1))/ax) * I_1_gamma_x
           S10y = dexp(- mu * (Y*Y))   * dsqrt(pi*inv_albe) * (yp_R-y1)
           S10z = dexp(- mu * (Z*Z))   * dsqrt(pi*inv_albe) * (zp_R-z1)
 
-          S00x = Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x
+          S00x = Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2) * I_0_gamma_x
 
           S00y = dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
           S00z = dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
@@ -426,18 +426,18 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           D11z = dexp(- mu * (Z*Z))   * dsqrt(pi*inv_albe) * ( (zp_R-z1)*(zp_R-z2) + 0.5d0 * inv_albe ) * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta ) - 4.d0 * alpha * beta * inv_albe * (zp_R-z2 * s01z  + (s11z) )
 
           D01x = - ax*ax*dsin(ax * (xp_C-x2)) * I_1_gamma_x - 3.0d0 * beta * dsin(2.0d0 * ax * (xp_C-x2)) * I_2_gamma_x + (2.d0*beta/ax)**2 * (0.25d0) * ( 3.0d0 * dsin(ax * (xp_C-x2)) * I_1_gamma_x - dsin(3.0d0 * ax * (xp_C-x2)) * I_3_gamma_x)
-          D01x = D01x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) / ax 
+          D01x = D01x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2) / ax 
 
           D01y = dexp(- mu * (Y*Y))   * dsqrt(pi*inv_albe) * (yp_R-y2) * ( 4.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe )  - 2.d0 * beta )
           D01z = dexp(- mu * (Z*Z))   * dsqrt(pi*inv_albe) * (zp_R-z2) * ( 4.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe )  - 2.d0 * beta )
 
           D10x = - ax*ax*dsin(ax * (xp_C-x1)) * I_1_gamma_x - 3.0d0 * beta * dsin(2.0d0 * ax * (xp_C-x1)) * I_2_gamma_x + (2.d0*beta/ax)**2 * (0.25d0) * ( 3.0d0 * dsin(ax * (xp_C-x1)) * I_1_gamma_x - dsin(3.0d0 * ax * (xp_C-x1)) * I_3_gamma_x)
-          D10x = D10x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax**2) / ax 
+          D10x = D10x * Lx * dexp(-2.0d0*(alpha+beta-gamma_x)/ax2) / ax 
 
           D10y = dexp(- mu * (Y*Y))   * dsqrt(pi*inv_albe) * (yp_R-y1) * ( 4.d0 * alpha * alpha * ( (yp_R-y1) * (yp_R-y1) + 0.5d0 * inv_albe )  - 2.d0 * alpha )
           D10z = dexp(- mu * (Z*Z))   * dsqrt(pi*inv_albe) * (zp_R-z1) * ( 4.d0 * alpha * alpha * ( (zp_R-z1) * (zp_R-z1) + 0.5d0 * inv_albe )  - 2.d0 * alpha )
 
-          D00x = -2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * (dcos(ax*(xp_C-x2)) * I_1_gamma_x + (beta/ax**2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
+          D00x = - 2.d0 * beta * Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * (dcos(ax*(xp_C-x2)) * I_1_gamma_x + (beta/ax2) * ( dcos(2.d0*ax*(xp_C-x2)) * I_2_gamma_x - I_0_gamma_x ) )
           D00y = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (yp_R-y2) * (yp_R-y2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Y * Y)) * dsqrt(pi*inv_albe)
           D00z = - 2.d0 *  ( beta - 2.d0 * beta * beta * ( (zp_R-z2) * (zp_R-z2) + 0.5d0 * inv_albe ) )  * dexp(- mu * (Z * Z)) * dsqrt(pi*inv_albe)
 
@@ -479,6 +479,7 @@ subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
               X_k  = D00x * S11y * S00z
               Y_k  = S00x * D11y * S00z
               Z_k  = S00x * S11y * D00z
+
               
             end if 
 

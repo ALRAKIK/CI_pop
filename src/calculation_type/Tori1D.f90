@@ -31,9 +31,6 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       double precision,intent(out)   ::  NA(number_of_functions,number_of_functions)
       double precision,intent(out)   :: ERI(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
 
-
-
-
       ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - !
 
 
@@ -47,10 +44,11 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
 
       call cpu_time(start)
 
-        call overlap_matrix_toroidal(n_atoms,number_of_functions,atoms,AO,OV)
+        call overlap_matrix_toroidal_n(n_atoms,number_of_functions,atoms,AO,OV)
         call check_the_overlap(number_of_functions,OV)
-        call kinetic_matrix_toroidal(n_atoms,number_of_functions,atoms,AO,K)
-        call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO,NA)
+        call kinetic_matrix_toroidal_n(n_atoms,number_of_functions,atoms,AO,K)
+        !call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO,NA)
+        call nuclear_attraction_matrix_toroidal_1D_n(n_atoms,number_of_functions,geometry,atoms,AO,NA)
         if (.not. c_One) call ERI_integral_toroidal(n_atoms,geometry,number_of_functions,atoms,ERI)
         
       call cpu_time(end)

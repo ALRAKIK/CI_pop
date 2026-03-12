@@ -96,6 +96,8 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       double precision                 :: mu
       double precision                 :: albe
       double precision                 :: inv_albe
+      double precision                 :: ax2
+
 
 
 
@@ -106,6 +108,8 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
       X        = (x1 - x2)
       Y        = (y1 - y2)
       Z        = (z1 - z2)
+
+      ax2 = ax * ax
 
       !-----------------------------------------------------------------!
 
@@ -127,8 +131,8 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
             call bary_exponent_x(alpha,beta,X,gamma_x)
             call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
 
-            I_0_gamma_x = iv_scaled(0,2.d0*gamma_x/(ax*ax))
-            I_1_gamma_x = iv_scaled(1,2.d0*gamma_x/(ax*ax))
+            I_0_gamma_x = iv_scaled(0,2.d0*gamma_x/(ax2))
+            I_1_gamma_x = iv_scaled(1,2.d0*gamma_x/(ax2))
 
             !    Real Gaussain  ! 
 
@@ -143,7 +147,7 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
              
             if (AO2%orbital=="px")   then 
 
-            overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_1_gamma_x            * (dsin(ax*(xp-x2))/ax) 
+            overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_1_gamma_x            * (dsin(ax*(xp-x2))/ax) 
             overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi/(alpha+beta))
             overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi/(alpha+beta))
 
@@ -151,7 +155,7 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
             if (AO2%orbital=="py")   then 
 
-            overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_0_gamma_x
+            overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x
             overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi/(alpha+beta)) * (yp-y2)
             overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi/(alpha+beta))
 
@@ -159,7 +163,7 @@ subroutine overlap_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
             
             if (AO2%orbital=="pz")   then 
 
-            overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_0_gamma_x
+            overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x
             overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi/(alpha+beta)) 
             overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi/(alpha+beta)) * (zp-z2)
 
@@ -268,7 +272,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           if (AO1%orbital == "px" .and. AO2%orbital == "py") then 
 
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_1_gamma_x        * (dsin(ax*(xp_C-x1))/ax) 
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * (dsin(ax*(xp_C-x1))/ax) * I_1_gamma_x        
           overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi*inv_albe) * (yp_R-y2)
           overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi*inv_albe)
 
@@ -276,7 +280,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           if (AO1%orbital == "px" .and. AO2%orbital == "pz") then 
 
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * (dsin(ax*(xp_C-x1))/ax) * I_0_gamma_x
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * (dsin(ax*(xp_C-x1))/ax) * I_1_gamma_x
           overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi*inv_albe) 
           overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi*inv_albe) * (zp_R-z2)
           
@@ -286,7 +290,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           if (AO1%orbital == "py" .and. AO2%orbital == "px") then 
 
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_1_gamma_x        * (dsin(ax*(xp_C-x2))/ax) 
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_1_gamma_x        * (dsin(ax*(xp_C-x2))/ax) 
           overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi*inv_albe) * (yp_R-y1)
           overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi*inv_albe)
           
@@ -294,7 +298,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           if (AO1%orbital == "py" .and. AO2%orbital == "py") then 
 
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2) * I_0_gamma_x
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2) * I_0_gamma_x
           overlap_y   =      dexp(- mu * (Y*Y) )                    * dsqrt(pi*inv_albe) * ( (yp_R-y1)*(yp_R-y2) + 0.5d0 * inv_albe )
           overlap_z   =      dexp(- mu * (Z*Z) )                    * dsqrt(pi*inv_albe)
 
@@ -303,7 +307,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           if (AO1%orbital == "py" .and. AO2%orbital == "pz") then 
 
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_0_gamma_x
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x
           overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi*inv_albe) * (yp_R-y1)
           overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi*inv_albe) * (zp_R-z2)
 
@@ -313,7 +317,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           if (AO1%orbital == "pz" .and. AO2%orbital == "px") then 
 
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * (dsin(ax*(xp_C-x2))/ax) * I_0_gamma_x 
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * (dsin(ax*(xp_C-x2))/ax) * I_1_gamma_x 
           overlap_y   =      dexp(- mu * (Y*Y) )                      *  dsqrt(pi*inv_albe) 
           overlap_z   =      dexp(- mu * (Z*Z) )                      *  dsqrt(pi*inv_albe)     * (zp_R-z1)
 
@@ -322,7 +326,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
           if (AO1%orbital == "pz" .and. AO2%orbital == "py") then 
 
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_0_gamma_x 
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x 
           overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi*inv_albe) * (yp_R-y2)
           overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi*inv_albe) * (zp_R-z1)
 
@@ -330,7 +334,7 @@ subroutine overlap_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
           
           if (AO1%orbital == "pz" .and. AO2%orbital == "pz") then 
 
-          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax**2)   * I_0_gamma_x 
+          overlap_x   = Lx * dexp(-2.d0*(alpha+beta-gamma_x)/ax2)   * I_0_gamma_x 
           overlap_y   =      dexp(- mu * (Y*Y) )                      * dsqrt(pi*inv_albe) 
           overlap_z   =      dexp(- mu * (Z*Z) )                      * dsqrt(pi*inv_albe)   * ( (zp_R-z1)*(zp_R-z2) + 0.5d0 * inv_albe )
 

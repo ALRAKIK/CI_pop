@@ -134,8 +134,6 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               ! value  = value    + const * value_s
 
               
-              
-              
             end do
           end do 
         end do 

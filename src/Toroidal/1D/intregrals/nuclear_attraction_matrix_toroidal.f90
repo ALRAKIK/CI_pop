@@ -50,54 +50,57 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
       !-----------------------------------------------------------------!
       ! Setup OpenMP
       !-----------------------------------------------------------------!
-      call omp_set_dynamic(.false.)
-      call omp_set_num_threads(omp_get_max_threads())
+      !call omp_set_dynamic(.false.)
+      !call omp_set_num_threads(omp_get_max_threads())
 
-      !$omp parallel
-      if (omp_get_thread_num() == 0) then
-        print *, "Nuclear Attraction: Running with", omp_get_num_threads(), "threads"
-      endif
-      !$omp end parallel
+      !!$omp parallel
+      !if (omp_get_thread_num() == 0) then
+      !  print *, "Nuclear Attraction: Running with", omp_get_num_threads(), "threads"
+      !endif
+      !!$omp end parallel
       
-      !$omp parallel
-        !$omp single
-          num_threads = omp_get_num_threads()
-        !$omp end single
-      !$omp end parallel
+      !!$omp parallel
+      !  !$omp single
+      !    num_threads = omp_get_num_threads()
+      !  !$omp end single
+      !!$omp end parallel
       
       ! Calculate optimal chunk size based on available threads
-      if (num_threads <= 16) then
-        optimal_chunk_size = 16
-      else if (num_threads <= 64) then
-        optimal_chunk_size = 8
-      else 
-        optimal_chunk_size = 1
-      end if
+      !if (num_threads <= 16) then
+      !  optimal_chunk_size = 16
+      !else if (num_threads <= 64) then
+      !  optimal_chunk_size = 8
+      !else 
+      !  optimal_chunk_size = 1
+      !end if
 
       !-----------------------------------------------------------------!
       ! Precompute all i-j pairs
       !-----------------------------------------------------------------!
-      total_ij_pairs = index_unitcell * number_of_functions
-      allocate(i_index(total_ij_pairs), j_index(total_ij_pairs))
+      !total_ij_pairs = index_unitcell * number_of_functions
+      !allocate(i_index(total_ij_pairs), j_index(total_ij_pairs))
 
-      ij_index = 0
-      do i = 1, index_unitcell
-        do j = 1, number_of_functions
-          ij_index = ij_index + 1
-          i_index(ij_index) = i
-          j_index(ij_index) = j
-        end do
-      end do
+      !ij_index = 0
+      !do i = 1, index_unitcell
+      !  do j = 1, number_of_functions
+      !    ij_index = ij_index + 1
+      !    i_index(ij_index) = i
+      !    j_index(ij_index) = j
+      !  end do
+      !end do
       
       !-----------------------------------------------------------------!
       ! Parallel computation
       !-----------------------------------------------------------------!
-      !$omp parallel do private(ij_index,i,j,k,l,AO1,AO2,r1,r2) &
-      !$omp shared(NA, AO, i_index, j_index, number_of_atoms, geometry, atoms) &
-      !$omp schedule(dynamic,optimal_chunk_size)
-      do ij_index = 1, total_ij_pairs
-        i = i_index(ij_index)
-        j = j_index(ij_index)
+      !!$omp parallel do private(ij_index,i,j,k,l,AO1,AO2,r1,r2) &
+      !!$omp shared(NA, AO, i_index, j_index, number_of_atoms, geometry, atoms) &
+      !!$omp schedule(dynamic,optimal_chunk_size)
+      !do ij_index = 1, total_ij_pairs
+      !  i = i_index(ij_index)
+      !  j = j_index(ij_index)
+
+      do i = 1 , index_unitcell
+        do j = 1 , number_of_functions
         
         AO1 = AO(i)
         AO2 = AO(j)
@@ -139,9 +142,10 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
         end if
         
       end do
-      !$omp end parallel do
+    end do 
+      !!$omp end parallel do
       
-      deallocate(i_index, j_index)
+      !deallocate(i_index, j_index)
 
       
 
@@ -170,3 +174,559 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
 
 
 end subroutine nuclear_attraction_matrix_toroidal 
+
+
+
+
+
+
+
+
+
+subroutine nuclear_attraction_matrix_toroidal_1D_n(number_of_atoms,number_of_functions,geometry,atoms,AO,NA)
+
+      use files
+      use atom_basis
+      use torus_init
+      use classification_ERI
+
+      implicit none 
+
+      !-----------------------------------------------------------------!
+
+      integer                       :: i , j
+      integer                       :: index_atom1 , index_sym
+      integer                       :: index_unitcell
+      integer                       :: number_of_atoms
+      integer                       :: number_of_functions
+
+      type(atom)                    :: atoms(number_of_atoms)
+
+      type(ERI_function)            :: AO (number_of_functions)
+      type(ERI_function)            :: AO1 , AO2
+
+      
+      double precision              :: r1(3) , r2(3)
+      double precision  ,intent(in) :: geometry(number_of_atoms,3)
+
+      integer                       :: pattern_id, encode_orbital_pattern_AO
+
+      ! output !
+
+      double precision,intent(out)  :: NA(number_of_functions,number_of_functions)
+
+      !-----------------------------------------------------------------!
+
+      NA(:,:) = 0.d0
+
+      index_atom1 = atoms(1)%num_s_function + 3*atoms(1)%num_p_function
+      
+      index_unitcell = 0
+
+      do i = 1 , number_of_atom_in_unitcell
+        index_unitcell = index_unitcell  + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
+      end do
+
+      index_sym   = 0
+
+      do i = 1 , number_of_atoms/2 + 1
+        index_sym = index_sym + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
+      end do
+
+      ! --------------------------------------------------------------- !
+
+      do i = 1 , index_unitcell
+        do j = 1 , number_of_functions
+
+          AO1 = AO(i)
+          AO2 = AO(j)
+
+          r1(1) = AO1%x ; r2(1) = AO2%x
+          r1(2) = AO1%y ; r2(2) = AO2%y
+          r1(3) = AO1%z ; r2(3) = AO2%z
+
+          pattern_id = encode_orbital_pattern_AO(AO1%orbital, AO2%orbital)
+
+          call nuclear_attraction_integral_toroidal_1D(pattern_id,number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
+          
+        end do 
+      end do 
+
+      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+      !                    symmetry of the integrals                    !
+      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
+
+
+      do i = 1 , index_unitcell
+       do j = 1 , number_of_functions
+         if (abs(NA(i,j)) < 1e-15) NA(i,j) = 0.d0 
+       end do 
+      end do 
+
+      do i = index_unitcell + 1   , number_of_functions
+       do j = index_unitcell + 1 , number_of_functions
+         NA(i,j) = NA(i-index_unitcell,j-index_unitcell)
+       end do 
+      end do 
+ 
+      do i = 1 , number_of_functions - 1 
+       do j = i , number_of_functions
+         NA(j,i) = NA(i,j)
+       end do 
+      end do
+
+end subroutine nuclear_attraction_matrix_toroidal_1D_n
+
+      !-----------------------------------------------------------------!
+
+subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,atoms,r1,r2,AO1,AO2,NA_prime)
+
+      use quadpack, only : dqagi
+      use torus_init
+      use classification_ERI
+      use bessel_functions
+      use atom_basis
+
+      implicit none 
+
+      !-----------------------------------------------------------------!
+
+      
+      type(ERI_function),intent(in)    :: AO1 , AO2
+      integer           ,intent(in)    :: n_atoms
+      type(atom)        ,intent(in)    :: atoms(n_atoms)
+      double precision  ,intent(in)    :: r1(3) , r2(3)
+      double precision  ,intent(in)    :: geometry(n_atoms,3)
+      double precision  ,intent(out)   :: NA_prime
+
+      integer                          :: i , j , k
+      integer                          :: charge_atom
+      double precision,parameter       :: pi = 3.14159265358979323846D00
+      double precision                 :: alpha  , beta
+      double precision                 :: c1     , c2     , const
+      double precision                 :: x1     , x2     , X  
+      double precision                 :: y1     , y2     , Y
+      double precision                 :: z1     , z2     , Z  
+      double precision                 :: kx     , ky     , kz 
+      double precision                 :: Ix     , Iy     , Iz  
+      double precision                 :: Ix_int , Iy_int , Iz_int  
+      double precision                 :: NA
+       
+      !-----------------------------------------------------------------!
+
+      ! Clifford ! 
+
+      double precision                 :: ax2 , inv_ax , inv_ax2 
+      double precision                 :: px
+      double precision                 :: I_0_A , I_1_A , I_2_A
+      double precision                 :: A 
+      double precision                 :: xp
+      double precision                 :: sda   , sdb
+      double precision                 :: cda   , cdb
+      double precision                 :: svp   , svp2
+      double precision                 :: cvp   , cvp2
+      double precision                 :: scvp
+
+      !-----------------------------------------------------------------!
+
+      !   Real   ! 
+
+      double precision                 :: albe, inv_albe , mu 
+      double precision                 :: yp   , zp
+      double precision                 :: ypa  , ypb 
+      double precision                 :: zpa  , zpb 
+      double precision                 :: yvp  , zvp
+      double precision                 :: yvp2 , zvp2
+
+      !-----------------------------------------------------------------!
+
+      !  Atoms ! 
+
+      double precision                 :: xc , yc , zc
+      double precision                 :: xpc ,  ypc,  zpc
+      double precision                 :: xpc2, ypc2, zpc2
+      double precision                 :: kc
+      double precision                 :: dx , xD
+
+      !-----------------------------------------------------------------!
+      
+      ! Local variables for numerical integration
+      
+      double precision,parameter    :: epsabs = 1.d-10 , epsrel = 1.d-8
+      integer,parameter             :: inf = 1 
+      double precision,parameter    :: bound = 0.0d0
+      integer, parameter            :: limit = 100
+      integer, parameter            :: lenw = limit*4
+      integer                       :: ier, iwork(limit), last, neval
+      double precision              :: abserr, work(lenw)
+      double precision              :: result
+
+      !-----------------------------------------------------------------!
+
+      integer                       :: pattern_id
+
+      !-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
+
+      x1  = r1(1) ; x2  = r2(1) 
+      y1  = r1(2) ; y2  = r2(2)
+      z1  = r1(3) ; z2  = r2(3)
+
+      X   = (x1 - x2)
+      Y   = (y1 - y2)
+      Z   = (z1 - z2)
+
+      ax2 = ax * ax 
+
+      inv_ax  = 1.d0 / ax 
+      inv_ax2 = inv_ax * inv_ax 
+
+      !-----------------------------------------------------------------!
+ 
+      NA       = 0.d0
+      NA_prime = 0.d0 
+
+
+
+      do i = 1 , size(AO1%exponent)
+        alpha = AO1%exponent(i)
+        c1    = AO1%coefficient(i)
+        do j = 1 , size(AO2%exponent)
+          beta = AO2%exponent(j)
+          c2   = AO2%coefficient(j)
+
+          const   =  c1 * c2
+
+          ! ----------------- !
+          ! Clifford Gaussian !
+          ! ----------------- ! 
+
+          call bary_exponent_x         (alpha,beta,X,px)
+          call bary_center_toroidal_x  (alpha,beta,x1,x2,xp)
+
+          !kx     = dexp(-2.d0 * ( alpha + beta ) / ax2)
+          kx     = 1.d0 
+
+          ! care here the did not add the px in the exponent as 
+          ! we dont have to calculat it, but we calculate dx 
+          ! inside the integral 
+
+          ! Note all the standard integrals should go 
+          ! inside the integration for now 
+
+          ! ----------------- !
+          !   Real Gaussian   !
+          ! ----------------- !
+
+          albe     = alpha + beta
+          inv_albe = 1.d0 / albe
+          mu       = alpha * beta * inv_albe
+
+          yp       = (alpha * y1 + beta * y2) * inv_albe
+          zp       = (alpha * z1 + beta * z2) * inv_albe
+
+          ky       = dexp(- mu * ( Y * Y ))
+          kz       = dexp(- mu * ( Z * Z ))
+
+          ypa = yp - y1
+          ypb = yp - y2
+
+          zpa = zp - z1 
+          zpb = zp - z2
+
+          do k = 1 , n_atoms
+
+            xc  = geometry(k,1) 
+            yc  = geometry(k,2)
+            zc  = geometry(k,3)
+            kc  = 2.d0 / sqrt(pi)
+            xpc = xp - xc 
+            ypc = yp - yc 
+            zpc = zp - zc 
+
+            ypc2 = ypc * ypc 
+            zpc2 = zpc * zpc 
+              
+            charge_atom = (-1)*atoms(k)%charge
+
+            call dqagi(f_decay, bound, inf, epsabs, epsrel, result, abserr, neval, ier, Limit, Lenw, Last, Iwork, Work)
+
+            NA_prime = NA_prime + charge_atom * result * kx * ky * kz * kc * const 
+
+            if (ier /= 0) then
+              write(*,'(A,//)')   'Error code from ss NA :'
+              write(*,'(A,I8,A)') 'Error code = ', ier
+            end if
+            
+          end do 
+
+        end do 
+      end do
+
+      contains
+
+      function f_decay(t) result(I_t)
+
+      ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
+      
+      double precision, intent(in) :: t
+      double precision             :: I_t
+      double precision             :: t2
+      double precision             :: albept , inv_albept
+      double precision             :: eta_t  , eta_t2 
+      double precision             :: k_na_x , k_na_y, k_na_z
+      ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
+
+      t2         = t  * t 
+      albept     = albe + t2
+      inv_albept = 1.d0 / albept
+      eta_t      = t2 * inv_albept
+      eta_t2     = eta_t * eta_t
+      
+      ! Clifford ! 
+
+      call bary_exponent_x(px,t2,xpc,dx)
+
+      dx = 2.d0 * dx  * inv_ax2
+
+      A = dx 
+
+      Ix_int = Lx * iv_scaled(0, A)
+      k_na_x = dexp( - 2.d0 * (t2 + albe)  * inv_ax2 + dx )
+
+      sda    = dsin(ax*(xd-x1))
+      cda    = dcos(ax*(xd-x1))
+
+      sdb    = dsin(ax*(xd-x2))
+      cdb    = dcos(ax*(xd-x2))
+
+
+      ! the modifed bessel function for the first terms ! 
+
+      I_1_A = iv_scaled(1, A)
+      I_2_A = iv_scaled(2, A)
+
+      ! ************ !
+      ! The integral !
+      ! ************ ! 
+
+      svp    = 0.d0
+      svp2   = Lx * I_1_A / A 
+
+      cvp    = Lx * I_1_A 
+      cvp2   = Lx * (I_1_A + A * I_2_A) / A 
+
+      scvp   = 0.d0 
+
+
+      ! Real ! 
+
+      k_na_y = dexp(- albe * eta_t * ( yPC * yPC ) )
+      k_na_z = dexp(- albe * eta_t * ( zPC * zPC ) )
+
+      Iy_int = dsqrt(pi * inv_albept)
+      Iz_int = dsqrt(pi * inv_albept)
+
+      ! ************ !
+      ! The integral !
+      ! ************ !
+      
+      yvp  = 0.d0 
+      yvp2 = 0.5d0 * inv_albept * Iy_int
+      zvp  = 0.d0 
+      zvp2 = 0.5d0 * inv_albept * Iz_int
+
+
+
+      select case(pattern_id)
+
+      case (00) ! | s     s     ( 1 )
+      
+        ! G1 (i=0, j=0, k=0)
+        ! G2 (l=0, m=0, n=0)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (01) ! | s     px    ( 2 )
+      
+        ! G1 (i=0, j=0, k=0)
+        ! G2 (l=1, m=0, n=0)
+      
+        Ix   = inv_ax * (svp*cdb + cvp*sdb)
+        Iy   = Iy_int
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (02) ! | s     py    ( 3 )
+      
+        ! G1 (i=0, j=0, k=0)
+        ! G2 (l=0, m=1, n=0)
+      
+        Ix   = Ix_int
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + yvp
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (03) ! | s     pz    ( 4 )
+      
+        ! G1 (i=0, j=0, k=0)
+        ! G2 (l=0, m=0, n=1)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + zvp
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (10) ! | px    s     ( 5 )
+      
+        ! G1 (i=1, j=0, k=0)
+        ! G2 (l=0, m=0, n=0)
+      
+        Ix   = inv_ax * (svp*cda + cvp*sda)
+        Iy   = Iy_int
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (11) ! | px    px    ( 6 )
+      
+        ! G1 (i=1, j=0, k=0)
+        ! G2 (l=1, m=0, n=0)
+      
+        Ix   = inv_ax2 * (svp2*cda*cdb + scvp*cda*sdb + scvp*cdb*sda + cvp2*sda*sdb)
+        Iy   = Iy_int
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (12) ! | px    py    ( 7 )
+      
+        ! G1 (i=1, j=0, k=0)
+        ! G2 (l=0, m=1, n=0)
+      
+        Ix   = inv_ax * (svp*cda + cvp*sda)
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + yvp
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (13) ! | px    pz    ( 8 )
+      
+        ! G1 (i=1, j=0, k=0)
+        ! G2 (l=0, m=0, n=1)
+      
+        Ix   = inv_ax * (svp*cda + cvp*sda)
+        Iy   = Iy_int
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + zvp
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (20) ! | py    s     ( 9 )
+      
+        ! G1 (i=0, j=1, k=0)
+        ! G2 (l=0, m=0, n=0)
+      
+        Ix   = Ix_int
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + yvp
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (21) ! | py    px    ( 10 )
+      
+        ! G1 (i=0, j=1, k=0)
+        ! G2 (l=1, m=0, n=0)
+      
+        Ix   = inv_ax * (svp*cdb + cvp*sdb)
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + yvp
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (22) ! | py    py    ( 11 )
+      
+        ! G1 (i=0, j=1, k=0)
+        ! G2 (l=0, m=1, n=0)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int*eta_t2*ypc2 - Iy_int*eta_t*ypa*ypc - Iy_int*eta_t*ypb*ypc - yvp*2*eta_t*ypc + Iy_int*ypa*ypb + yvp*ypa + yvp*ypb + yvp2
+        Iz   = Iz_int
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (23) ! | py    pz    ( 12 )
+      
+        ! G1 (i=0, j=1, k=0)
+        ! G2 (l=0, m=0, n=1)
+      
+        Ix   = Ix_int
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + yvp
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + zvp
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (30) ! | pz    s     ( 13 )
+      
+        ! G1 (i=0, j=0, k=1)
+        ! G2 (l=0, m=0, n=0)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + zvp
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (31) ! | pz    px    ( 14 )
+      
+        ! G1 (i=0, j=0, k=1)
+        ! G2 (l=1, m=0, n=0)
+      
+        Ix   = inv_ax * (svp*cdb + cvp*sdb)
+        Iy   = Iy_int
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + zvp
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (32) ! | pz    py    ( 15 )
+      
+        ! G1 (i=0, j=0, k=1)
+        ! G2 (l=0, m=1, n=0)
+      
+        Ix   = Ix_int
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + yvp
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + zvp
+      
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+      case (33) ! | pz    pz    ( 16 )
+      
+        ! G1 (i=0, j=0, k=1)
+        ! G2 (l=0, m=0, n=1)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int
+        Iz   = Iz_int*eta_t2*zpc2 - Iz_int*eta_t*zpa*zpc - Iz_int*eta_t*zpb*zpc - zvp*2*eta_t*zpc + Iz_int*zpa*zpb + zvp*zpa + zvp*zpb + zvp2
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+
+
+      case default
+
+        I_t = 0.0d0
+
+      end select
+
+      !-----------------------------------------------------------------!
+
+
+      end function f_decay
+
+      !-----------------------------------------------------------------!
+
+end subroutine nuclear_attraction_integral_toroidal_1D
