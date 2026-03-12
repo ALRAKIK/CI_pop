@@ -52,18 +52,17 @@ module Tools
       implicit none 
 
       integer ,intent(in) :: x
-      integer             :: fac 
-
+      double precision    :: fac 
       integer             :: i 
 
       if (x <= 1 ) then 
-        fac = 1 
+        fac = 1.d0
         return 
       end if 
 
       fac = 1.d0 
       do i = x , 2 , -2
-        fac = fac * i 
+        fac = fac * dble(i)
       end do 
 
       end function factorial2

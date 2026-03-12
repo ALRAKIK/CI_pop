@@ -50,58 +50,56 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
       !-----------------------------------------------------------------!
       ! Setup OpenMP
       !-----------------------------------------------------------------!
-      !call omp_set_dynamic(.false.)
-      !call omp_set_num_threads(omp_get_max_threads())
+      call omp_set_dynamic(.false.)
+      call omp_set_num_threads(omp_get_max_threads())
 
-      !!$omp parallel
-      !if (omp_get_thread_num() == 0) then
-      !  print *, "Nuclear Attraction: Running with", omp_get_num_threads(), "threads"
-      !endif
-      !!$omp end parallel
+      !$omp parallel
+      if (omp_get_thread_num() == 0) then
+       print *, "Nuclear Attraction: Running with", omp_get_num_threads(), "threads"
+      endif
+      !$omp end parallel
       
-      !!$omp parallel
-      !  !$omp single
-      !    num_threads = omp_get_num_threads()
-      !  !$omp end single
-      !!$omp end parallel
+      !$omp parallel
+       !$omp single
+         num_threads = omp_get_num_threads()
+       !$omp end single
+      !$omp end parallel
       
-      ! Calculate optimal chunk size based on available threads
-      !if (num_threads <= 16) then
-      !  optimal_chunk_size = 16
-      !else if (num_threads <= 64) then
-      !  optimal_chunk_size = 8
-      !else 
-      !  optimal_chunk_size = 1
-      !end if
+      !Calculate optimal chunk size based on available threads
+      if (num_threads <= 16) then
+       optimal_chunk_size = 16
+      else if (num_threads <= 64) then
+       optimal_chunk_size = 8
+      else 
+       optimal_chunk_size = 1
+      end if
 
       !-----------------------------------------------------------------!
       ! Precompute all i-j pairs
       !-----------------------------------------------------------------!
-      !total_ij_pairs = index_unitcell * number_of_functions
-      !allocate(i_index(total_ij_pairs), j_index(total_ij_pairs))
+      total_ij_pairs = index_unitcell * number_of_functions
+      allocate(i_index(total_ij_pairs), j_index(total_ij_pairs))
 
-      !ij_index = 0
-      !do i = 1, index_unitcell
-      !  do j = 1, number_of_functions
-      !    ij_index = ij_index + 1
-      !    i_index(ij_index) = i
-      !    j_index(ij_index) = j
-      !  end do
-      !end do
+      ij_index = 0
+      do i = 1, index_unitcell
+       do j = 1, number_of_functions
+         ij_index = ij_index + 1
+         i_index(ij_index) = i
+         j_index(ij_index) = j
+       end do
+      end do
       
       !-----------------------------------------------------------------!
-      ! Parallel computation
+      !Parallel computation
       !-----------------------------------------------------------------!
-      !!$omp parallel do private(ij_index,i,j,k,l,AO1,AO2,r1,r2) &
-      !!$omp shared(NA, AO, i_index, j_index, number_of_atoms, geometry, atoms) &
-      !!$omp schedule(dynamic,optimal_chunk_size)
-      !do ij_index = 1, total_ij_pairs
-      !  i = i_index(ij_index)
-      !  j = j_index(ij_index)
 
-      do i = 1 , index_unitcell
-        do j = 1 , number_of_functions
-        
+      !$omp parallel do private(ij_index,i,j,k,l,AO1,AO2,r1,r2) &
+      !$omp shared(NA, AO, i_index, j_index, number_of_atoms, geometry, atoms) &
+      !$omp schedule(dynamic,optimal_chunk_size)
+      do ij_index = 1, total_ij_pairs
+       i = i_index(ij_index)
+       j = j_index(ij_index)
+
         AO1 = AO(i)
         AO2 = AO(j)
         
@@ -142,13 +140,12 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
         end if
         
       end do
-    end do 
-      !!$omp end parallel do
       
-      !deallocate(i_index, j_index)
+      !$omp end parallel do
+      
+      deallocate(i_index, j_index)
 
       
-
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
       !                    symmetry of the integrals                    !
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
@@ -176,19 +173,13 @@ subroutine nuclear_attraction_matrix_toroidal(number_of_atoms,number_of_function
 end subroutine nuclear_attraction_matrix_toroidal 
 
 
-
-
-
-
-
-
-
 subroutine nuclear_attraction_matrix_toroidal_1D_n(number_of_atoms,number_of_functions,geometry,atoms,AO,NA)
 
       use files
       use atom_basis
       use torus_init
       use classification_ERI
+      use omp_lib
 
       implicit none 
 
@@ -211,9 +202,18 @@ subroutine nuclear_attraction_matrix_toroidal_1D_n(number_of_atoms,number_of_fun
 
       integer                       :: pattern_id, encode_orbital_pattern_AO
 
+      double precision              :: temp_integral
+
       ! output !
 
       double precision,intent(out)  :: NA(number_of_functions,number_of_functions)
+
+      !-----------------------------------------------------------------!
+      ! Parallelization variables
+      integer                        :: total_ij_pairs, ij_index
+      integer, allocatable           :: i_index(:), j_index(:)
+      integer                        :: num_threads, optimal_chunk_size
+      !-----------------------------------------------------------------!
 
       !-----------------------------------------------------------------!
 
@@ -235,8 +235,60 @@ subroutine nuclear_attraction_matrix_toroidal_1D_n(number_of_atoms,number_of_fun
 
       ! --------------------------------------------------------------- !
 
-      do i = 1 , index_unitcell
-        do j = 1 , number_of_functions
+      !-----------------------------------------------------------------!
+      ! Setup OpenMP
+      !-----------------------------------------------------------------!
+      call omp_set_dynamic(.false.)
+      call omp_set_num_threads(omp_get_max_threads())
+
+      !$omp parallel
+      if (omp_get_thread_num() == 0) then
+       print *, "Nuclear Attraction: Running with", omp_get_num_threads(), "threads"
+      endif
+      !$omp end parallel
+      
+      !$omp parallel
+       !$omp single
+         num_threads = omp_get_num_threads()
+       !$omp end single
+      !$omp end parallel
+      
+      !Calculate optimal chunk size based on available threads
+      if (num_threads <= 16) then
+       optimal_chunk_size = 16
+      else if (num_threads <= 64) then
+       optimal_chunk_size = 8
+      else 
+       optimal_chunk_size = 1
+      end if
+
+      !-----------------------------------------------------------------!
+      ! Precompute all i-j pairs
+      !-----------------------------------------------------------------!
+      total_ij_pairs = index_unitcell * number_of_functions
+      allocate(i_index(total_ij_pairs), j_index(total_ij_pairs))
+
+      ij_index = 0
+      do i = 1, index_unitcell
+       do j = 1, number_of_functions
+         ij_index = ij_index + 1
+         i_index(ij_index) = i
+         j_index(ij_index) = j
+       end do
+      end do
+
+      !-----------------------------------------------------------------!
+      !Parallel computation
+      !-----------------------------------------------------------------!
+
+      !$omp parallel do private(ij_index,i,j,AO1,AO2,r1,r2, pattern_id, temp_integral) &
+      !$omp shared(NA, AO, i_index, j_index, number_of_atoms, geometry, atoms, total_ij_pairs) &
+      !$omp schedule(dynamic,optimal_chunk_size)
+
+
+      do ij_index = 1, total_ij_pairs
+        i = i_index(ij_index)
+        j = j_index(ij_index)
 
           AO1 = AO(i)
           AO2 = AO(j)
@@ -247,10 +299,14 @@ subroutine nuclear_attraction_matrix_toroidal_1D_n(number_of_atoms,number_of_fun
 
           pattern_id = encode_orbital_pattern_AO(AO1%orbital, AO2%orbital)
 
-          call nuclear_attraction_integral_toroidal_1D(pattern_id,number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA(i,j))
+          call nuclear_attraction_integral_toroidal_1D(pattern_id,number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,temp_integral)
+          NA(i,j) = temp_integral 
           
         end do 
-      end do 
+      
+      !$omp end parallel do
+      
+      deallocate(i_index, j_index)
 
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
       !                    symmetry of the integrals                    !
@@ -318,14 +374,10 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
 
       double precision                 :: ax2 , inv_ax , inv_ax2 
       double precision                 :: px
-      double precision                 :: I_0_A , I_1_A , I_2_A
-      double precision                 :: A 
+      double precision                 :: A , B
       double precision                 :: xp
       double precision                 :: sda   , sdb
       double precision                 :: cda   , cdb
-      double precision                 :: svp   , svp2
-      double precision                 :: cvp   , cvp2
-      double precision                 :: scvp
 
       !-----------------------------------------------------------------!
 
@@ -334,9 +386,7 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
       double precision                 :: albe, inv_albe , mu 
       double precision                 :: yp   , zp
       double precision                 :: ypa  , ypb 
-      double precision                 :: zpa  , zpb 
-      double precision                 :: yvp  , zvp
-      double precision                 :: yvp2 , zvp2
+      double precision                 :: zpa  , zpb
 
       !-----------------------------------------------------------------!
 
@@ -344,7 +394,7 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
 
       double precision                 :: xc , yc , zc
       double precision                 :: xpc ,  ypc,  zpc
-      double precision                 :: xpc2, ypc2, zpc2
+      double precision                 :: ypc2, zpc2
       double precision                 :: kc
       double precision                 :: dx , xD
 
@@ -468,20 +518,19 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
       function f_decay(t) result(I_t)
 
       ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
-      
       double precision, intent(in) :: t
       double precision             :: I_t
       double precision             :: t2
       double precision             :: albept , inv_albept
-      double precision             :: eta_t  , eta_t2 
+      double precision             :: eta_t
       double precision             :: k_na_x , k_na_y, k_na_z
+      double precision             :: Ireal , Icliff
       ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< !
 
       t2         = t  * t 
       albept     = albe + t2
       inv_albept = 1.d0 / albept
       eta_t      = t2 * inv_albept
-      eta_t2     = eta_t * eta_t
       
       ! Clifford ! 
 
@@ -492,6 +541,7 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
       A = dx 
 
       Ix_int = Lx * iv_scaled(0, A)
+
       k_na_x = dexp( - 2.d0 * (t2 + albe)  * inv_ax2 + dx )
 
       sda    = dsin(ax*(xd-x1))
@@ -500,221 +550,193 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
       sdb    = dsin(ax*(xd-x2))
       cdb    = dcos(ax*(xd-x2))
 
-
-      ! the modifed bessel function for the first terms ! 
-
-      I_1_A = iv_scaled(1, A)
-      I_2_A = iv_scaled(2, A)
-
-      ! ************ !
-      ! The integral !
-      ! ************ ! 
-
-      svp    = 0.d0
-      svp2   = Lx * I_1_A / A 
-
-      cvp    = Lx * I_1_A 
-      cvp2   = Lx * (I_1_A + A * I_2_A) / A 
-
-      scvp   = 0.d0 
-
-
       ! Real ! 
 
       k_na_y = dexp(- albe * eta_t * ( yPC * yPC ) )
       k_na_z = dexp(- albe * eta_t * ( zPC * zPC ) )
 
+      B      = albept
+
       Iy_int = dsqrt(pi * inv_albept)
       Iz_int = dsqrt(pi * inv_albept)
-
-      ! ************ !
-      ! The integral !
-      ! ************ !
-      
-      yvp  = 0.d0 
-      yvp2 = 0.5d0 * inv_albept * Iy_int
-      zvp  = 0.d0 
-      zvp2 = 0.5d0 * inv_albept * Iz_int
-
-
 
       select case(pattern_id)
 
       case (00) ! | s     s     ( 1 )
-      
-        ! G1 (i=0, j=0, k=0)
-        ! G2 (l=0, m=0, n=0)
-      
-        Ix   = Ix_int
-        Iy   = Iy_int
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+          
+      ! G1 (i=0, j=0, k=0)
+      ! G2 (l=0, m=0, n=0)
+          
+      Ix   = Ix_int
+      Iy   = Iy_int
+      Iz   = Iz_int
+          
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+          
       case (01) ! | s     px    ( 2 )
-      
-        ! G1 (i=0, j=0, k=0)
-        ! G2 (l=1, m=0, n=0)
-      
-        Ix   = inv_ax * (svp*cdb + cvp*sdb)
-        Iy   = Iy_int
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=0, k=0)
+      ! G2 (l=1, m=0, n=0)
+    
+      Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
+      Iy   = Iy_int
+      Iz   = Iz_int
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (02) ! | s     py    ( 3 )
-      
-        ! G1 (i=0, j=0, k=0)
-        ! G2 (l=0, m=1, n=0)
-      
-        Ix   = Ix_int
-        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + yvp
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=0, k=0)
+      ! G2 (l=0, m=1, n=0)
+    
+      Ix   = Ix_int
+      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,B)
+      Iz   = Iz_int
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (03) ! | s     pz    ( 4 )
-      
-        ! G1 (i=0, j=0, k=0)
-        ! G2 (l=0, m=0, n=1)
-      
-        Ix   = Ix_int
-        Iy   = Iy_int
-        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + zvp
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=0, k=0)
+      ! G2 (l=0, m=0, n=1)
+    
+      Ix   = Ix_int
+      Iy   = Iy_int
+      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,B)
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (10) ! | px    s     ( 5 )
-      
-        ! G1 (i=1, j=0, k=0)
-        ! G2 (l=0, m=0, n=0)
-      
-        Ix   = inv_ax * (svp*cda + cvp*sda)
-        Iy   = Iy_int
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=1, j=0, k=0)
+      ! G2 (l=0, m=0, n=0)
+    
+      Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
+      Iy   = Iy_int
+      Iz   = Iz_int
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (11) ! | px    px    ( 6 )
-      
-        ! G1 (i=1, j=0, k=0)
-        ! G2 (l=1, m=0, n=0)
-      
-        Ix   = inv_ax2 * (svp2*cda*cdb + scvp*cda*sdb + scvp*cdb*sda + cvp2*sda*sdb)
-        Iy   = Iy_int
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=1, j=0, k=0)
+      ! G2 (l=1, m=0, n=0)
+    
+      Ix   = inv_ax2 * (Icliff(2,0,A)*cda*cdb + Icliff(1,1,A)*cda*sdb + Icliff(1,1,A)*cdb*sda + Icliff(0,2,A)*sda*sdb)
+      Iy   = Iy_int
+      Iz   = Iz_int
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (12) ! | px    py    ( 7 )
-      
-        ! G1 (i=1, j=0, k=0)
-        ! G2 (l=0, m=1, n=0)
-      
-        Ix   = inv_ax * (svp*cda + cvp*sda)
-        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + yvp
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=1, j=0, k=0)
+      ! G2 (l=0, m=1, n=0)
+    
+      Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
+      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,B)
+      Iz   = Iz_int
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (13) ! | px    pz    ( 8 )
-      
-        ! G1 (i=1, j=0, k=0)
-        ! G2 (l=0, m=0, n=1)
-      
-        Ix   = inv_ax * (svp*cda + cvp*sda)
-        Iy   = Iy_int
-        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + zvp
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=1, j=0, k=0)
+      ! G2 (l=0, m=0, n=1)
+    
+      Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
+      Iy   = Iy_int
+      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,B)
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (20) ! | py    s     ( 9 )
-      
-        ! G1 (i=0, j=1, k=0)
-        ! G2 (l=0, m=0, n=0)
-      
-        Ix   = Ix_int
-        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + yvp
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=1, k=0)
+      ! G2 (l=0, m=0, n=0)
+    
+      Ix   = Ix_int
+      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,B)
+      Iz   = Iz_int
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (21) ! | py    px    ( 10 )
-      
-        ! G1 (i=0, j=1, k=0)
-        ! G2 (l=1, m=0, n=0)
-      
-        Ix   = inv_ax * (svp*cdb + cvp*sdb)
-        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + yvp
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=1, k=0)
+      ! G2 (l=1, m=0, n=0)
+    
+      Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
+      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,B)
+      Iz   = Iz_int
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (22) ! | py    py    ( 11 )
-      
-        ! G1 (i=0, j=1, k=0)
-        ! G2 (l=0, m=1, n=0)
-      
-        Ix   = Ix_int
-        Iy   = Iy_int*eta_t2*ypc2 - Iy_int*eta_t*ypa*ypc - Iy_int*eta_t*ypb*ypc - yvp*2*eta_t*ypc + Iy_int*ypa*ypb + yvp*ypa + yvp*ypb + yvp2
-        Iz   = Iz_int
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=1, k=0)
+      ! G2 (l=0, m=1, n=0)
+    
+      Ix   = Ix_int
+      Iy   = Iy_int*eta_t * eta_t*ypc * ypc - Iy_int*eta_t*ypa*ypc - Iy_int*eta_t*ypb*ypc - Ireal(1,B)*2*eta_t*ypc + Iy_int*ypa*ypb + Ireal(1,B)*ypa + Ireal(1,B)*ypb + Ireal(2,B)
+      Iz   = Iz_int
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (23) ! | py    pz    ( 12 )
-      
-        ! G1 (i=0, j=1, k=0)
-        ! G2 (l=0, m=0, n=1)
-      
-        Ix   = Ix_int
-        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + yvp
-        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + zvp
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=1, k=0)
+      ! G2 (l=0, m=0, n=1)
+    
+      Ix   = Ix_int
+      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,B)
+      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,B)
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (30) ! | pz    s     ( 13 )
-      
-        ! G1 (i=0, j=0, k=1)
-        ! G2 (l=0, m=0, n=0)
-      
-        Ix   = Ix_int
-        Iy   = Iy_int
-        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + zvp
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=0, k=1)
+      ! G2 (l=0, m=0, n=0)
+    
+      Ix   = Ix_int
+      Iy   = Iy_int
+      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,B)
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (31) ! | pz    px    ( 14 )
-      
-        ! G1 (i=0, j=0, k=1)
-        ! G2 (l=1, m=0, n=0)
-      
-        Ix   = inv_ax * (svp*cdb + cvp*sdb)
-        Iy   = Iy_int
-        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + zvp
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
+    
+      ! G1 (i=0, j=0, k=1)
+      ! G2 (l=1, m=0, n=0)
+    
+      Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
+      Iy   = Iy_int
+      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,B)
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
       case (32) ! | pz    py    ( 15 )
-      
-        ! G1 (i=0, j=0, k=1)
-        ! G2 (l=0, m=1, n=0)
-      
-        Ix   = Ix_int
-        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + yvp
-        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + zvp
-      
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-      
-      case (33) ! | pz    pz    ( 16 )
-      
-        ! G1 (i=0, j=0, k=1)
-        ! G2 (l=0, m=0, n=1)
-      
-        Ix   = Ix_int
-        Iy   = Iy_int
-        Iz   = Iz_int*eta_t2*zpc2 - Iz_int*eta_t*zpa*zpc - Iz_int*eta_t*zpb*zpc - zvp*2*eta_t*zpc + Iz_int*zpa*zpb + zvp*zpa + zvp*zpb + zvp2
-        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+    
+      ! G1 (i=0, j=0, k=1)
+      ! G2 (l=0, m=1, n=0)
+    
+      Ix   = Ix_int
+      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,B)
+      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,B)
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
 
+      case (33) ! | pz    pz    ( 16 )
+    
+      ! G1 (i=0, j=0, k=1)
+      ! G2 (l=0, m=0, n=1)
+    
+      Ix   = Ix_int
+      Iy   = Iy_int
+      Iz   = Iz_int*eta_t * eta_t*zpc * zpc - Iz_int*eta_t*zpa*zpc - Iz_int*eta_t*zpb*zpc - Ireal(1,B)*2*eta_t*zpc + Iz_int*zpa*zpb + Ireal(1,B)*zpa + Ireal(1,B)*zpb + Ireal(2,B)
+    
+      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
 
       case default
 
@@ -724,9 +746,73 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
 
       !-----------------------------------------------------------------!
 
-
       end function f_decay
 
       !-----------------------------------------------------------------!
 
 end subroutine nuclear_attraction_integral_toroidal_1D
+
+double precision function Icliff(n,m,A)
+
+      use torus_init
+      use bessel_functions
+      implicit none 
+
+      integer, intent(in)          :: n , m
+      double precision, intent(in) :: A
+      integer                      :: nm
+
+      ! Combine n and m into a two-digit number
+      ! For n=1, m=0 -> nm=10  
+      ! For n=0, m=1 -> nm=01
+      ! n mean sin and m mean cos
+
+      nm = n*10 + m
+
+      select case (nm)
+        case (00)  
+            Icliff = Lx * iv_scaled(0, A)  ! This should be the integral of the Clifford function for s-s
+        case (01)  
+            Icliff = Lx * iv_scaled(1, A)
+        case (02)  
+            Icliff = Lx * (iv_scaled(1, A) + A * iv_scaled(2, A)) / A 
+        case (10)  
+            Icliff = 0.d0 
+        case (11)  
+            Icliff = 0.d0 
+        case (12)  
+            Icliff = 0.d0
+        case (20)  
+            Icliff = Lx * iv_scaled(1, A) / A
+        case (21)  
+            Icliff = Lx * iv_scaled(2, A) / A
+        case (22)  
+            Icliff = Lx * (A * iv_scaled(1, A) - 3.d0 * iv_scaled(2, A) ) / ( A * A )
+
+        case default
+            Icliff = 0.d0
+        end select
+
+end function Icliff
+
+double precision function Ireal(n,A)
+
+      use torus_init
+      use bessel_functions
+      use tools 
+      implicit none 
+
+      integer, intent(in)          :: n
+      double precision, intent(in) :: A
+      double precision,parameter   :: pi = 3.14159265358979323846D00
+
+
+      ! n mean the power of the term
+
+      if (mod(n,2) == 0) then
+        Ireal = dble(factorial2(n-1)) / (2.d0*A)**(n/2) * dsqrt(pi/A)
+      else
+        Ireal = 0.d0
+      end if
+
+end function Ireal

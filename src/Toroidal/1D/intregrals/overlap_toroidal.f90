@@ -260,12 +260,10 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       double precision                 :: ax2 , inv_ax , inv_ax2 
       double precision                 :: px
       double precision                 :: I_0_A , I_1_A , I_2_A
-      double precision                 :: A 
+      double precision                 :: A , B 
       double precision                 :: xp
       double precision                 :: spa  , spb
       double precision                 :: cpa  , cpb
-      double precision                 :: svp  , cvp
-      double precision                 :: svp2 , cvp2
 
       !   Real   ! 
 
@@ -273,8 +271,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       double precision                 :: yp   , zp
       double precision                 :: ypa  , ypb 
       double precision                 :: zpa  , zpb 
-      double precision                 :: yvp  , zvp
-      double precision                 :: yvp2 , zvp2
+      double precision                 :: Ireal , Icliff
 
       
       integer                          :: pattern_id
@@ -327,18 +324,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
           sx_int = Lx * I_0_A
 
           spa    = dsin(ax*(xp-x1)) ; cpa    = dcos(ax*(xp-x1))
-          spb    = dsin(ax*(xp-x2)) ; cpb    = dcos(ax*(xp-x2)) 
-
-          ! ************ !
-          ! The integral !
-          ! ************ ! 
-
-          svp    = 0.d0
-          svp2   = Lx * I_1_A / A 
-
-          cvp    = Lx * I_1_A 
-          cvp2   = Lx * (I_1_A + A * I_2_A) / A 
-
+          spb    = dsin(ax*(xp-x2)) ; cpb    = dcos(ax*(xp-x2))
 
           ! ----------------- !
           !   Real Gaussian   !
@@ -349,6 +335,8 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
           mu       = alpha * beta * inv_albe
           yp       = (alpha * y1 + beta * y2) * inv_albe
           zp       = (alpha * z1 + beta * z2) * inv_albe
+
+          B        = albe
 
           ky       = dexp(- mu * ( Y * Y ))
           kz       = dexp(- mu * ( Z * Z ))
@@ -361,290 +349,185 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
 
           zpa = zp - z1 
           zpb = zp - z2
-
-          ! ************ !
-          ! the integral !
-          ! ************ !
-
-          yvp  = 0.d0 
-          yvp2 = 0.5d0 * inv_albe * sy_int
-          zvp  = 0.d0 
-          zvp2 = 0.5d0 * inv_albe * sz_int
           
 
       select case(pattern_id)
 
-      ! case (00) ! | s   s    ( 1 )
-
-      ! zeta_x    = sx
-      ! zeta_y    = sy
-      ! zeta_z    = sz
-
-      ! case (01) ! | s   px   ( 2 )
-      
-      ! zeta_x    = (cpb*svp + cvp*spb) * inv_ax
-      ! zeta_y    = (sy)
-      ! zeta_z    = (sz)
-      
-      ! case (02) ! | s   py   ( 3 )
-      
-      ! zeta_x    = (sx)
-      ! zeta_y    = (ypb + yvp) * sy
-      ! zeta_z    = (sz)
-      
-      ! case (03) ! | s   pz   ( 4 )
-      
-      ! zeta_x    = (sx)
-      ! zeta_y    = (sy)
-      ! zeta_z    = (zpb + zvp) * sz
-      
-      ! case (10) ! | px  s    ( 5 )
-      
-      ! zeta_x    = (cpa*svp + cvp*spa) * inv_ax
-      ! zeta_y    = (sy)
-      ! zeta_z    = (sz)
-      
-      ! case (11) ! | px  px   ( 6 )
-      
-      ! zeta_x    = (cpa*cpb*svp2 + cpa*cvp*spb*svp + cpb*cvp*spa*svp + cvp2*spa*spb) * inv_ax2
-      ! zeta_y    = sy
-      ! zeta_z    = sz
-      
-      ! case (12) ! | px  py   ( 7 )
-      
-      ! zeta_x    = (cpa*svp + cvp*spa) * inv_ax
-      ! zeta_y    = (ypb + yvp) * sy
-      ! zeta_z    = sz
-      
-      ! case (13) ! | px  pz   ( 8 )
-      
-      ! zeta_x    = (cpa*svp + cvp*spa) * inv_ax
-      ! zeta_y    = sy
-      ! zeta_z    = (zpb + zvp) * sz
-      
-      ! case (20) ! | py  s    ( 9 )
-      
-      ! zeta_x    = (sx)
-      ! zeta_y    = (ypa + yvp) * sy
-      ! zeta_z    = (sz)
-      
-      ! case (21) ! | py  px   ( 10)
-      
-      ! zeta_x    = (cpb*svp + cvp*spb) * inv_ax
-      ! zeta_y    = (ypa + yvp) * sy
-      ! zeta_z    = sz
-      
-      ! case (22) ! | py  py   ( 11)
-      
-      ! zeta_x    = sx
-      ! zeta_y    = (ypa*ypb + ypa*yvp + ypb*yvp + yvp2) * sy
-      ! zeta_z    = sz
-      
-      ! case (23) ! | py  pz   ( 12)
-      
-      ! zeta_x    = sx
-      ! zeta_y    = (ypa + yvp) * sy
-      ! zeta_z    = (zpb + zvp) * sz
-      
-      ! case (30) ! | pz  s    ( 13)
-      
-      ! zeta_x    = (sx)
-      ! zeta_y    = (sy)
-      ! zeta_z    = (zpa + zvp) * sz
-      
-      ! case (31) ! | pz  px   ( 14)
-      
-      ! zeta_x    = (cpb*svp + cvp*spb) * inv_ax
-      ! zeta_y    = sy
-      ! zeta_z    = (zpa + zvp) * sz
-      
-      ! case (32) ! | pz  py   ( 15)
-      
-      ! zeta_x    = sx
-      ! zeta_y    = (ypb + yvp) * sy
-      ! zeta_z    = (zpa + zvp) * sz
-      
-      ! case (33) ! | pz  pz   ( 16)
-      
-      ! zeta_x    = sx
-      ! zeta_y    = sy
-      ! zeta_z    = (zpa*zpb + zpa*zvp + zpb*zvp + zvp2) * sz
-
       case (00) ! | s     s     ( 1 )
-      
+
         ! G1 (i=0, j=0, k=0)
         ! G2 (l=0, m=0, n=0)
-      
-        sx = sx_int
-        sy = sy_int
-        sz = sz_int
-      
-        s  = sx * sy * sz
-      
+
+        sx   = Sx_int
+        sy   = Sy_int
+        sz   = Sz_int
+
+        s    = sx * sy * sz
+
       case (01) ! | s     px    ( 2 )
       
         ! G1 (i=0, j=0, k=0)
         ! G2 (l=1, m=0, n=0)
       
-        sx = (svp*cpb + cvp*spb) * inv_ax
-        sy = sy_int
-        sz = sz_int
+        sx   = inv_ax * (Icliff(1,0,A)*cpb + Icliff(0,1,A)*spb)
+        sy   = Sy_int
+        sz   = Sz_int
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (02) ! | s     py    ( 3 )
       
         ! G1 (i=0, j=0, k=0)
         ! G2 (l=0, m=1, n=0)
       
-        sx = sx_int
-        sy = sy_int*ypb + yvp
-        sz = sz_int
+        sx   = Sx_int
+        sy   = Sy_int*ypb + Ireal(1,B)
+        sz   = Sz_int
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (03) ! | s     pz    ( 4 )
       
         ! G1 (i=0, j=0, k=0)
         ! G2 (l=0, m=0, n=1)
       
-        sx = sx_int
-        sy = sy_int
-        sz = sz_int*zpb + zvp
+        sx   = Sx_int
+        sy   = Sy_int
+        sz   = Sz_int*zpb + Ireal(1,B)
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (10) ! | px    s     ( 5 )
       
         ! G1 (i=1, j=0, k=0)
         ! G2 (l=0, m=0, n=0)
       
-        sx = (svp*cpa + cvp*spa) * inv_ax
-        sy = sy_int
-        sz = sz_int
+        sx   = inv_ax * (Icliff(1,0,A)*cpa + Icliff(0,1,A)*spa)
+        sy   = Sy_int
+        sz   = Sz_int
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (11) ! | px    px    ( 6 )
       
         ! G1 (i=1, j=0, k=0)
         ! G2 (l=1, m=0, n=0)
       
-        sx = (svp2*cpa*cpb + svp*cvp*cpa*spb + svp*cvp*cpb*spa + cvp2*spa*spb) * inv_ax2
-        sy = sy_int
-        sz = sz_int
+        sx   = inv_ax2 * (Icliff(2,0,A)*cpa*cpb + Icliff(1,1,A)*cpa*spb + Icliff(1,1,A)*cpb*spa + Icliff(0,2,A)*spa*spb)
+        sy   = Sy_int
+        sz   = Sz_int
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (12) ! | px    py    ( 7 )
       
         ! G1 (i=1, j=0, k=0)
         ! G2 (l=0, m=1, n=0)
       
-        sx = (svp*cpa + cvp*spa) * inv_ax
-        sy = sy_int*ypb + yvp
-        sz = sz_int
+        sx   = inv_ax * (Icliff(1,0,A)*cpa + Icliff(0,1,A)*spa)
+        sy   = Sy_int*ypb + Ireal(1,B)
+        sz   = Sz_int
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (13) ! | px    pz    ( 8 )
       
         ! G1 (i=1, j=0, k=0)
         ! G2 (l=0, m=0, n=1)
       
-        sx = (svp*cpa + cvp*spa) * inv_ax
-        sy = sy_int
-        sz = sz_int*zpb + zvp
+        sx   = inv_ax * (Icliff(1,0,A)*cpa + Icliff(0,1,A)*spa)
+        sy   = Sy_int
+        sz   = Sz_int*zpb + Ireal(1,B)
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (20) ! | py    s     ( 9 )
       
         ! G1 (i=0, j=1, k=0)
         ! G2 (l=0, m=0, n=0)
       
-        sx = sx_int
-        sy = sy_int*ypa + yvp
-        sz = sz_int
+        sx   = Sx_int
+        sy   = Sy_int*ypa + Ireal(1,B)
+        sz   = Sz_int
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (21) ! | py    px    ( 10 )
       
         ! G1 (i=0, j=1, k=0)
         ! G2 (l=1, m=0, n=0)
       
-        sx = (svp*cpb + cvp*spb) * inv_ax
-        sy = sy_int*ypa + yvp
-        sz = sz_int
+        sx   = inv_ax * (Icliff(1,0,A)*cpb + Icliff(0,1,A)*spb)
+        sy   = Sy_int*ypa + Ireal(1,B)
+        sz   = Sz_int
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (22) ! | py    py    ( 11 )
       
         ! G1 (i=0, j=1, k=0)
         ! G2 (l=0, m=1, n=0)
       
-        sx = sx_int
-        sy = sy_int*ypa*ypb + yvp*ypa + yvp*ypb + yvp2
-        sz = sz_int
+        sx   = Sx_int
+        sy   = Sy_int*ypa*ypb + Ireal(1,B)*ypa + Ireal(1,B)*ypb + Ireal(2,B)
+        sz   = Sz_int
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (23) ! | py    pz    ( 12 )
       
         ! G1 (i=0, j=1, k=0)
         ! G2 (l=0, m=0, n=1)
       
-        sx = sx_int
-        sy = sy_int*ypa + yvp
-        sz = sz_int*zpb + zvp
+        sx   = Sx_int
+        sy   = Sy_int*ypa + Ireal(1,B)
+        sz   = Sz_int*zpb + Ireal(1,B)
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (30) ! | pz    s     ( 13 )
       
         ! G1 (i=0, j=0, k=1)
         ! G2 (l=0, m=0, n=0)
       
-        sx = sx_int
-        sy = sy_int
-        sz = sz_int*zpa + zvp
+        sx   = Sx_int
+        sy   = Sy_int
+        sz   = Sz_int*zpa + Ireal(1,B)
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (31) ! | pz    px    ( 14 )
       
         ! G1 (i=0, j=0, k=1)
         ! G2 (l=1, m=0, n=0)
       
-        sx = (svp*cpb + cvp*spb) * inv_ax
-        sy = sy_int
-        sz = sz_int*zpa + zvp
+        sx   = inv_ax * (Icliff(1,0,A)*cpb + Icliff(0,1,A)*spb)
+        sy   = Sy_int
+        sz   = Sz_int*zpa + Ireal(1,B)
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (32) ! | pz    py    ( 15 )
       
         ! G1 (i=0, j=0, k=1)
         ! G2 (l=0, m=1, n=0)
       
-        sx = sx_int
-        sy = sy_int*ypb + yvp
-        sz = sz_int*zpa + zvp
+        sx   = Sx_int
+        sy   = Sy_int*ypb + Ireal(1,B)
+        sz   = Sz_int*zpa + Ireal(1,B)
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
       
       case (33) ! | pz    pz    ( 16 )
       
         ! G1 (i=0, j=0, k=1)
         ! G2 (l=0, m=0, n=1)
       
-        sx = sx_int
-        sy = sy_int
-        sz = sz_int*zpa*zpb + zvp*zpa + zvp*zpb + zvp2
+        sx   = Sx_int
+        sy   = Sy_int
+        sz   = Sz_int*zpa*zpb + Ireal(1,B)*zpa + Ireal(1,B)*zpb + Ireal(2,B)
       
-        s  = sx * sy * sz
+        s    = sx * sy * sz
 
       case default
         s = 0.0d0
