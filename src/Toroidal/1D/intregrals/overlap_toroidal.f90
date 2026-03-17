@@ -228,7 +228,7 @@ end subroutine overlap_matrix_toroidal_n
 
       !-----------------------------------------------------------------!
 
-subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
+subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S)
 
       use torus_init
       use classification_ERI
@@ -240,7 +240,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
 
       double precision  ,intent(in)    :: r1(3) , r2(3)
       type(ERI_function),intent(in)    :: AO1 , AO2
-      double precision  ,intent(out)   :: S_prime
+      double precision  ,intent(out)   :: S
 
       integer                          :: i , j 
       double precision,parameter       :: pi = 3.14159265358979323846D00
@@ -251,17 +251,14 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       double precision                 :: z1     , z2     , Z 
       double precision                 :: kx     , ky     , kz
       double precision                 :: sx     , sy     , sz  
-      double precision                 :: sx_int , sy_int , sz_int  
-      double precision                 :: s 
+      double precision                 :: sx_int , sy_int , sz_int 
        
 
       ! Clifford ! 
 
       double precision                 :: ax2 , inv_ax , inv_ax2 
-      double precision                 :: px
-      double precision                 :: I_0_A , I_1_A , I_2_A
-      double precision                 :: A , B 
-      double precision                 :: xp
+      double precision                 :: px , xp
+      double precision                 :: A
       double precision                 :: spa  , spb
       double precision                 :: cpa  , cpb
 
@@ -294,8 +291,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
 
       !-----------------------------------------------------------------!
  
-      S       = 0.d0
-      s_prime = 0.d0 
+      s       = 0.d0
 
       do i = 1 , size(AO1%exponent)
         alpha = AO1%exponent(i)
@@ -315,13 +311,9 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
 
           A      = 2.d0*px/ax2
 
-          I_0_A  = iv_scaled(0, A)
-          I_1_A  = iv_scaled(1, A)
-          I_2_A  = iv_scaled(2, A)
-
           kx     = dexp(-2.d0 * ( alpha + beta - px ) / ax2)
 
-          sx_int = Lx * I_0_A
+          sx_int = Lx * iv_scaled(0, A)
 
           spa    = dsin(ax*(xp-x1)) ; cpa    = dcos(ax*(xp-x1))
           spb    = dsin(ax*(xp-x2)) ; cpb    = dcos(ax*(xp-x2))
@@ -336,13 +328,11 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
           yp       = (alpha * y1 + beta * y2) * inv_albe
           zp       = (alpha * z1 + beta * z2) * inv_albe
 
-          B        = albe
-
           ky       = dexp(- mu * ( Y * Y ))
           kz       = dexp(- mu * ( Z * Z ))
 
-          sy_int       = dsqrt(pi * inv_albe)
-          sz_int       = dsqrt(pi * inv_albe)
+          sy_int   = dsqrt(pi * inv_albe)
+          sz_int   = dsqrt(pi * inv_albe)
 
           ypa = yp - y1
           ypb = yp - y2
@@ -354,16 +344,14 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       select case(pattern_id)
 
       case (00) ! | s     s     ( 1 )
-
+      
         ! G1 (i=0, j=0, k=0)
         ! G2 (l=0, m=0, n=0)
-
+      
         sx   = Sx_int
         sy   = Sy_int
         sz   = Sz_int
-
-        s    = sx * sy * sz
-
+      
       case (01) ! | s     px    ( 2 )
       
         ! G1 (i=0, j=0, k=0)
@@ -373,18 +361,14 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
         sy   = Sy_int
         sz   = Sz_int
       
-        s    = sx * sy * sz
-      
       case (02) ! | s     py    ( 3 )
       
         ! G1 (i=0, j=0, k=0)
         ! G2 (l=0, m=1, n=0)
       
         sx   = Sx_int
-        sy   = Sy_int*ypb + Ireal(1,B)
+        sy   = Sy_int*ypb + Ireal(1,albe)
         sz   = Sz_int
-      
-        s    = sx * sy * sz
       
       case (03) ! | s     pz    ( 4 )
       
@@ -393,9 +377,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       
         sx   = Sx_int
         sy   = Sy_int
-        sz   = Sz_int*zpb + Ireal(1,B)
-      
-        s    = sx * sy * sz
+        sz   = Sz_int*zpb + Ireal(1,albe)
       
       case (10) ! | px    s     ( 5 )
       
@@ -406,8 +388,6 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
         sy   = Sy_int
         sz   = Sz_int
       
-        s    = sx * sy * sz
-      
       case (11) ! | px    px    ( 6 )
       
         ! G1 (i=1, j=0, k=0)
@@ -417,18 +397,14 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
         sy   = Sy_int
         sz   = Sz_int
       
-        s    = sx * sy * sz
-      
       case (12) ! | px    py    ( 7 )
       
         ! G1 (i=1, j=0, k=0)
         ! G2 (l=0, m=1, n=0)
       
         sx   = inv_ax * (Icliff(1,0,A)*cpa + Icliff(0,1,A)*spa)
-        sy   = Sy_int*ypb + Ireal(1,B)
+        sy   = Sy_int*ypb + Ireal(1,albe)
         sz   = Sz_int
-      
-        s    = sx * sy * sz
       
       case (13) ! | px    pz    ( 8 )
       
@@ -437,9 +413,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       
         sx   = inv_ax * (Icliff(1,0,A)*cpa + Icliff(0,1,A)*spa)
         sy   = Sy_int
-        sz   = Sz_int*zpb + Ireal(1,B)
-      
-        s    = sx * sy * sz
+        sz   = Sz_int*zpb + Ireal(1,albe)
       
       case (20) ! | py    s     ( 9 )
       
@@ -447,10 +421,8 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
         ! G2 (l=0, m=0, n=0)
       
         sx   = Sx_int
-        sy   = Sy_int*ypa + Ireal(1,B)
+        sy   = Sy_int*ypa + Ireal(1,albe)
         sz   = Sz_int
-      
-        s    = sx * sy * sz
       
       case (21) ! | py    px    ( 10 )
       
@@ -458,10 +430,8 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
         ! G2 (l=1, m=0, n=0)
       
         sx   = inv_ax * (Icliff(1,0,A)*cpb + Icliff(0,1,A)*spb)
-        sy   = Sy_int*ypa + Ireal(1,B)
+        sy   = Sy_int*ypa + Ireal(1,albe)
         sz   = Sz_int
-      
-        s    = sx * sy * sz
       
       case (22) ! | py    py    ( 11 )
       
@@ -469,10 +439,8 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
         ! G2 (l=0, m=1, n=0)
       
         sx   = Sx_int
-        sy   = Sy_int*ypa*ypb + Ireal(1,B)*ypa + Ireal(1,B)*ypb + Ireal(2,B)
+        sy   = Sy_int*ypa*ypb + Ireal(1,albe)*ypa + Ireal(1,albe)*ypb + Ireal(2,albe)
         sz   = Sz_int
-      
-        s    = sx * sy * sz
       
       case (23) ! | py    pz    ( 12 )
       
@@ -480,10 +448,8 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
         ! G2 (l=0, m=0, n=1)
       
         sx   = Sx_int
-        sy   = Sy_int*ypa + Ireal(1,B)
-        sz   = Sz_int*zpb + Ireal(1,B)
-      
-        s    = sx * sy * sz
+        sy   = Sy_int*ypa + Ireal(1,albe)
+        sz   = Sz_int*zpb + Ireal(1,albe)
       
       case (30) ! | pz    s     ( 13 )
       
@@ -492,9 +458,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       
         sx   = Sx_int
         sy   = Sy_int
-        sz   = Sz_int*zpa + Ireal(1,B)
-      
-        s    = sx * sy * sz
+        sz   = Sz_int*zpa + Ireal(1,albe)
       
       case (31) ! | pz    px    ( 14 )
       
@@ -503,9 +467,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       
         sx   = inv_ax * (Icliff(1,0,A)*cpb + Icliff(0,1,A)*spb)
         sy   = Sy_int
-        sz   = Sz_int*zpa + Ireal(1,B)
-      
-        s    = sx * sy * sz
+        sz   = Sz_int*zpa + Ireal(1,albe)
       
       case (32) ! | pz    py    ( 15 )
       
@@ -513,10 +475,8 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
         ! G2 (l=0, m=1, n=0)
       
         sx   = Sx_int
-        sy   = Sy_int*ypb + Ireal(1,B)
-        sz   = Sz_int*zpa + Ireal(1,B)
-      
-        s    = sx * sy * sz
+        sy   = Sy_int*ypb + Ireal(1,albe)
+        sz   = Sz_int*zpa + Ireal(1,albe)
       
       case (33) ! | pz    pz    ( 16 )
       
@@ -525,16 +485,15 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S_prime)
       
         sx   = Sx_int
         sy   = Sy_int
-        sz   = Sz_int*zpa*zpb + Ireal(1,B)*zpa + Ireal(1,B)*zpb + Ireal(2,B)
-      
-        s    = sx * sy * sz
+        sz   = Sz_int*zpa*zpb + Ireal(1,albe)*zpa + Ireal(1,albe)*zpb + Ireal(2,albe)
 
       case default
+
         s = 0.0d0
 
       end select
 
-        s_prime  =  s_prime + const * kx * ky * kz * s 
+        s  =  s + const * kx * ky * kz * sx * sy * sz
 
         end do 
       end do

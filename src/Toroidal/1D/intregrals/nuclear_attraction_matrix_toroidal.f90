@@ -374,7 +374,7 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
 
       double precision                 :: ax2 , inv_ax , inv_ax2 
       double precision                 :: px
-      double precision                 :: A , B
+      double precision                 :: A
       double precision                 :: xp
       double precision                 :: sda   , sdb
       double precision                 :: cda   , cdb
@@ -555,194 +555,161 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
       k_na_y = dexp(- albe * eta_t * ( yPC * yPC ) )
       k_na_z = dexp(- albe * eta_t * ( zPC * zPC ) )
 
-      B      = albept
-
       Iy_int = dsqrt(pi * inv_albept)
       Iz_int = dsqrt(pi * inv_albept)
 
       select case(pattern_id)
 
       case (00) ! | s     s     ( 1 )
-          
-      ! G1 (i=0, j=0, k=0)
-      ! G2 (l=0, m=0, n=0)
-          
-      Ix   = Ix_int
-      Iy   = Iy_int
-      Iz   = Iz_int
-          
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-          
+              
+        ! G1 (i=0, j=0, k=0)
+        ! G2 (l=0, m=0, n=0)
+              
+        Ix   = Ix_int
+        Iy   = Iy_int
+        Iz   = Iz_int
+              
       case (01) ! | s     px    ( 2 )
-    
-      ! G1 (i=0, j=0, k=0)
-      ! G2 (l=1, m=0, n=0)
-    
-      Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
-      Iy   = Iy_int
-      Iz   = Iz_int
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=0, k=0)
+        ! G2 (l=1, m=0, n=0)
+      
+        Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
+        Iy   = Iy_int
+        Iz   = Iz_int
+      
       case (02) ! | s     py    ( 3 )
-    
-      ! G1 (i=0, j=0, k=0)
-      ! G2 (l=0, m=1, n=0)
-    
-      Ix   = Ix_int
-      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,B)
-      Iz   = Iz_int
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=0, k=0)
+        ! G2 (l=0, m=1, n=0)
+      
+        Ix   = Ix_int
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,albept)
+        Iz   = Iz_int
+      
       case (03) ! | s     pz    ( 4 )
-    
-      ! G1 (i=0, j=0, k=0)
-      ! G2 (l=0, m=0, n=1)
-    
-      Ix   = Ix_int
-      Iy   = Iy_int
-      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,B)
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=0, k=0)
+        ! G2 (l=0, m=0, n=1)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,albept)
+      
       case (10) ! | px    s     ( 5 )
-    
-      ! G1 (i=1, j=0, k=0)
-      ! G2 (l=0, m=0, n=0)
-    
-      Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
-      Iy   = Iy_int
-      Iz   = Iz_int
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=1, j=0, k=0)
+        ! G2 (l=0, m=0, n=0)
+      
+        Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
+        Iy   = Iy_int
+        Iz   = Iz_int
+      
       case (11) ! | px    px    ( 6 )
-    
-      ! G1 (i=1, j=0, k=0)
-      ! G2 (l=1, m=0, n=0)
-    
-      Ix   = inv_ax2 * (Icliff(2,0,A)*cda*cdb + Icliff(1,1,A)*cda*sdb + Icliff(1,1,A)*cdb*sda + Icliff(0,2,A)*sda*sdb)
-      Iy   = Iy_int
-      Iz   = Iz_int
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=1, j=0, k=0)
+        ! G2 (l=1, m=0, n=0)
+      
+        Ix   = inv_ax2 * (Icliff(2,0,A)*cda*cdb + Icliff(1,1,A)*cda*sdb + Icliff(1,1,A)*cdb*sda + Icliff(0,2,A)*sda*sdb)
+        Iy   = Iy_int
+        Iz   = Iz_int
+      
       case (12) ! | px    py    ( 7 )
-    
-      ! G1 (i=1, j=0, k=0)
-      ! G2 (l=0, m=1, n=0)
-    
-      Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
-      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,B)
-      Iz   = Iz_int
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=1, j=0, k=0)
+        ! G2 (l=0, m=1, n=0)
+      
+        Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,albept)
+        Iz   = Iz_int
+      
       case (13) ! | px    pz    ( 8 )
-    
-      ! G1 (i=1, j=0, k=0)
-      ! G2 (l=0, m=0, n=1)
-    
-      Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
-      Iy   = Iy_int
-      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,B)
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=1, j=0, k=0)
+        ! G2 (l=0, m=0, n=1)
+      
+        Ix   = inv_ax * (Icliff(1,0,A)*cda + Icliff(0,1,A)*sda)
+        Iy   = Iy_int
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,albept)
+      
       case (20) ! | py    s     ( 9 )
-    
-      ! G1 (i=0, j=1, k=0)
-      ! G2 (l=0, m=0, n=0)
-    
-      Ix   = Ix_int
-      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,B)
-      Iz   = Iz_int
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=1, k=0)
+        ! G2 (l=0, m=0, n=0)
+      
+        Ix   = Ix_int
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,albept)
+        Iz   = Iz_int
+      
       case (21) ! | py    px    ( 10 )
-    
-      ! G1 (i=0, j=1, k=0)
-      ! G2 (l=1, m=0, n=0)
-    
-      Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
-      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,B)
-      Iz   = Iz_int
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=1, k=0)
+        ! G2 (l=1, m=0, n=0)
+      
+        Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,albept)
+        Iz   = Iz_int
+      
       case (22) ! | py    py    ( 11 )
-    
-      ! G1 (i=0, j=1, k=0)
-      ! G2 (l=0, m=1, n=0)
-    
-      Ix   = Ix_int
-      Iy   = Iy_int*eta_t * eta_t*ypc * ypc - Iy_int*eta_t*ypa*ypc - Iy_int*eta_t*ypb*ypc - Ireal(1,B)*2*eta_t*ypc + Iy_int*ypa*ypb + Ireal(1,B)*ypa + Ireal(1,B)*ypb + Ireal(2,B)
-      Iz   = Iz_int
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=1, k=0)
+        ! G2 (l=0, m=1, n=0)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int*eta_t**2*ypc**2 - Iy_int*eta_t*ypa*ypc - Iy_int*eta_t*ypb*ypc - Ireal(1,albept)*2*eta_t*ypc + Iy_int*ypa*ypb + Ireal(1,albept)*ypa + Ireal(1,albept)*ypb + Ireal(2,albept)
+        Iz   = Iz_int
+      
       case (23) ! | py    pz    ( 12 )
-    
-      ! G1 (i=0, j=1, k=0)
-      ! G2 (l=0, m=0, n=1)
-    
-      Ix   = Ix_int
-      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,B)
-      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,B)
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=1, k=0)
+        ! G2 (l=0, m=0, n=1)
+      
+        Ix   = Ix_int
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypa + Ireal(1,albept)
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpb + Ireal(1,albept)
+      
       case (30) ! | pz    s     ( 13 )
-    
-      ! G1 (i=0, j=0, k=1)
-      ! G2 (l=0, m=0, n=0)
-    
-      Ix   = Ix_int
-      Iy   = Iy_int
-      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,B)
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=0, k=1)
+        ! G2 (l=0, m=0, n=0)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,albept)
+      
       case (31) ! | pz    px    ( 14 )
-    
-      ! G1 (i=0, j=0, k=1)
-      ! G2 (l=1, m=0, n=0)
-    
-      Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
-      Iy   = Iy_int
-      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,B)
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-    
+      
+        ! G1 (i=0, j=0, k=1)
+        ! G2 (l=1, m=0, n=0)
+      
+        Ix   = inv_ax * (Icliff(1,0,A)*cdb + Icliff(0,1,A)*sdb)
+        Iy   = Iy_int
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,albept)
+      
       case (32) ! | pz    py    ( 15 )
-    
-      ! G1 (i=0, j=0, k=1)
-      ! G2 (l=0, m=1, n=0)
-    
-      Ix   = Ix_int
-      Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,B)
-      Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,B)
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
-
+      
+        ! G1 (i=0, j=0, k=1)
+        ! G2 (l=0, m=1, n=0)
+      
+        Ix   = Ix_int
+        Iy   = -Iy_int*eta_t*ypc + Iy_int*ypb + Ireal(1,albept)
+        Iz   = -Iz_int*eta_t*zpc + Iz_int*zpa + Ireal(1,albept)
+      
       case (33) ! | pz    pz    ( 16 )
-    
-      ! G1 (i=0, j=0, k=1)
-      ! G2 (l=0, m=0, n=1)
-    
-      Ix   = Ix_int
-      Iy   = Iy_int
-      Iz   = Iz_int*eta_t * eta_t*zpc * zpc - Iz_int*eta_t*zpa*zpc - Iz_int*eta_t*zpb*zpc - Ireal(1,B)*2*eta_t*zpc + Iz_int*zpa*zpb + Ireal(1,B)*zpa + Ireal(1,B)*zpb + Ireal(2,B)
-    
-      I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
+      
+        ! G1 (i=0, j=0, k=1)
+        ! G2 (l=0, m=0, n=1)
+      
+        Ix   = Ix_int
+        Iy   = Iy_int
+        Iz   = Iz_int*eta_t**2*zpc**2 - Iz_int*eta_t*zpa*zpc - Iz_int*eta_t*zpb*zpc - Ireal(1,albept)*2*eta_t*zpc + Iz_int*zpa*zpb + Ireal(1,albept)*zpa + Ireal(1,albept)*zpb + Ireal(2,albept)
 
       case default
-
         I_t = 0.0d0
 
       end select
+
+        I_t  = Ix * Iy * Iz * k_na_x * k_na_y * k_na_z
 
       !-----------------------------------------------------------------!
 
@@ -776,11 +743,19 @@ double precision function Icliff(n,m,A)
             Icliff = Lx * iv_scaled(1, A)
         case (02)  
             Icliff = Lx * (iv_scaled(1, A) + A * iv_scaled(2, A)) / A 
+        case (03)  
+            Icliff = Lx * (3.d0 * iv_scaled(2, A) / A + iv_scaled(3, A)) 
+        case (04)  
+            Icliff = Lx * ( (3.d0 + A * A ) * iv_scaled(2, A) ) / ( A * A ) 
         case (10)  
             Icliff = 0.d0 
         case (11)  
             Icliff = 0.d0 
         case (12)  
+            Icliff = 0.d0
+        case (13)  
+            Icliff = 0.d0
+        case (14)  
             Icliff = 0.d0
         case (20)  
             Icliff = Lx * iv_scaled(1, A) / A
@@ -788,6 +763,30 @@ double precision function Icliff(n,m,A)
             Icliff = Lx * iv_scaled(2, A) / A
         case (22)  
             Icliff = Lx * (A * iv_scaled(1, A) - 3.d0 * iv_scaled(2, A) ) / ( A * A )
+        case (23)  
+            Icliff = Lx * (A * iv_scaled(2, A) - 3.d0 * iv_scaled(3, A) ) / ( A * A )
+        case (24)  
+            Icliff = Lx * ( (15.d0 + A * A ) * iv_scaled(3, A) - 2 * A * iv_scaled(2, A) ) / ( A * A * A ) 
+        case (30)  
+            Icliff = 0.d0 
+        case (31)  
+            Icliff = 0.d0
+        case (32)  
+            Icliff = 0.d0
+        case (33)  
+            Icliff = 0.d0
+        case (34)  
+            Icliff = 0.d0
+        case (40)  
+            Icliff = 3.d0 * Lx * iv_scaled(2, A) / ( A * A )
+        case (41)  
+            Icliff = 3.d0 * Lx * iv_scaled(3, A) / ( A * A )
+        case (42)  
+            Icliff = 3.d0 * Lx * ( (20.d0 + A * A ) * iv_scaled(2, A) - 5.d0 * A * iv_scaled(1, A)  ) / ( A * A * A * A )
+        case (43)  
+            Icliff = 3.d0 * Lx * ( (30.d0 + A * A ) * iv_scaled(3, A) - 5.d0 * A * iv_scaled(2, A)  ) / ( A * A * A * A )
+        case (44)  
+            Icliff = 3.d0 * Lx * ( A * (35.d0 + A * A ) * iv_scaled(2, A) - 10.d0 * ( 21.d0 + A * A ) * iv_scaled(3, A)  ) / ( A * A * A * A * A )
 
         case default
             Icliff = 0.d0
