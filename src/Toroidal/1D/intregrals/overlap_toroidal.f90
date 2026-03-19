@@ -138,6 +138,7 @@ subroutine overlap_matrix_toroidal_n(number_of_atoms,number_of_functions,atoms,A
       use atom_basis
       use torus_init
       use classification_ERI
+      use keywords
 
       implicit none 
 
@@ -223,6 +224,25 @@ subroutine overlap_matrix_toroidal_n(number_of_atoms,number_of_functions,atoms,A
          overlap(j,i) = overlap(i,j)
        end do 
       end do
+
+      if (c_OV) then 
+        write(outfile,'(a)') ""
+        write(outfile,'(a)') "------------------"
+        write(outfile,'(a)') "The overlap matrix"
+        write(outfile,'(a)') "------------------"
+        write(outfile,'(a)') ""
+        do i = 1 , number_of_functions - 1 
+          do j = i , number_of_functions
+            write(outfile,'(i3,i3, 6x,1000(f16.12,2x))') i , j, overlap(i,j)
+          end do
+        end do 
+      end if 
+      
+
+
+
+
+
 
 end subroutine overlap_matrix_toroidal_n
 

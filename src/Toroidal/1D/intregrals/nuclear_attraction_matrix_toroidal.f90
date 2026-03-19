@@ -180,6 +180,7 @@ subroutine nuclear_attraction_matrix_toroidal_1D_n(number_of_atoms,number_of_fun
       use torus_init
       use classification_ERI
       use omp_lib
+      use keywords
 
       implicit none 
 
@@ -330,6 +331,19 @@ subroutine nuclear_attraction_matrix_toroidal_1D_n(number_of_atoms,number_of_fun
          NA(j,i) = NA(i,j)
        end do 
       end do
+
+      if (c_NA) then 
+        write(outfile,'(a)') ""
+        write(outfile,'(a)') "------------------"
+        write(outfile,'(a)') "The nuclear attraction matrix"
+        write(outfile,'(a)') "------------------"
+        write(outfile,'(a)') ""
+        do i = 1 , number_of_functions - 1 
+          do j = i , number_of_functions
+            write(outfile,'(i3,i3, 6x,1000(f16.12,2x))') i , j, NA(i,j)
+          end do
+        end do 
+      end if 
 
 end subroutine nuclear_attraction_matrix_toroidal_1D_n
 
