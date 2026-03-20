@@ -752,15 +752,18 @@ double precision function Icliff(n,m,A)
 
       select case (nm)
         case (00)  
-            Icliff = Lx * iv_scaled(0, A)  ! This should be the integral of the Clifford function for s-s
+            Icliff = Lx * iv_scaled(0, A) 
         case (01)  
             Icliff = Lx * iv_scaled(1, A)
         case (02)  
-            Icliff = Lx * (iv_scaled(1, A) + A * iv_scaled(2, A)) / A 
+          !Icliff = Lx * (iv_scaled(1, A) + A * iv_scaled(2, A) ) / A 
+          Icliff = Lx *  0.5d0 * ( iv_scaled(0, A) + iv_scaled(2, A) )
         case (03)  
-            Icliff = Lx * (3.d0 * iv_scaled(2, A) / A + iv_scaled(3, A)) 
+            !Icliff = Lx * (3.d0 * iv_scaled(2, A) / A + iv_scaled(3, A)) 
+          Icliff = Lx * (0.75d0 * iv_scaled(1, A) + 0.25d0 * iv_scaled(3, A))
         case (04)  
-            Icliff = Lx * ( (3.d0 + A * A ) * iv_scaled(2, A) ) / ( A * A ) 
+            !Icliff = Lx * ( (3.d0 + A * A ) * iv_scaled(2, A) ) / ( A * A ) 
+          Icliff = Lx * (0.375d0 * iv_scaled(0, A) + 0.5d0 * iv_scaled(2, A) + 0.125d0 * iv_scaled(4, A))
         case (10)  
             Icliff = 0.d0 
         case (11)  
@@ -772,13 +775,16 @@ double precision function Icliff(n,m,A)
         case (14)  
             Icliff = 0.d0
         case (20)  
-            Icliff = Lx * iv_scaled(1, A) / A
+            Icliff = Lx * 0.5d0 * ( iv_scaled(0, A) - iv_scaled(2, A) )
         case (21)  
-            Icliff = Lx * iv_scaled(2, A) / A
+            !Icliff = Lx * iv_scaled(2, A) / A
+          Icliff = Lx * 0.25d0 * (iv_scaled(1, A) - iv_scaled(3, A))
         case (22)  
-            Icliff = Lx * (A * iv_scaled(1, A) - 3.d0 * iv_scaled(2, A) ) / ( A * A )
+            !Icliff = Lx * (A * iv_scaled(1, A) - 3.d0 * iv_scaled(2, A) ) / ( A * A )
+          Icliff = Lx * 0.125d0 * (iv_scaled(0, A) - iv_scaled(4, A))
         case (23)  
-            Icliff = Lx * (A * iv_scaled(2, A) - 3.d0 * iv_scaled(3, A) ) / ( A * A )
+            !Icliff = Lx * (A * iv_scaled(2, A) - 3.d0 * iv_scaled(3, A) ) / ( A * A )
+          Icliff = Lx * (0.125d0 * iv_scaled(1, A) - 0.0625d0 * iv_scaled(3, A) - 0.0625d0 * iv_scaled(5, A))
         case (24)  
             Icliff = Lx * ( (15.d0 + A * A ) * iv_scaled(3, A) - 2 * A * iv_scaled(2, A) ) / ( A * A * A ) 
         case (30)  
@@ -787,7 +793,7 @@ double precision function Icliff(n,m,A)
             Icliff = 0.d0
         case (32)  
             Icliff = 0.d0
-        case (33)  
+        case (33)
             Icliff = 0.d0
         case (34)  
             Icliff = 0.d0
