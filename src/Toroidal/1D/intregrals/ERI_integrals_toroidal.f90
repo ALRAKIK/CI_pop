@@ -73,7 +73,6 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
 
           call bary_center_toroidal_x(alpha,beta,xa,xb,xp)
 
-
           !   Real Gaussian   !
       
           albe                = alpha + beta 
@@ -124,8 +123,8 @@ subroutine ERI_integral_4_function_toroidal(one,two,three,four,value)
               if ( dabs(test) <= 2.22d-16 ) cycle
 
                 call integrate_ERI_sum(pattern_id,albe,gade,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq&
-                &                                                                    ,ya,yb,yc,yd,yp,yq&
-                &                                                                    ,za,zb,zc,zd,zp,zq,value_s)
+                &                                                                        ,ya,yb,yc,yd,yp,yq&
+                &                                                                        ,za,zb,zc,zd,zp,zq,value_s)
                 value  = value    + test * value_s
 
               !call integrate_ERI_integral(pattern_id,px_count,mu,nu,mu_x,nu_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc,xd,xp,xq,value_s)

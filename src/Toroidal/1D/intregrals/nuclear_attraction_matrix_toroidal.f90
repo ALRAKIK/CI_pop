@@ -549,6 +549,7 @@ subroutine nuclear_attraction_integral_toroidal_1D(pattern_id,n_atoms,geometry,a
       ! Clifford ! 
 
       call bary_exponent_x(px,t2,xpc,dx)
+      call bary_center_toroidal_x(px,t2,xp,xc,xd)
 
       dx = 2.d0 * dx  * inv_ax2
 
@@ -756,11 +757,12 @@ double precision function Icliff(n,m,A)
         case (01)  
             Icliff = Lx * iv_scaled(1, A)
         case (02)  
-            Icliff = Lx * 0.5d0 * ( iv_scaled(0, A) + iv_scaled(2, A) )
+            Icliff = Lx * ( 0.50d0 * ( iv_scaled(0, A) - iv_scaled(2, A) ) + iv_scaled(2, A) )
         case (03)  
-            Icliff = Lx * ( 0.75d0 * iv_scaled(1, A) + iv_scaled(3, A) )
+            Icliff = Lx * ( 0.75d0 * ( iv_scaled(1, A) - iv_scaled(3, A) ) + iv_scaled(3, A) )
         case (04)
-            Icliff = Lx *  (3.d0 + A * A ) * 0.25d0 * ( 0.5d0 * ( iv_scaled(0, A) - iv_scaled(2, A) ) - 0.1666666d0 *  (iv_scaled(2, A) - iv_scaled(4, A)) ) 
+            Icliff = Lx * (3.d0 + A * A ) *  0.25d0 * ( 0.50d0 * ( iv_scaled(0, A) - iv_scaled(2, A) ) - 0.166666d0 * ( iv_scaled(2, A) - iv_scaled(4, A) ) )
+            
         case (10)  
             Icliff = 0.d0 
         case (11)  
@@ -771,16 +773,18 @@ double precision function Icliff(n,m,A)
             Icliff = 0.d0
         case (14)  
             Icliff = 0.d0
+
         case (20)  
-            Icliff = Lx * 0.5d0     * ( iv_scaled(0, A) - iv_scaled(2, A) )
+            Icliff = Lx * 0.50000d0 * ( iv_scaled(0, A) - iv_scaled(2, A) )
         case (21)  
-            Icliff = Lx * 0.25d0    * ( iv_scaled(1, A) - iv_scaled(3, A) )
+            Icliff = Lx * 0.25000d0 * ( iv_scaled(1, A) - iv_scaled(3, A) )
         case (22)  
-            Icliff = Lx * 0.125d0   * ( iv_scaled(0, A) - iv_scaled(4, A) )
+            Icliff = Lx * ( 0.5d0 *  ( iv_scaled(0, A) - iv_scaled(2, A) )  - 0.75d0 * ( 0.5d0 * ( iv_scaled(0, A) - iv_scaled(2, A) ) - 0.166666d0 * ( iv_scaled(2, A) - iv_scaled(4, A) ) ) )            
         case (23)  
-            Icliff = Lx * 0.0625d0  * ( 2.d0 * iv_scaled(1, A) - iv_scaled(3, A) - iv_scaled(5, A) )
+            Icliff = Lx * 0.06250d0 * ( 2.d0 * iv_scaled(1, A) - iv_scaled(3, A) - iv_scaled(5, A) )
         case (24)  
             Icliff = Lx * 0.03125d0 * ( 2.d0 * iv_scaled(0, A) + iv_scaled(2, A) - 2.d0 * iv_scaled(4, A) - iv_scaled(6, A) )
+
         case (30)  
             Icliff = 0.d0 
         case (31)  
