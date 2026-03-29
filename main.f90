@@ -84,7 +84,7 @@ program CI
       c_NA       = any(keyword == 'NA'       )
       c_ERI      = any(keyword == 'ERI'      )
       c_One      = any(keyword == 'One'      )
-
+      c_Orbitals = any(keyword == 'Orbitals' )
 
       ! --------------------------------------------------------------- !
       ! *************************************************************** !

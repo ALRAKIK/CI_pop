@@ -1,10 +1,17 @@
 subroutine print_orbital_table(ERI, number_of_functions)
+      
       use files
       use classification_ERI
+      use keywords
+
       implicit none
+
       type(ERI_function)  :: ERI(number_of_functions)
       integer, intent(in) :: number_of_functions
       integer             :: i, j
+
+      ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
+
       call header_under("Atomic Orbitals", -1)
       ! Print header
       write(outfile,'(A)') "|-----------------------------------------------------------------------------------------|"
@@ -19,4 +26,14 @@ subroutine print_orbital_table(ERI, number_of_functions)
       end do
       write(outfile,'(A)') ""
       FLUSH(outfile)
+
+      ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
+
+      !if (c_Orbitals) then 
+
+      !  write(orbfile,*) 
+
+      !end if
+
+
 end subroutine print_orbital_table

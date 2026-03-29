@@ -12,6 +12,6 @@ module keywords
       logical :: c_read, c_Integral, c_trexio
       logical :: c_Angstrom, c_plot, c_details
       logical :: c_MO      , c_UHF , c_Huckel
-      logical :: c_MP2
+      logical :: c_MP2     , c_Orbitals
 
 end module keywords

@@ -399,6 +399,8 @@ subroutine read_keywords(keyword)
 
         if (trim(line) == 'One'      )   keyword(15) = 'One'
 
+        if (trim(line) == 'Orbitals' )   keyword(16) = 'Orbitals'
+
 
 
 

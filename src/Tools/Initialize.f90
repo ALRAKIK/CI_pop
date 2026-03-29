@@ -28,6 +28,10 @@ subroutine initialize_ff(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
       call system(command)
       write(output_file_name,'(A,A,A,A,A,I0,A)') "results_",trim(calculation_type),"_",trim(label),"_",n_atoms,".out"
       open (outfile,file=trim(output_file_name))
+      write(orb_file_name,'(A)') "orb.CI"
+      open (orbfile,file=trim(orb_file_name))
+
+
 
       ! --------------------------------------------------------------- !
 
