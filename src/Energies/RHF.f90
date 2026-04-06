@@ -152,6 +152,7 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       "|","#","|","      HF energy  ","|", "    Conv   ","|","   HL Gap  ","|", "    T contribution  ",&
       "|","   V contribution   ","|","   Two contribution ","|"
       write(outfile,*) repeat('-', 110)
+      flush(outfile)
       
       do while(nSCF < maxSCF)
   
@@ -327,6 +328,7 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       write(outfile,"(1x,a1,i2,1x,a1,f16.8,1x,a1,f10.6,1x,a1,f10.6,1x,a1,f16.8,4x,a1,f16.8,4x,a1,f16.8,4x,a1)")      & 
       "|",nSCF,"|",EHF+ENuc,"|",Conv,"|",Gap,"|",ET,"|",EV,"|",EJ+EK,"|"
       write(outfile,*) repeat('-', 110)
+      flush(outfile)
       
       enddo
 

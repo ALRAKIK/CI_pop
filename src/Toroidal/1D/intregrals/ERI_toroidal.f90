@@ -38,6 +38,10 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       integer                        :: num_threads, optimal_chunk_size
       !-----------------------------------------------------------------!
 
+      integer                        :: current_pct 
+      integer                        :: last_pct = -1
+      double precision               :: integrals_done = 0.d0
+      
       !-----------------------------------------------------------------!
 
       !                   Precompute Bessel functions                   !
@@ -130,6 +134,15 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       write(outfile,*) ''
       flush(outfile)
 
+      
+
+      ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
+
+      ! tracking variables for progress reporting ! 
+
+      ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
+
+
       !$omp parallel do private(ij_index,i,j,k,l) &
       !$omp shared(two_electron, ERI, i_index, j_index) &
       !$omp schedule(dynamic,optimal_chunk_size)
@@ -144,12 +157,31 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
               call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))
 
+              !$omp critical
+              integrals_done = integrals_done + 1.d0
+              current_pct = int((integrals_done * 100.0d0) / num_total_int)
+              if (current_pct > last_pct .and. mod(current_pct, 5) == 0) then
+                  write(*,'(I3,"% done")', advance='no') current_pct
+                  write(*,'(A)') repeat(char(8), 10)
+                  flush(6)
+                  last_pct = current_pct
+              endif
+              !$omp end critical
+
             end if
           end do
         end do
+
       end do
       
-      !$omp end parallel do      
+      !$omp end parallel do
+
+      write(*,'(a)') ""
+      write(*,'(a)') "*************************************************"
+      write(*,'(a)') "* Two-electron integrals calculation completed  *"
+      write(*,'(a)') "*************************************************"
+      flush(6)
+      write(*,'(a)') ""
 
       deallocate(i_index, j_index)
 

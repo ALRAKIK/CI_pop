@@ -35,6 +35,12 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       integer                        :: num_threads, optimal_chunk_size
       !-----------------------------------------------------------------!
 
+      integer                        :: current_pct 
+      integer                        :: last_pct = -1
+      double precision               :: integrals_done = 0.d0
+
+      !-----------------------------------------------------------------!
+
       call initialize_bessel_table_64_Lx()
       call initialize_bessel_table_64_Ly()
       call initialize_bessel_table_64_Lz()
@@ -142,12 +148,30 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
               call ERI_integral_4_function_toroidal_3D(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))
 
+              !$omp critical
+              integrals_done = integrals_done + 1.d0
+              current_pct = int((integrals_done * 100.0d0) / num_total_int)
+              if (current_pct > last_pct .and. mod(current_pct, 5) == 0) then
+                  write(*,'(I3,"% done")', advance='no') current_pct
+                  write(*,'(A)') repeat(char(8), 10)
+                  flush(6)
+                  last_pct = current_pct
+              endif
+              !$omp end critical
+
             end if
           end do
         end do
       end do
       
       !$omp end parallel do
+
+      write(*,'(a)') ""
+      write(*,'(a)') "*************************************************"
+      write(*,'(a)') "* Two-electron integrals calculation completed  *"
+      write(*,'(a)') "*************************************************"
+      flush(6)
+      write(*,'(a)') ""
 
 
       deallocate(i_index, j_index)
