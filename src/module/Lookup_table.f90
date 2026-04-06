@@ -2,23 +2,23 @@ module table_lookup_module
       implicit none
       
       ! Grid parameters
-      integer :: n_points
-      double precision :: A_min, A_max
-      double precision :: log_min, log_max, log_step
+      integer                     :: n_points
+      double precision            :: A_min, A_max
+      double precision            :: log_min, log_max, log_step
       double precision, parameter :: pi = 3.14159265358979323846d0
-      integer, parameter :: n_phi = 20
+      integer, parameter          :: n_phi = 20
       
       ! 4D lookup table (allocatable for flexibility)
-      integer, allocatable :: Nmax_table(:,:,:,:)
-      logical :: table_loaded = .false.
+      integer, allocatable        :: Nmax_table(:,:,:,:)
+      logical                     :: table_loaded = .false.
       
 contains
 
       subroutine load_table(filename)
             character(len=*), intent(in) :: filename
-            integer :: file_unit, ios
-            integer :: i, j, k, l, Nmax_val
-            real :: start_time, end_time
+            integer                      :: file_unit, ios
+            integer                      :: i, j, k, l, Nmax_val
+            real                         :: start_time, end_time
             
             if (table_loaded) then
                   print*, 'Table already loaded!'

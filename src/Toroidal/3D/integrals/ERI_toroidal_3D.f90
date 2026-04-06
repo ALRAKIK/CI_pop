@@ -6,6 +6,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       use torus_init
       use atom_basis
       use classification_ERI
+      use precomputed_bessel
 
       implicit none 
 
@@ -34,6 +35,9 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       integer                        :: num_threads, optimal_chunk_size
       !-----------------------------------------------------------------!
 
+      call initialize_bessel_table_64_Lx()
+      call initialize_bessel_table_64_Ly()
+      call initialize_bessel_table_64_Lz()
       
       !-----------------------------------------------------------------!
 

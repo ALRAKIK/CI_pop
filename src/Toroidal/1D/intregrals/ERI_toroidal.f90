@@ -7,6 +7,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       use atom_basis
       use classification_ERI
       use unitcell_module
+      use precomputed_bessel
 
       implicit none 
 
@@ -38,6 +39,13 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       !-----------------------------------------------------------------!
 
       !-----------------------------------------------------------------!
+
+      !                   Precompute Bessel functions                   !
+
+      call initialize_bessel_table_64_Lx()
+
+      !-----------------------------------------------------------------!
+
 
       ! functions_per_unitcell ! 
 

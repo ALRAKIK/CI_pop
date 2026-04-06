@@ -41,7 +41,6 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx
       write(outfile,*) ""
 
-
       call cpu_time(start)
 
         call overlap_matrix_toroidal_n(n_atoms,number_of_functions,atoms,AO,OV)

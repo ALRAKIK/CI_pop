@@ -8,6 +8,7 @@ program CI
       use trexio
       use keywords
       use table_lookup_module
+      use table_1d_lookup
 
       implicit none
 
@@ -90,6 +91,7 @@ program CI
       ! *************************************************************** !
 
       call load_table('table.bin')
+      call load_table_1d('table_1D.bin')
 
       if (c_UHF) then 
         n_alpha = 0 
