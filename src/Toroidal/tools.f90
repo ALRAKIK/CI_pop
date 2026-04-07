@@ -332,6 +332,7 @@ end subroutine
 subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
 
       use unitcell_module
+      use omp_lib
 
       implicit none 
 
@@ -346,6 +347,12 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
 
       double precision             :: eri_tmp(fpuc, nf, nf, nf)
       double precision,intent(out) ::     eri(nf, nf, nf, nf)
+      double precision             :: val 
+
+      ! ----------------------    Time     ---------------------------- !
+      integer                        :: days, hours, minutes, seconds , time 
+      double precision               :: start,end
+      !-----------------------------------------------------------------!
 
 
       !-----------------------------------------------------------------!
@@ -353,6 +360,8 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
       eri(:,:,:,:) = 0.d0
     
       ! First, copy what you already computed (first index up to fpuc)
+
+      call cpu_time(start)
 
       do i = 1, fpuc
         do j = 1, nf
@@ -364,21 +373,50 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
         end do
       end do
 
+      call cpu_time(end)
+
+      time = int(end - start)
+      days = (time/86400)
+      hours=mod(time,86400)/3600
+      minutes=mod(mod(time,86400),3600)/60
+      seconds=mod(mod(mod(time,86400),3600),60)
+
+      write(*,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'CPU time for The first loop of The Translational and 8 fold symmetry = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
+
+      call cpu_time(start)
+
+      !$OMP PARALLEL DO PRIVATE(i,j,k,l,val) SCHEDULE(static)
       do i = 1, nf
-        do j = 1, nf
+        do j = i, nf
           do k = 1, nf
-            do l = 1, nf
-              eri(i,j,l,k) = eri(i,j,k,l)
-              eri(j,i,k,l) = eri(i,j,k,l)
-              eri(j,i,l,k) = eri(i,j,k,l)
-              eri(k,l,i,j) = eri(i,j,k,l)
-              eri(k,l,j,i) = eri(i,j,k,l)
-              eri(l,k,i,j) = eri(i,j,k,l)
-              eri(l,k,j,i) = eri(i,j,k,l)
+            do l = k, nf
+              val = eri(i,j,k,l)
+              if (val /= 0.d0) then
+                eri(i,j,l,k) = val
+                eri(j,i,k,l) = val
+                eri(j,i,l,k) = val
+                eri(k,l,i,j) = val
+                eri(k,l,j,i) = val
+                eri(l,k,i,j) = val
+                eri(l,k,j,i) = val
+              end if
             end do
           end do
         end do
       end do
+      !$OMP END PARALLEL DO
+
+      call cpu_time(end)
+
+      time = int(end - start)
+      days = (time/86400)
+      hours=mod(time,86400)/3600
+      minutes=mod(mod(time,86400),3600)/60
+      seconds=mod(mod(mod(time,86400),3600),60)
+
+      write(*,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'CPU time for The second loop of The Translational and 8 fold symmetry = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
+
+      call cpu_time(start)
 
       ! Now fill the rest using symmetry
     
@@ -432,10 +470,22 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
                   equiv_l <= nf) then
                   eri(i,j,k,l) = eri(func_i, equiv_j, equiv_k, equiv_l)
               endif
+
             end do
           end do
         end do
       end do
+
+      call cpu_time(end)
+
+      time = int(end - start)
+      days = (time/86400)
+      hours=mod(time,86400)/3600
+      minutes=mod(mod(time,86400),3600)/60
+      seconds=mod(mod(mod(time,86400),3600),60)
+
+      write(*,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'CPU time for The Third loop of The Translational and 8 fold symmetry = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
+
 
       !-----------------------------------------------------------------!
 
@@ -463,4 +513,114 @@ subroutine find_cell_and_function(index, fpuc, i_cell, j_cell, k_cell, func_inde
       j_cell = mod(temp, ny) 
       i_cell = temp / ny
   
-end subroutine
+end subroutine find_cell_and_function
+
+      !-----------------------------------------------------------------!
+      !-----------------------------------------------------------------!
+
+
+subroutine symmetry_of_integrals_ERI_mod(nf, fpuc, eri_tmp, eri)
+
+      use unitcell_module
+      use omp_lib
+
+      implicit none 
+
+      integer                      :: i, j, k, l
+      integer                      :: nf, fpuc
+      integer                      :: func_i
+      integer                      :: idx, ii, m, n, p
+      double precision             :: eri_tmp(fpuc, nf, nf, nf)
+      double precision,intent(out) ::     eri(nf, nf, nf, nf)
+      double precision             :: val 
+
+      ! Precomputation arrays
+      integer                      :: icell(nf), jcell(nf), kcell(nf), func_idx(nf)
+      integer                      :: equiv(nf, nf)
+      integer                      :: eqv(nf)
+      integer                      :: el , ek
+      
+      ! Timing
+
+      double precision             :: wstart, wend
+
+
+      !-----------------------------------------------------------------!
+
+      eri(:,:,:,:) = 0.d0
+      
+      ! Precompute cell and function indices
+      do idx = 1, nf
+        func_idx(idx) = mod(idx - 1, fpuc) + 1
+        ii = (idx - 1) / fpuc
+        kcell(idx) = mod(ii, nz)
+        ii = ii / nz
+        jcell(idx) = mod(ii, ny)
+        icell(idx) = ii / ny
+      end do
+    
+      ! Copy computed integrals (first index up to fpuc)
+      do i = 1, fpuc
+        do j = 1, nf
+          do k = 1, nf
+            do l = 1, nf
+              if (dabs(eri_tmp(i,j,k,l)) > 1.d-12) eri(i,j,k,l) = eri_tmp(i,j,k,l)
+            end do
+          end do
+        end do
+      end do
+
+      ! Precompute equivalence mapping table
+      do i = 1, nf
+        do j = 1, nf
+          m = modulo(icell(j) - icell(i), nx)
+          n = modulo(jcell(j) - jcell(i), ny)
+          p = modulo(kcell(j) - kcell(i), nz)
+          equiv(i,j) = m * ny * nz * fpuc + n * nz * fpuc + p * fpuc + func_idx(j)
+        end do
+      end do
+
+      ! 8-fold symmetry expansion (keep as is)
+      !$OMP PARALLEL DO PRIVATE(i,j,k,l,val) SCHEDULE(static)
+      do i = 1, nf
+        do j = i, nf
+          do k = 1, nf
+            do l = k, nf
+              val = eri(i,j,k,l)
+              if (val /= 0.d0) then
+                eri(i,j,l,k) = val
+                eri(j,i,k,l) = val
+                eri(j,i,l,k) = val
+                eri(k,l,i,j) = val
+                eri(k,l,j,i) = val
+                eri(l,k,i,j) = val
+                eri(l,k,j,i) = val
+              end if
+            end do
+          end do
+        end do
+      end do
+      !$OMP END PARALLEL DO
+
+      !$OMP PARALLEL DO PRIVATE(i,func_i,eqv,l,el,k,ek,j) SCHEDULE(static)
+      do i = fpuc + 1, nf
+        func_i = func_idx(i)
+        ! Copy equiv for this i into local array
+        do j = 1, nf
+          eqv(j) = equiv(i, j)
+        end do
+        do l = 1, nf
+          el = eqv(l)
+          do k = 1, nf
+            ek = eqv(k)
+            ! Innermost loop over j (contiguous stride 1)
+            do j = 1, nf
+              eri(i, j, k, l) = eri(func_i, eqv(j), ek, el)
+            end do
+          end do
+        end do
+      end do
+      !$OMP END PARALLEL DO
+      !-----------------------------------------------------------------!
+
+end subroutine symmetry_of_integrals_ERI_mod

@@ -154,8 +154,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
               integrals_done = integrals_done + 1.d0
               current_pct = int((integrals_done * 100.0d0) / num_total_int)
               if (current_pct > last_pct .and. mod(current_pct, 5) == 0) then
-                  write(*,'(I3,"% done")', advance='no') current_pct
-                  write(*,'(A)') repeat(char(8), 10)
+                  write(*,'(I3,"% done")') current_pct
                   flush(6)
                   last_pct = current_pct
               endif
@@ -195,7 +194,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 
       call cpu_time(start)
-        call symmetry_of_integrals_ERI(number_of_functions,fpuc,two_electron,two_electron_integrals)
+        call symmetry_of_integrals_ERI_mod(number_of_functions,fpuc,two_electron,two_electron_integrals)
       call cpu_time(end)
 
       time = int(end - start)
