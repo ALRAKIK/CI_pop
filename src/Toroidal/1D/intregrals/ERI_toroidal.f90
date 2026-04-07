@@ -134,14 +134,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       write(outfile,*) ''
       flush(outfile)
 
-      
-
       ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
-
-      ! tracking variables for progress reporting ! 
-
-      ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
-
 
       !$omp parallel do private(ij_index,i,j,k,l) &
       !$omp shared(two_electron, ERI, i_index, j_index) &
