@@ -27,6 +27,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       ! --------------------------------------------------------------- !
       
       double precision,intent(out)   :: two_electron_integrals(number_of_functions,number_of_functions,number_of_functions,number_of_functions)
+      double precision               :: slice(number_of_functions, number_of_functions)
 
       ! ----------------------    Time     ---------------------------- !
       integer                        :: days, hours, minutes, seconds , t , time 
@@ -41,6 +42,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       integer                        :: current_pct 
       integer                        :: last_pct = -1
       double precision               :: integrals_done = 0.d0
+      double precision               :: tmp
       
       !-----------------------------------------------------------------!
 
@@ -148,7 +150,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
             if (i <= k .or. (i == k .and. j <= l)) then
 
-              call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))
+              call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))    ! chemist notation
 
               !$omp critical
               integrals_done = integrals_done + 1.d0

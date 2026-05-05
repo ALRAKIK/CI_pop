@@ -9,6 +9,7 @@ subroutine get_charge(number_of_atoms,type,charge)
       
 
       do i = 1 , number_of_atoms
+        if (type(i) == "GO") charge(i) = 0
         if (type(i) == "H" ) charge(i) = 1
         if (type(i) == "He") charge(i) = 2
         if (type(i) == "Li") charge(i) = 3
@@ -45,7 +46,6 @@ subroutine get_charge(number_of_atoms,type,charge)
         if (type(i) == "Se") charge(i) = 34
         if (type(i) == "Br") charge(i) = 35
         if (type(i) == "Kr") charge(i) = 36
-        if (type(i) == "GO") charge(i) = 0
     end do
 
 

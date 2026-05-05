@@ -486,7 +486,6 @@ subroutine symmetry_of_integrals_ERI(nf, fpuc, eri_tmp, eri)
 
       write(*,'(A65,5X,I0,a,I0,a,I0,a,I0,4x,a)') 'CPU time for The Third loop of The Translational and 8 fold symmetry = ',days,":",hours,":",minutes,":",seconds, "days:hour:min:sec"
 
-
       !-----------------------------------------------------------------!
 
 end subroutine symmetry_of_integrals_ERI
@@ -601,6 +600,7 @@ subroutine symmetry_of_integrals_ERI_mod(nf, fpuc, eri_tmp, eri)
         end do
       end do
       !$OMP END PARALLEL DO
+
 
       !$OMP PARALLEL DO PRIVATE(i,func_i,eqv,l,el,k,ek,j) SCHEDULE(static)
       do i = fpuc + 1, nf
