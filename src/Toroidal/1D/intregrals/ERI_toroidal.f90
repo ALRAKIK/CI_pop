@@ -362,56 +362,56 @@ subroutine SAO_ERI_integral_toroidal(number_of_atoms,geometry,number_of_function
 
       ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
 
-      ! !$omp parallel do private(ij_index,i,j,k,l) &
-      ! !$omp shared(two_electron, ERI, i_index, j_index) &
-      ! !$omp schedule(dynamic,optimal_chunk_size)
-
-      ! do ij_index = 1, total_ij_pairs
-      !     i = i_index(ij_index)
-      !     j = j_index(ij_index)
-      !   do k = 1, number_of_functions  
-      !     do l = k, number_of_functions
-
-      !       if (i <= k .or. (i == k .and. j <= l)) then
-
-      !         call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))    ! chemist notation
-
-      !         !$omp critical
-      !         integrals_done = integrals_done + 1.d0
-      !         current_pct = int((integrals_done * 100.0d0) / num_total_int)
-      !         if (current_pct > last_pct .and. mod(current_pct, 5) == 0) then
-      !             write(*,'(I3,"% done")') current_pct
-      !             flush(6)
-      !             last_pct = current_pct
-      !         endif
-      !         !$omp end critical
-
-      !       end if
-      !     end do
-      !   end do
-
-      ! end do
-      
-      ! !$omp end parallel do
-
       !$omp parallel do private(ij_index,i,j,k,l) &
       !$omp shared(two_electron, ERI, i_index, j_index) &
       !$omp schedule(dynamic,optimal_chunk_size)
 
-        do i = 1, fpuc 
-          do j = i, number_of_functions
-            do k = 1, number_of_functions  
-              do l = k, number_of_functions
+      do ij_index = 1, total_ij_pairs
+          i = i_index(ij_index)
+          j = j_index(ij_index)
+        do k = 1, number_of_functions  
+          do l = k, number_of_functions
+
+            if (i <= k .or. (i == k .and. j <= l)) then
 
               call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))    ! chemist notation
-              two_electron(i,j,l,k) = two_electron(i,j,k,l)
 
-            end do
+              !$omp critical
+              integrals_done = integrals_done + 1.d0
+              current_pct = int((integrals_done * 100.0d0) / num_total_int)
+              if (current_pct > last_pct .and. mod(current_pct, 5) == 0) then
+                  write(*,'(I3,"% done")') current_pct
+                  flush(6)
+                  last_pct = current_pct
+              endif
+              !$omp end critical
+
+            end if
           end do
-        end do 
+        end do
+
       end do
       
       !$omp end parallel do
+
+      ! !$omp parallel do private(ij_index,i,j,k,l) &
+      ! !$omp shared(two_electron, ERI, i_index, j_index) &
+      ! !$omp schedule(dynamic,optimal_chunk_size)
+
+      !   do i = 1, fpuc 
+      !     do j = i, number_of_functions
+      !       do k = 1, number_of_functions  
+      !         do l = k, number_of_functions
+
+      !         call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))    ! chemist notation
+      !         two_electron(i,j,l,k) = two_electron(i,j,k,l)
+
+      !       end do
+      !     end do
+      !   end do 
+      ! end do
+      
+      ! !$omp end parallel do
 
       write(*,'(a)') ""
       write(*,'(a)') "*************************************************"
@@ -442,35 +442,35 @@ subroutine SAO_ERI_integral_toroidal(number_of_atoms,geometry,number_of_function
         call save_two_electron_integrals(fpuc,number_of_functions,two_electron)
       end if
 
-      !call cpu_time(start)
-      !  call symmetry_of_integrals_ERI_mod(number_of_functions,fpuc,two_electron,two_electron_integrals)
-      !call cpu_time(end)
+      call cpu_time(start)
+       call symmetry_of_integrals_ERI_mod(number_of_functions,fpuc,two_electron,two_electron_integrals)
+      call cpu_time(end)
 
-      two_electron_integrals(:,:,:,:) = 0d0
+      !two_electron_integrals(:,:,:,:) = 0d0
 
-      do k = 1 , number_of_functions
-        do kp = 1 , number_of_functions
-          do kpp = 1 , number_of_functions
-            do kppp = 1 , number_of_functions
+      ! do k = 1 , number_of_functions
+      !   do kp = 1 , number_of_functions
+      !     do kpp = 1 , number_of_functions
+      !       do kppp = 1 , number_of_functions
 
-              if (Kronecker_delta(k+kp-kpp-kppp) == 1) then
+      !         if (Kronecker_delta(k+kp-kpp-kppp) == 1) then
 
-              do mu = 1 , number_of_functions 
-                do rho =1 , number_of_functions 
-                  do sigma = 1 , number_of_functions 
-                    phase = ((2.d0*pi)/number_of_functions)*((kp-1)*(mu-1)-(kpp-1)*(rho-1)-(kppp-1)*(sigma-1))
-                    two_electron_integrals(k,kp,kpp,kppp) =  two_electron_integrals(k,kp,kpp,kppp) + &
-                                              dcos(phase) * two_electron(1,rho,mu,sigma) * (1.d0/number_of_functions)
-                  end do 
-                end do 
-              end do 
+      !         do mu = 1 , number_of_functions 
+      !           do rho =1 , number_of_functions 
+      !             do sigma = 1 , number_of_functions 
+      !               phase = ((2.d0*pi)/number_of_functions)*((kp-1)*(mu-1)-(kpp-1)*(rho-1)-(kppp-1)*(sigma-1))
+      !               two_electron_integrals(k,kp,kpp,kppp) =  two_electron_integrals(k,kp,kpp,kppp) + &
+      !                                         dcos(phase) * two_electron(1,rho,mu,sigma) * (1.d0/number_of_functions)
+      !             end do 
+      !           end do 
+      !         end do 
 
-              end if 
+      !         end if 
 
-            end do 
-          end do 
-        end do 
-      end do 
+      !       end do 
+      !     end do 
+      !   end do 
+      ! end do 
 
       time = int(end - start)
       days = (time/86400)
