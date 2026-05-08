@@ -41,16 +41,39 @@ subroutine Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,OV,K,NA,ERI)
       write(outfile,'(a,f12.8)') "The length of the box:  Lx = ", Lx
       write(outfile,*) ""
 
+      if (c_SAO) then 
+
+      call cpu_time(start)
+
+        call SAO_overlap_matrix_toroidal_n(n_atoms,number_of_functions,atoms,AO,OV)
+        call check_the_overlap(number_of_functions,OV)
+        call SAO_kinetic_matrix_toroidal_n(n_atoms,number_of_functions,atoms,AO,K)
+        call SAO_nuclear_attraction_matrix_toroidal_1D_n(n_atoms,number_of_functions,geometry,atoms,AO,NA)
+        if (c_One) then 
+          ERI = 0.d0
+        else 
+          call SAO_ERI_integral_toroidal(n_atoms,geometry,number_of_functions,atoms,ERI) 
+        end if 
+        
+      call cpu_time(end)
+
+      else 
+
       call cpu_time(start)
 
         call overlap_matrix_toroidal_n(n_atoms,number_of_functions,atoms,AO,OV)
         call check_the_overlap(number_of_functions,OV)
         call kinetic_matrix_toroidal_n(n_atoms,number_of_functions,atoms,AO,K)
-        !call nuclear_attraction_matrix_toroidal(n_atoms,number_of_functions,geometry,atoms,AO,NA)
         call nuclear_attraction_matrix_toroidal_1D_n(n_atoms,number_of_functions,geometry,atoms,AO,NA)
-        if (.not. c_One) call ERI_integral_toroidal(n_atoms,geometry,number_of_functions,atoms,ERI)
+        if (c_One) then 
+          ERI = 0.d0
+        else 
+          call ERI_integral_toroidal(n_atoms,geometry,number_of_functions,atoms,ERI) 
+        end if
         
       call cpu_time(end)
+
+      end if
 
       write(outfile,*) ""
 

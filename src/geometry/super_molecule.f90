@@ -401,6 +401,11 @@ subroutine read_keywords(keyword)
 
         if (trim(line) == 'Orbitals' )   keyword(16) = 'Orbitals'
 
+        if (trim(line) == 'SAO'      )   keyword(17) = 'SAO'
+
+        if (trim(line) == 'Save'     )   keyword(18) = 'Save'
+
+
 
 
 

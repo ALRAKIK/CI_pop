@@ -86,7 +86,8 @@ program CI
       c_ERI      = any(keyword == 'ERI'      )
       c_One      = any(keyword == 'One'      )
       c_Orbitals = any(keyword == 'Orbitals' )
-
+      c_SAO      = any(keyword == 'SAO' )
+      c_save     = any(keyword == 'Save' )
       ! --------------------------------------------------------------- !
       ! *************************************************************** !
 
@@ -349,7 +350,6 @@ program CI
         end select         
 
       end if
-
 
       ! --------------------------------------------------------------- !
       !            Read the one and the two electron integrals     

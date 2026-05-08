@@ -624,3 +624,32 @@ subroutine symmetry_of_integrals_ERI_mod(nf, fpuc, eri_tmp, eri)
       !-----------------------------------------------------------------!
 
 end subroutine symmetry_of_integrals_ERI_mod
+
+subroutine save_two_electron_integrals(fpuc, nf, int)
+    
+      implicit none
+      integer, intent(in)          :: fpuc, nf
+      double precision, intent(in) :: int(fpuc, nf, nf, nf)
+
+      integer                      :: i, j, k, l
+
+      ! Open file as unformatted, stream access → pure binary, no record overhead
+
+      open(10, file="ERI_unique", form='unformatted', access='stream', status='replace')
+
+      do i = 1, fpuc
+          do j = 1, nf
+              do k = 1, nf
+                  do l = 1, nf
+                      if (dabs(int(i,j,k,l)) > 1.d-12) then
+                          ! Write indices and value directly as binary
+                          write(10) i, j, k, l, int(i,j,k,l)
+                      end if
+                  end do
+              end do
+          end do
+      end do
+
+      close(10)
+
+end subroutine save_two_electron_integrals
