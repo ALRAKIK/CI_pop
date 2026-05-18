@@ -4,8 +4,8 @@ subroutine kinetic_integral_ss_toroidal_2D(r1,r2,AO1,AO2,S_ss_normal)
       use torus_init
       use classification_ERI
       use HeavisideModule
-      use gsl_bessel_mod
-
+      use bessel_functions
+      
       implicit none 
 
       !-----------------------------------------------------------------!
@@ -52,13 +52,13 @@ subroutine kinetic_integral_ss_toroidal_2D(r1,r2,AO1,AO2,S_ss_normal)
           gamma_y     = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y)))+eta
 
 
-          I_0_gamma_x = bessi_scaled(0,2.d0*gamma_x/(ax**2))
-          I_1_gamma_x = bessi_scaled(1,2.d0*gamma_x/(ax**2))
-          I_2_gamma_x = bessi_scaled(2,2.d0*gamma_x/(ax**2))
+          I_0_gamma_x = iv_scaled(0,2.d0*gamma_x/(ax**2))
+          I_1_gamma_x = iv_scaled(1,2.d0*gamma_x/(ax**2))
+          I_2_gamma_x = iv_scaled(2,2.d0*gamma_x/(ax**2))
 
-          I_0_gamma_y = bessi_scaled(0,2.d0*gamma_y/(ay**2))
-          I_1_gamma_y = bessi_scaled(1,2.d0*gamma_y/(ay**2))
-          I_2_gamma_y = bessi_scaled(2,2.d0*gamma_y/(ay**2))
+          I_0_gamma_y = iv_scaled(0,2.d0*gamma_y/(ay**2))
+          I_1_gamma_y = iv_scaled(1,2.d0*gamma_y/(ay**2))
+          I_2_gamma_y = iv_scaled(2,2.d0*gamma_y/(ay**2))
 
           xp          = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0* Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2))  
           yp          = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5d0* Ly * Heaviside(-alpha*dcos(ay*y1)-beta*dcos(ay*y2))  

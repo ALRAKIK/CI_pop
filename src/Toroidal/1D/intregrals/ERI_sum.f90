@@ -5,7 +5,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       use quadpack , only : dqags
       use iso_c_binding
       use torus_init
-      use gsl_bessel_mod
       use bessel_functions
       use files
       use table_lookup_module
@@ -178,7 +177,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
       double precision function S(t,i_quad) result(sum)
 
-      use gsl_bessel_mod
       use bessel_derivatives
       use precomputed_bessel
 

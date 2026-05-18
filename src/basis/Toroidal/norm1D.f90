@@ -93,8 +93,6 @@ end subroutine normalize_basis_tor_1D
 
 subroutine norm_orb_tor_1D(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
-
-      use gsl_bessel_mod
       use bessel_functions
 
       implicit none 
@@ -220,7 +218,6 @@ end subroutine  norm_orb_tor_1D
 
 subroutine norm_orb_tor_px_1D(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
-      use gsl_bessel_mod
       use bessel_functions
       
       implicit none 
@@ -332,7 +329,6 @@ end subroutine  norm_orb_tor_px_1D
 
 subroutine norm_orb_tor_py_1D(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
-      use gsl_bessel_mod
       use bessel_functions
 
       implicit none 
@@ -442,7 +438,6 @@ end subroutine  norm_orb_tor_py_1D
 
 subroutine norm_orb_tor_pz_1D(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
-      use gsl_bessel_mod
       use bessel_functions
 
       implicit none 

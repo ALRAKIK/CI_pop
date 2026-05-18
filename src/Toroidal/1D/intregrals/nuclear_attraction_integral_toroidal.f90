@@ -101,7 +101,6 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xPC,yPC,zPC,albe, result)
       use quadpack, only : dqagi
       use omp_lib
       use torus_init
-      use gsl_bessel_mod
       use bessel_functions
       use, intrinsic :: ieee_arithmetic
     
@@ -150,7 +149,7 @@ subroutine integrate_NA_ss_Toroidal(gamma_x,xPC,yPC,zPC,albe, result)
 
         dx = dx * 2.d0 / ( ax * ax )
         
-        I_0_x = bessi_scaled(0, dx)
+        I_0_x = iv_scaled(0, dx)
         
         ft  = 1.d0/(albe+t2) * dexp(-2.d0*(t2+albe)/ax**2 + dx)  * dexp(-(albe*t2)/(albe+t2) * ((yPC*yPC) + (zPC*zPC)) )  *  I_0_x 
 
@@ -294,7 +293,6 @@ subroutine integrate_NA_spx_Toroidal(gamma_x,xP,xc,xb,yPC,zPC,albe, result)
     
       use quadpack, only : dqagi
       use torus_init
-      use gsl_bessel_mod
       use HeavisideModule
       use bessel_functions
       use, intrinsic :: ieee_arithmetic
@@ -352,7 +350,6 @@ subroutine integrate_NA_spy_Toroidal(gamma_x,xPc,yPC,yPB,zPC,albe, result)
     
       use quadpack, only : dqagi
       use torus_init
-      use gsl_bessel_mod
       use HeavisideModule
       use bessel_functions
       use, intrinsic :: ieee_arithmetic
@@ -414,7 +411,6 @@ subroutine integrate_NA_spz_Toroidal(gamma_x,xPc,yPC,zPC,zPB,albe, result)
     
       use quadpack, only : dqagi
       use torus_init
-      use gsl_bessel_mod
       use HeavisideModule
       use bessel_functions
       use, intrinsic :: ieee_arithmetic
@@ -826,7 +822,6 @@ subroutine integrate_NA_px_px_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(ft)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t
@@ -913,7 +908,6 @@ subroutine integrate_NA_px_py_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(fx)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t
@@ -1005,7 +999,6 @@ subroutine integrate_NA_px_pz_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(fx)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t
@@ -1097,7 +1090,6 @@ subroutine integrate_NA_py_px_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(fx)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t
@@ -1189,7 +1181,6 @@ subroutine integrate_NA_py_py_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(fx)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t
@@ -1281,7 +1272,6 @@ subroutine integrate_NA_py_pz_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(fx)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t
@@ -1373,7 +1363,6 @@ subroutine integrate_NA_pz_px_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(fx)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t
@@ -1465,7 +1454,6 @@ subroutine integrate_NA_pz_py_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(fx)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t
@@ -1557,7 +1545,6 @@ subroutine integrate_NA_pz_pz_Toroidal(xpC,ypC,zpC, &
 
       function f_decay(t) result(fx)
 
-        use gsl_bessel_mod
         use bessel_functions
 
         double precision, intent(in) :: t

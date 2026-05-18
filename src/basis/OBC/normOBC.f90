@@ -50,7 +50,7 @@ subroutine normalize_basis()
           do i = 1 , n_gaussian
             write(2,*) exponent(i) , (contractionN(i,j),j=1,n_contraction)
           end do
-          deallocate(exponent,contraction,contractionN)
+          deallocate(exponent,contraction,contractionN) 
         end if
       
       end do 

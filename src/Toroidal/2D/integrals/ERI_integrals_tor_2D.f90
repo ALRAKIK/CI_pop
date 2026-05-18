@@ -108,11 +108,10 @@ end subroutine ERI_integral_4_function_toroidal_2D
 
 subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
       
-      use gsl_bessel_mod
       use quadpack , only : dqagi
       use iso_c_binding
       use torus_init
-      use gsl_bessel_mod
+      use bessel_functions
       use, intrinsic :: ieee_arithmetic
 
       implicit none
@@ -161,7 +160,7 @@ subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
 
       double precision function S(t) result(sum)
 
-      use gsl_bessel_mod
+      use bessel_functions
       implicit none
       double precision, intent(in) :: t
       double precision             :: A, B, C, term
@@ -173,10 +172,10 @@ subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
       B = 2.d0*nu_x/(ax*ax)
       C = 2.d0*t*t/(ax*ax)
 
-      sum1 = bessi_scaled(0,A)*bessi_scaled(0,B)*bessi_scaled(0,C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
+      sum1 = iv_scaled(0,A)*iv_scaled(0,B)*iv_scaled(0,C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
 
       do n = 1, Nmax
-         term = bessi_scaled(n, A)*bessi_scaled(n, B)*bessi_scaled(n, C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
+         term = iv_scaled(n, A)*iv_scaled(n, B)*iv_scaled(n, C) * exp(A+B-2.d0*(sigma+nu)/(ax*ax))
          if (term < tol) exit
          sum1 = sum1 + term * 2.d0 * cos(dble(n)*ax*xpq) 
       end do
@@ -185,10 +184,10 @@ subroutine integrate_ERI_2D(sigma,nu,sigma_x,nu_x,sigma_y,nu_y,xpq,ypq,result)
       B = 2.d0*nu_y/(ay*ay)
       C = 2.d0*t*t/(ay*ay)
 
-      sum2 = bessi_scaled(0,A)*bessi_scaled(0,B)*bessi_scaled(0,C) * exp(A+B-2.d0*(sigma+nu)/(ay*ay))
+      sum2 = iv_scaled(0,A)*iv_scaled(0,B)*iv_scaled(0,C) * exp(A+B-2.d0*(sigma+nu)/(ay*ay))
 
       do n = 1, Nmax
-         term = bessi_scaled(n, A)*bessi_scaled(n, B)*bessi_scaled(n, C) * exp(A+B-2.d0*(sigma+nu)/(ay*ay))
+         term = iv_scaled(n, A)*iv_scaled(n, B)*iv_scaled(n, C) * exp(A+B-2.d0*(sigma+nu)/(ay*ay))
          if (term < tol) exit
          sum2 = sum2 + term * 2.d0 * cos(dble(n)*ay*ypq) 
       end do

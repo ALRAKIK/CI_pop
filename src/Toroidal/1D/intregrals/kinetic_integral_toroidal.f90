@@ -1,6 +1,5 @@
 subroutine kinetic_integral_ss_toroidal(r1,r2,AO1,AO2,S_ss_normal)
 
-      use gsl_bessel_mod
       use torus_init
       use classification_ERI
       use HeavisideModule
@@ -120,7 +119,6 @@ end subroutine kinetic_integral_ss_toroidal
 subroutine kinetic_integral_sp_toroidal(r1,r2,AO1,AO2,S_sp_normal)
 
       use torus_init
-      use gsl_bessel_mod
       use classification_ERI
       use HeavisideModule
       use bessel_functions
@@ -300,7 +298,6 @@ end subroutine kinetic_integral_sp_toroidal
 
 subroutine kinetic_integral_pp_toroidal(r1,r2,AO1,AO2,S_pp_normal)
 
-      use gsl_bessel_mod
       use torus_init
       use classification_ERI
       use HeavisideModule

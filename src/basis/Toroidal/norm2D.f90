@@ -54,7 +54,7 @@ end subroutine normalize_basis_tor_2D
 
 subroutine norm_orb_tor_2D(n_gaussian , n_contraction, exponent, contraction  , n_type , contractionN, Lx , Ly , Lz )
 
-      use gsl_bessel_mod
+      use bessel_functions
 
       implicit none 
 
@@ -86,7 +86,7 @@ subroutine norm_orb_tor_2D(n_gaussian , n_contraction, exponent, contraction  , 
       do n = 1 , n_contraction
         do i = 1 , n_gaussian
 
-        Norm(i) = 1.d0 / dsqrt( Lx * bessi_scaled(0,4.d0*exponent(i)/(ax*ax)) * Ly * bessi_scaled(0,4.d0*exponent(i)/(ay*ay)) ) 
+        Norm(i) = 1.d0 / dsqrt( Lx * iv_scaled(0,4.d0*exponent(i)/(ax*ax)) * Ly * iv_scaled(0,4.d0*exponent(i)/(ay*ay)) ) 
 
         contractionN(i,n) =  contraction(i,n) * Norm(i) 
 
@@ -104,8 +104,8 @@ subroutine norm_orb_tor_2D(n_gaussian , n_contraction, exponent, contraction  , 
               beta  = exponent(j)
               gamma = alpha + beta
 
-              I_0_gamma_x = bessi_scaled(0,2.d0*gamma/ax**2)
-              I_0_gamma_y = bessi_scaled(0,2.d0*gamma/ay**2)
+              I_0_gamma_x = iv_scaled(0,2.d0*gamma/ax**2)
+              I_0_gamma_y = iv_scaled(0,2.d0*gamma/ay**2)
 
 
               c1 = contractionN(i,n)
