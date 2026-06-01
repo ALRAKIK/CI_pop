@@ -1,11 +1,13 @@
 module table_lookup_module
+
+      use constants_module
+      
       implicit none
       
       ! Grid parameters
       integer                     :: n_points
       double precision            :: A_min, A_max
       double precision            :: log_min, log_max, log_step
-      double precision, parameter :: pi = 3.14159265358979323846d0
       integer, parameter          :: n_phi = 20
       
       ! 4D lookup table (allocatable for flexibility)

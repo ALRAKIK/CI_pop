@@ -69,7 +69,7 @@ module bessel_derivatives
 
       double complex function der_I_B(s, c, n, I_B,B)
 
-        implicit none
+      implicit none
 
       integer,          intent(in) :: s, c, n
       double precision, intent(in) :: I_B(0:)
@@ -117,8 +117,6 @@ module bessel_derivatives
             der_I_B = 0.d0
           end if 
         end if
-
-
 
         case(02)
           der_I_B =          0.25d0 * ( I_B(abs(n-2)) + 2.d0 * I_B(n) + I_B(n+2) )

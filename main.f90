@@ -316,7 +316,7 @@ program CI
 
       if (c_plot) then 
         call plot(n_atoms,geometry,atoms)
-      end if 
+      end if
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !               ---------------------------------                 !

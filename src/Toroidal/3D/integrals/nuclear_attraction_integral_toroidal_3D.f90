@@ -58,17 +58,9 @@ subroutine nuclear_attraction_integral_ss_toroidal_3D(number_of_atoms,geometry,a
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
             
-            !gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
-            !gamma_y  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y)))
-            !gamma_z  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z)))
-
             call bary_exponent_x(alpha,beta,X,gamma_x)
             call bary_exponent_y(alpha,beta,Y,gamma_y)
             call bary_exponent_z(alpha,beta,Z,gamma_z)
-
-            !xp       = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5*Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
-            !yp       = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5*Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))
-            !zp       = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5*Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))
 
             call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
             call bary_center_toroidal_y(alpha,beta,y1,y2,yp)
@@ -146,11 +138,7 @@ subroutine integrate_NA_ss_Toroidal_3D(xpC,ypC,zpC, &
         double precision             :: fx
         double precision             :: I_0_x , I_0_y , I_0_z  
         double precision             :: dx , dy , dz  
-        double precision             :: Nax , Nay , Naz  
-        
-        !dx = 2.d0*dsqrt( gamma_x**2 + t**4 + 2.d0 * gamma_x * t**2 * dcos(ax*(XpC))) / ax**2
-        !dy = 2.d0*dsqrt( gamma_y**2 + t**4 + 2.d0 * gamma_y * t**2 * dcos(ay*(ypC))) / ay**2
-        !dz = 2.d0*dsqrt( gamma_z**2 + t**4 + 2.d0 * gamma_z * t**2 * dcos(az*(zpC))) / az**2
+        double precision             :: Nax , Nay , Naz
 
         call bary_exponent_x(gamma_x,t*t,XpC,dx)
         call bary_exponent_y(gamma_y,t*t,YpC,dy)
@@ -174,7 +162,6 @@ subroutine integrate_NA_ss_Toroidal_3D(xpC,ypC,zpC, &
       end function f_decay
 
 end subroutine integrate_NA_ss_Toroidal_3D
-
 
 
 subroutine nuclear_attraction_integral_sp_toroidal_3D(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,S_sp_normal)
@@ -236,18 +223,10 @@ subroutine nuclear_attraction_integral_sp_toroidal_3D(number_of_atoms,geometry,a
         do j = 1 , size(AO2%exponent)
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
-            
-            !gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(ax*(X)))
-            !gamma_y  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(ay*(Y)))
-            !gamma_z  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*dcos(az*(Z)))
 
             call bary_exponent_x(alpha,beta,X,gamma_x)
             call bary_exponent_y(alpha,beta,Y,gamma_y)
             call bary_exponent_z(alpha,beta,Z,gamma_z)
-
-            !xp       = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*dcos(ax*x1)-beta*dcos(ax*x2))
-            !yp       = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5d0 * Ly * Heaviside(-alpha*dcos(ay*y1)-beta*dcos(ay*y2))
-            !zp       = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5d0 * Lz * Heaviside(-alpha*dcos(az*z1)-beta*dcos(az*z2))
 
             call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
             call bary_center_toroidal_y(alpha,beta,y1,y2,yp)
@@ -628,17 +607,9 @@ subroutine nuclear_attraction_integral_pp_toroidal_3D(number_of_atoms,geometry,a
           beta =   AO2%exponent(j)
           c2   =   AO2%coefficient(j)
             
-            !gamma_x  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ax*(X)))
-            !gamma_y  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(ay*(Y)))
-            !gamma_z  = dsqrt(alpha**2+beta**2+2.d0*alpha*beta*cos(az*(Z)))
-
             call bary_exponent_x(alpha,beta,X,gamma_x)
             call bary_exponent_y(alpha,beta,Y,gamma_y)
             call bary_exponent_z(alpha,beta,Z,gamma_z)
-
-            !xp       = datan((alpha*dsin(ax*x1)+beta*dsin(ax*x2))/(alpha*dcos(ax*x1)+beta*dcos(ax*x2)))/ax + 0.5d0 * Lx * Heaviside(-alpha*cos(ax*x1)-beta*cos(ax*x2))
-            !yp       = datan((alpha*dsin(ay*y1)+beta*dsin(ay*y2))/(alpha*dcos(ay*y1)+beta*dcos(ay*y2)))/ay + 0.5d0 * Ly * Heaviside(-alpha*cos(ay*y1)-beta*cos(ay*y2))
-            !zp       = datan((alpha*dsin(az*z1)+beta*dsin(az*z2))/(alpha*dcos(az*z1)+beta*dcos(az*z2)))/az + 0.5d0 * Lz * Heaviside(-alpha*cos(az*z1)-beta*cos(az*z2))
 
             call bary_center_toroidal_x(alpha,beta,x1,x2,xp)
             call bary_center_toroidal_y(alpha,beta,y1,y2,yp)

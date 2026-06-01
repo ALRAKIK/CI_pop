@@ -136,12 +136,12 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       use table_1d_lookup
       use constants_module
 
-
       use, intrinsic :: ieee_arithmetic
 
       implicit none
 
       ! Input parameters
+
       double precision, intent(in)       :: p_x , q_x 
       double precision, intent(in)       :: p_y , q_y
       double precision, intent(in)       :: p_z , q_z 
@@ -213,6 +213,24 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       double precision                     :: I_B_y(0:50000)
       double precision                     :: I_A_z(0:50000)
       double precision                     :: I_B_z(0:50000)
+
+      ! COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
+      !COMPLEX(KIND=KIND(1.0D0))            :: expo_x(0:50000)
+      !COMPLEX(KIND=KIND(1.0D0))            :: expo_y(0:50000)
+      !COMPLEX(KIND=KIND(1.0D0))            :: expo_z(0:50000)
+      ! integer                              :: i 
+
+      !COMPLEX(KIND=KIND(1.0D0))            :: F_x(0:50000)
+      !COMPLEX(KIND=KIND(1.0D0))            :: F_y(0:50000)
+      !COMPLEX(KIND=KIND(1.0D0))            :: F_z(0:50000)
+
+      ! double precision                     :: F_x(0:50000)
+      ! double precision                     :: F_y(0:50000)
+      ! double precision                     :: F_z(0:50000)
+
+      ! double precision                     :: cos_phi_x(0:50000)
+      ! double precision                     :: cos_phi_y(0:50000)
+      ! double precision                     :: cos_phi_z(0:50000)
       ! --------------------------------------------------------------- !
 
       inv_ax  = 1.d0/ax 
@@ -229,7 +247,6 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       BBy   = inv_ay2 * 2.d0 * q_y
       AAz   = inv_az2 * 2.d0 * p_z 
       BBz   = inv_az2 * 2.d0 * q_z
-
 
       ! --------------------------------------------------------------- !
 
@@ -251,8 +268,6 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       call bessel_I_scaled_backward(Nmax_AAz+20, AAz, I_A_z)
       call bessel_I_scaled_backward(Nmax_BBz+20, BBz, I_B_z)
 
-
-
       ! --------------------------------------------------------------- !
 
       cxpa  = dcos(xpA) ; cypa  = dcos(ypA) ; czpa  = dcos(zpA) 
@@ -273,10 +288,6 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       c2xqcd = dcos(ax*(2.d0*xq-xC-xD)) ; c2yqcd = dcos(ay*(2.d0*yq-yC-yD)) ; c2zqcd = dcos(az*(2.d0*zq-zC-zD)) 
       s2xqcd = dsin(ax*(2.d0*xq-xC-xD)) ; s2yqcd = dsin(ay*(2.d0*yq-yC-yD)) ; s2zqcd = dsin(az*(2.d0*zq-zC-zD)) 
       
-      !call dqagi(f_decay , bound, inf , epsabs, epsrel, result, abserr, neval, ier,Limit,Lenw,Last,Iwork,Work)
-
-      !call dqags(transformed_integrand, 0.0d0, 1.0d0, epsabs, epsrel, result, abserr, neval, ier, Limit, Lenw, Last, Iwork, Work)
-
       call gauss_legendre_64(transformed_integrand, 0.0d0, 1.0d0, result)
 
       ! if (ier /= 0) then
@@ -332,25 +343,19 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       integer                              :: n  
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn
+      !double precision                     :: termAn , termBn
       double precision                     :: termC 
       double precision                     :: sum1, sum2, sum3
       COMPLEX(KIND=KIND(1.0D0))            :: term
 
       ! --------------------------------------------------------------- !
-      integer                              :: Peak_x, Peak_y, Peak_z
+      
       integer                              :: Nmax_x, Nmax_y, Nmax_z
       logical                              :: no_converged_x = .true. , no_converged_y = .true. , no_converged_z = .true.
       COMPLEX(KIND=KIND(1.0D0))            :: expo_term_x , expo_term_y , expo_term_z
       COMPLEX(KIND=KIND(1.0D0))            :: current_term_x , current_term_y , current_term_z
       double precision,parameter           :: eps = 2.22d-16
 
-      ! Peak_x         = ceiling(min(AAx,BBx,CCx))
-      ! Peak_y         = ceiling(min(AAy,BBy,CCy))
-      ! Peak_z         = ceiling(min(AAz,BBz,CCz))
-
-      ! Nmax_x         = Peak_x + 10
-      ! Nmax_y         = Peak_y + 10
-      ! Nmax_z         = Peak_z + 10
 
       CCx   = inv_ax2 * 2.d0 * t * t 
       CCy   = inv_ay2 * 2.d0 * t * t 
@@ -377,18 +382,6 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
       sum2      = 0.d0
       sum3      = 0.d0
       sum       = 0.d0
-
-      !call bessel_I_scaled_backward(Nmax_x, AAx, I_A_x)
-      !call bessel_I_scaled_backward(Nmax_x, BBx, I_B_x)
-      !call bessel_I_scaled_backward(Nmax_x, CCx, I_C_x)
-
-      !call bessel_I_scaled_backward(Nmax_y, AAy, I_A_y)
-      !call bessel_I_scaled_backward(Nmax_y, BBy, I_B_y)
-      !call bessel_I_scaled_backward(Nmax_y, CCy, I_C_y)
-
-      !call bessel_I_scaled_backward(Nmax_z, AAz, I_A_z)
-      !call bessel_I_scaled_backward(Nmax_z, BBz, I_B_z)
-      !call bessel_I_scaled_backward(Nmax_z, CCz, I_C_z)
 
       select case(pattern_id)
 
@@ -4221,7 +4214,7 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
         termAn  = inv_ax2 * (cxpa * cxpb * I_A_x(n)-c2xpab*(0.25d0*(I_A_x(abs(n-2))+2.d0*I_A_x(n)+I_A_x(n+2))))
         else 
         termAn  = inv_ax2 * (cxpa * cxpb * I_A_x(n)-c2xpab*(0.25d0*(I_A_x(abs(n-2))+2.d0*I_A_x(n)+I_A_x(n+2)))+I_dp/AAx*n * s2xpab * (0.5d0*(I_A_x(abs(n-1))+I_A_x(n+1))))
-         end if 
+        end if 
         termBn  = I_B_x(n)
         termc   = I_C_table_x(n, i_quad)  
         term    = current_term_x * termC * termAn * termBn
@@ -12816,10 +12809,10 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
 
       sum = sum1 * sum2 * sum3
 
-      if ( (no_converged_x) .or. (no_converged_y) .or.  (no_converged_z) ) then
-        print *, "Warning: The sum did not converge in x " ,no_converged_x, " or/and y " , no_converged_y, " or/and z " , no_converged_z, ", sum is " , sum, " for the integral " , pattern_id
-        print *, "                                       " ,sum1, " or/and y " , sum2, " or/and z " , sum3
-      end if
+      ! if ( (no_converged_x) .or. (no_converged_y) .or.  (no_converged_z) ) then
+      !   print *, "Warning: The sum did not converge in x " ,no_converged_x, " or/and y " , no_converged_y, " or/and z " , no_converged_z, ", sum is " , sum, " for the integral " , pattern_id
+      !   print *, "                                       " ,sum1, " or/and y " , sum2, " or/and z " , sum3
+      ! end if
 
       end function S
 

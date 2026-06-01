@@ -55,6 +55,7 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
       !-----------------------------------------------------------------!
       ! Setup OpenMP
       !-----------------------------------------------------------------!
+      
       call omp_set_dynamic(.false.)
       call omp_set_num_threads(omp_get_max_threads())
 
@@ -98,9 +99,11 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
       !-----------------------------------------------------------------!
       ! Parallel computation
       !-----------------------------------------------------------------!
+
       !$omp parallel do private(ij_index,i,j,k,l,AO1,AO2,r1,r2) &
       !$omp shared(NA, AO, i_index, j_index, number_of_atoms, geometry, atoms) &
       !$omp schedule(dynamic,optimal_chunk_size)
+
       do ij_index = 1, total_ij_pairs
         i = i_index(ij_index)
         j = j_index(ij_index)
@@ -144,64 +147,10 @@ subroutine nuclear_attraction_matrix_toroidal_3D(number_of_atoms,number_of_funct
         end if
         
       end do
+      
       !$omp end parallel do
       
       deallocate(i_index, j_index)
-
-
-  
-      ! do i = 1 , fpuc
-      !   do j = 1 , number_of_functions
-        
-      !     AO1 = AO(i)
-      !     AO2 = AO(j)
-
-      !     r1(1) = AO1%x ; r2(1) = AO2%x
-      !     r1(2) = AO1%y ; r2(2) = AO2%y
-      !     r1(3) = AO1%z ; r2(3) = AO2%z
-      
-      !     if (AO1%orbital =="s" .and. AO2%orbital == "s") then
-            
-      !       do k = 1 , size  (AO1%exponent)
-      !         do l = 1 , size  (AO2%exponent)
-      !           call nuclear_attraction_integral_ss_toroidal_3D(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA_tmp(i,j))
-      !         end do 
-      !       end do 
-
-      !     end if
-
-      !     if (AO1%orbital =="s" .and. AO2%orbital(:1) == "p") then
-            
-      !         do k = 1 , size  (AO1%exponent)
-      !           do l = 1 , size  (AO2%exponent)
-      !             call nuclear_attraction_integral_sp_toroidal_3D(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA_tmp(i,j))
-      !           end do 
-      !         end do
-
-      !     end if
-
-      !     if (AO1%orbital(:1) =="p" .and. AO2%orbital == "s") then
-            
-      !       do k = 1 , size  (AO1%exponent)
-      !         do l = 1 , size  (AO2%exponent)
-      !           call nuclear_attraction_integral_sp_toroidal_3D(number_of_atoms,geometry,atoms,r2,r1,AO2,AO1,NA_tmp(i,j))
-      !         end do 
-      !       end do
-      !     end if
-
-      !     if (AO1%orbital(:1) =="p" .and. AO2%orbital(:1) == "p") then
-          
-            
-      !       do k = 1 , size  (AO1%exponent)
-      !         do l = 1 , size  (AO2%exponent)
-      !           call nuclear_attraction_integral_pp_toroidal_3D(number_of_atoms,geometry,atoms,r1,r2,AO1,AO2,NA_tmp(i,j))
-      !         end do 
-      !       end do
-          
-      !     end if
-          
-      !   end do 
-      ! end do 
 
 !      !-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-!
 !      !                    symmetry of the integrals                    !

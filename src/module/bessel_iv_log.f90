@@ -298,7 +298,7 @@ module bessel_functions
         integer, intent(in)          :: v_in
         double precision             :: Iv
         
-          Iv = dexp(iv_log(dble(v_in),x))
+          Iv = dexp(iv_log(dble(abs(v_in)),x))
           
       end function iv_scaled
 
@@ -308,7 +308,7 @@ module bessel_functions
         integer, intent(in)          :: v_in
         double precision             :: Iv
         
-          Iv = iv_log(dble(v_in),x)
+          Iv = iv_log(dble(abs(v_in)),x)
           
       end function iv_log_scaled
 

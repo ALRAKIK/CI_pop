@@ -9,6 +9,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       use classification_ERI
       use unitcell_module
       use precomputed_bessel
+      use gauss_legendre_quadrature
       
 
       implicit none 
@@ -43,12 +44,27 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       integer                        :: current_pct 
       integer                        :: last_pct = -1
       double precision               :: integrals_done = 0.d0
+
+      !-----------------------------------------------------------------!
+      !                      Schwarz screening                          !
+      
+      double precision, allocatable :: Q_schwarz(:,:)
+      double precision              :: val_iijj
+      double precision, parameter   :: schwarz_thresh = 1.d-12
+      !double precision, parameter   :: schwarz_thresh = 0.d0 
+      integer                       :: n_screened, n_computed , n_check 
+      !-----------------------------------------------------------------!
       
       !-----------------------------------------------------------------!
 
       !                   Precompute Bessel functions                   !
 
       call initialize_bessel_table_64_Lx()
+      call precompute_gauss_legendre_64()
+
+      do i = 1 , 64
+        write(*,'(I3,2X,F12.4,F12.4)') i, gl_t_nodes(i), gl_t_weights(i)
+      end do
 
       !-----------------------------------------------------------------!
 
@@ -136,10 +152,73 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       write(outfile,*) ''
       flush(outfile)
 
+
+      !-----------------------------------------------------------------!
+      !              Schwarz screening precomputation                   !
+      !   Q_schwarz(i,j) = sqrt(|(ij|ij)|)  for all unique pairs        !
+      !   Done ONCE here, reused for every screening check below        !
+      !-----------------------------------------------------------------!
+
+      allocate(Q_schwarz(number_of_functions, number_of_functions))
+      Q_schwarz = 0.d0
+      write(*,'(A)') 'Precomputing Schwarz screening matrix...'
+      write(outfile,'(A)') 'Precomputing Schwarz screening matrix...'
+
+
+      do i = 1, number_of_functions
+        do j = i, number_of_functions
+          call ERI_integral_4_function_toroidal(ERI(i), ERI(j), ERI(i), ERI(j), val_iijj)
+          Q_schwarz(i,j) = dsqrt(dabs(val_iijj))
+          Q_schwarz(j,i) = Q_schwarz(i,j)
+        end do
+      end do
+
+      write(*,'(A)') 'Schwarz matrix done.'
+      write(outfile,'(A)') 'Schwarz matrix done.'
+      flush(outfile)
+
+      write(*,'(A)') 'Sample Q_schwarz values:'
+      write(*,'(A,ES12.4)') 'Max Q value = ', maxval(Q_schwarz)
+      write(*,'(A,ES12.4)') 'Min Q value = ', minval(Q_schwarz)
+      write(*,'(A,ES12.4)') 'Threshold   = ', schwarz_thresh
+
+      ! --- Diagnostic: count how many integrals survive ---
+      n_screened = 0
+      n_computed = 0
+      do ij_index = 1, total_ij_pairs
+        i = i_index(ij_index)
+        j = j_index(ij_index)
+        do k = 1, number_of_functions
+          do l = k, number_of_functions
+            if (i <= k .or. (i == k .and. j <= l)) then
+              n_computed = n_computed + 1
+              if (Q_schwarz(i,j) * Q_schwarz(k,l) < schwarz_thresh) then
+                n_screened = n_screened + 1
+              end if
+            end if
+          end do
+        end do
+      end do
+
+      write(*,'(A,I0)')   'Total unique integrals:    ', n_computed
+      write(*,'(A,I0)')   'Screened out by Schwarz:   ', n_screened
+      write(*,'(A,F8.2,A)') 'Reduction:                 ', &
+        100.d0 * dble(n_screened) / dble(n_computed), ' %'
+      write(outfile,'(A,I0)')   'Total unique integrals:    ', n_computed
+      write(outfile,'(A,I0)')   'Screened out by Schwarz:   ', n_screened
+      write(outfile,'(A,F8.2,A)') 'Reduction:                 ', &
+        100.d0 * dble(n_screened) / dble(n_computed), ' %'
+      flush(outfile)
+      !-----------------------------------------------------------------!
+      
+      ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
+
+      two_electron = 0.d0 
+
       ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> !
 
       !$omp parallel do private(ij_index,i,j,k,l) &
-      !$omp shared(two_electron, ERI, i_index, j_index) &
+      !$omp shared(two_electron, ERI, i_index, j_index, Q_schwarz) &
       !$omp schedule(dynamic,optimal_chunk_size)
 
       do ij_index = 1, total_ij_pairs
@@ -149,6 +228,12 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
           do l = k, number_of_functions
 
             if (i <= k .or. (i == k .and. j <= l)) then
+
+             ! ---- Schwarz screen: ONE multiply + ONE compare ----
+             if (Q_schwarz(i,j) * Q_schwarz(k,l) < schwarz_thresh) then
+               two_electron(i,j,k,l) = 0.d0   ! screened integrals are zero
+               cycle
+             end if
 
               call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))    ! chemist notation
 
@@ -178,6 +263,8 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       write(*,'(a)') ""
 
       deallocate(i_index, j_index)
+      deallocate(Q_schwarz)
+
 
       end_time = omp_get_wtime()
     
