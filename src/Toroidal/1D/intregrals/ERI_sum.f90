@@ -75,6 +75,8 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       integer                              :: i 
       COMPLEX(KIND=KIND(1.0D0))            :: exp_term(0:50000)
 
+      logical                              :: no_converged_x = .true.
+
       ! --------------------------------------------------------------- !
 
       ! --------------------------------------------------------------- !
@@ -201,9 +203,6 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       double precision                     :: const
       integer                              :: n     
       COMPLEX(KIND=KIND(1.0D0))            :: termAn , termBn , term
-       !double precision                     :: termAn_real , termBn_real
-       !double precision                     :: termAn_imag , termBn_imag
-       !double precision                     :: term_final
       COMPLEX(KIND=KIND(1.0D0)), PARAMETER :: I_dp = (0.0D0, 1.0D0)
       COMPLEX(KIND=KIND(1.0D0))            :: expo_term , current_term
 
@@ -214,7 +213,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
       double precision                     :: eta_t   , eta_p  , eta_q
 
-      ! ! /////////////////////////////////////////////////////////////// !
+      ! /////////////////////////////////////////////////////////////// !
 
       double precision                     :: Ireal , Ireal_0_ppt , Ireal_0_upq
       double precision                     :: u
@@ -260,7 +259,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       select case(pattern_id)
       
       ! /////////////////////////////////////////////////////////////// !
-      
+
       case (0000) ! | s     s    s    s     ( 1 )
       n = 0
       const  = dexp(-p * q * t2 * D2 * ( ypq*ypq + zpq*zpq ) ) * (piD2) 
@@ -268,10 +267,15 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
-      sum = sum + 2.d0 * real(term)      
-      end do      
-
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
+      sum = sum + 2.d0 * real(term)
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
+      end do
+          
       case (0001) ! | s     s    s    px    ( 2 )
       n = 0
       const  = dexp(-p * q * t2 * D2 * ( ypq*ypq + zpq*zpq ) ) * (piD2) 
@@ -279,10 +283,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0002) ! | s     s    s    py    ( 3 )
@@ -292,10 +299,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0003) ! | s     s    s    pz    ( 4 )
@@ -305,10 +315,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0010) ! | s     s    px   s     ( 5 )
@@ -318,10 +331,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0011) ! | s     s    px   px    ( 6 )
@@ -331,10 +347,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0012) ! | s     s    px   py    ( 7 )
@@ -344,10 +363,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0013) ! | s     s    px   pz    ( 8 )
@@ -357,10 +379,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0020) ! | s     s    py   s     ( 9 )
@@ -370,10 +395,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0021) ! | s     s    py   px    ( 10 )
@@ -383,10 +411,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0022) ! | s     s    py   py    ( 11 )
@@ -396,10 +427,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0023) ! | s     s    py   pz    ( 12 )
@@ -409,10 +443,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0030) ! | s     s    pz   s     ( 13 )
@@ -422,10 +459,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0031) ! | s     s    pz   px    ( 14 )
@@ -435,10 +475,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0032) ! | s     s    pz   py    ( 15 )
@@ -448,10 +491,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0033) ! | s     s    pz   pz    ( 16 )
@@ -461,10 +507,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0100) ! | s     px   s    s     ( 17 )
@@ -474,10 +523,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0101) ! | s     px   s    px    ( 18 )
@@ -487,10 +539,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0102) ! | s     px   s    py    ( 19 )
@@ -500,10 +555,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0103) ! | s     px   s    pz    ( 20 )
@@ -513,10 +571,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0110) ! | s     px   px   s     ( 21 )
@@ -526,10 +587,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0111) ! | s     px   px   px    ( 22 )
@@ -539,10 +603,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0112) ! | s     px   px   py    ( 23 )
@@ -552,10 +619,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0113) ! | s     px   px   pz    ( 24 )
@@ -565,10 +635,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0120) ! | s     px   py   s     ( 25 )
@@ -578,10 +651,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0121) ! | s     px   py   px    ( 26 )
@@ -591,10 +667,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0122) ! | s     px   py   py    ( 27 )
@@ -604,10 +683,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0123) ! | s     px   py   pz    ( 28 )
@@ -617,10 +699,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0130) ! | s     px   pz   s     ( 29 )
@@ -630,10 +715,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0131) ! | s     px   pz   px    ( 30 )
@@ -643,10 +731,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0132) ! | s     px   pz   py    ( 31 )
@@ -656,10 +747,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0133) ! | s     px   pz   pz    ( 32 )
@@ -669,10 +763,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0200) ! | s     py   s    s     ( 33 )
@@ -682,10 +779,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0201) ! | s     py   s    px    ( 34 )
@@ -695,10 +795,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0202) ! | s     py   s    py    ( 35 )
@@ -708,10 +811,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0203) ! | s     py   s    pz    ( 36 )
@@ -721,10 +827,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0210) ! | s     py   px   s     ( 37 )
@@ -734,10 +843,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0211) ! | s     py   px   px    ( 38 )
@@ -747,10 +859,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0212) ! | s     py   px   py    ( 39 )
@@ -760,10 +875,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0213) ! | s     py   px   pz    ( 40 )
@@ -773,10 +891,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0220) ! | s     py   py   s     ( 41 )
@@ -786,10 +907,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0221) ! | s     py   py   px    ( 42 )
@@ -799,10 +923,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0222) ! | s     py   py   py    ( 43 )
@@ -812,10 +939,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0223) ! | s     py   py   pz    ( 44 )
@@ -825,10 +955,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0230) ! | s     py   pz   s     ( 45 )
@@ -838,10 +971,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0231) ! | s     py   pz   px    ( 46 )
@@ -851,10 +987,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0232) ! | s     py   pz   py    ( 47 )
@@ -864,10 +1003,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0233) ! | s     py   pz   pz    ( 48 )
@@ -877,10 +1019,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0300) ! | s     pz   s    s     ( 49 )
@@ -890,10 +1035,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0301) ! | s     pz   s    px    ( 50 )
@@ -903,10 +1051,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0302) ! | s     pz   s    py    ( 51 )
@@ -916,10 +1067,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0303) ! | s     pz   s    pz    ( 52 )
@@ -929,10 +1083,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0310) ! | s     pz   px   s     ( 53 )
@@ -942,10 +1099,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0311) ! | s     pz   px   px    ( 54 )
@@ -955,10 +1115,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0312) ! | s     pz   px   py    ( 55 )
@@ -968,10 +1131,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0313) ! | s     pz   px   pz    ( 56 )
@@ -981,10 +1147,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0320) ! | s     pz   py   s     ( 57 )
@@ -994,10 +1163,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0321) ! | s     pz   py   px    ( 58 )
@@ -1007,10 +1179,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0322) ! | s     pz   py   py    ( 59 )
@@ -1020,10 +1195,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0323) ! | s     pz   py   pz    ( 60 )
@@ -1033,10 +1211,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0330) ! | s     pz   pz   s     ( 61 )
@@ -1046,10 +1227,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0331) ! | s     pz   pz   px    ( 62 )
@@ -1059,10 +1243,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0332) ! | s     pz   pz   py    ( 63 )
@@ -1072,10 +1259,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (0333) ! | s     pz   pz   pz    ( 64 )
@@ -1085,10 +1275,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1000) ! | px    s    s    s     ( 65 )
@@ -1098,10 +1291,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1001) ! | px    s    s    px    ( 66 )
@@ -1111,10 +1307,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1002) ! | px    s    s    py    ( 67 )
@@ -1124,10 +1323,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1003) ! | px    s    s    pz    ( 68 )
@@ -1137,10 +1339,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1010) ! | px    s    px   s     ( 69 )
@@ -1150,10 +1355,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1011) ! | px    s    px   px    ( 70 )
@@ -1163,10 +1371,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1012) ! | px    s    px   py    ( 71 )
@@ -1176,10 +1387,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1013) ! | px    s    px   pz    ( 72 )
@@ -1189,10 +1403,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1020) ! | px    s    py   s     ( 73 )
@@ -1202,10 +1419,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1021) ! | px    s    py   px    ( 74 )
@@ -1215,10 +1435,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1022) ! | px    s    py   py    ( 75 )
@@ -1228,10 +1451,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1023) ! | px    s    py   pz    ( 76 )
@@ -1241,10 +1467,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1030) ! | px    s    pz   s     ( 77 )
@@ -1254,10 +1483,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1031) ! | px    s    pz   px    ( 78 )
@@ -1267,10 +1499,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1032) ! | px    s    pz   py    ( 79 )
@@ -1280,10 +1515,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1033) ! | px    s    pz   pz    ( 80 )
@@ -1293,10 +1531,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1100) ! | px    px   s    s     ( 81 )
@@ -1306,10 +1547,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1101) ! | px    px   s    px    ( 82 )
@@ -1319,10 +1563,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1102) ! | px    px   s    py    ( 83 )
@@ -1332,10 +1579,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1103) ! | px    px   s    pz    ( 84 )
@@ -1345,10 +1595,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1110) ! | px    px   px   s     ( 85 )
@@ -1358,10 +1611,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1111) ! | px    px   px   px    ( 86 )
@@ -1371,10 +1627,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1112) ! | px    px   px   py    ( 87 )
@@ -1384,10 +1643,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1113) ! | px    px   px   pz    ( 88 )
@@ -1397,10 +1659,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1120) ! | px    px   py   s     ( 89 )
@@ -1410,10 +1675,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1121) ! | px    px   py   px    ( 90 )
@@ -1423,10 +1691,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1122) ! | px    px   py   py    ( 91 )
@@ -1436,10 +1707,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1123) ! | px    px   py   pz    ( 92 )
@@ -1449,10 +1723,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1130) ! | px    px   pz   s     ( 93 )
@@ -1462,10 +1739,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1131) ! | px    px   pz   px    ( 94 )
@@ -1475,10 +1755,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1132) ! | px    px   pz   py    ( 95 )
@@ -1488,10 +1771,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1133) ! | px    px   pz   pz    ( 96 )
@@ -1501,10 +1787,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax2*(cxpa*cxpb*der_I_A(2, 0, n, I_A, A) + cxpa*sxpb*der_I_A(1, 1, n, I_A, A) + cxpb*sxpa*der_I_A(1, 1, n, I_A, A) + sxpa*sxpb*der_I_A(0, 2, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1200) ! | px    py   s    s     ( 97 )
@@ -1514,10 +1803,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1201) ! | px    py   s    px    ( 98 )
@@ -1527,10 +1819,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1202) ! | px    py   s    py    ( 99 )
@@ -1540,10 +1835,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1203) ! | px    py   s    pz    ( 100 )
@@ -1553,10 +1851,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1210) ! | px    py   px   s     ( 101 )
@@ -1566,10 +1867,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1211) ! | px    py   px   px    ( 102 )
@@ -1579,10 +1883,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1212) ! | px    py   px   py    ( 103 )
@@ -1592,10 +1899,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1213) ! | px    py   px   pz    ( 104 )
@@ -1605,10 +1915,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1220) ! | px    py   py   s     ( 105 )
@@ -1618,10 +1931,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1221) ! | px    py   py   px    ( 106 )
@@ -1631,10 +1947,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1222) ! | px    py   py   py    ( 107 )
@@ -1644,10 +1963,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1223) ! | px    py   py   pz    ( 108 )
@@ -1657,10 +1979,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1230) ! | px    py   pz   s     ( 109 )
@@ -1670,10 +1995,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1231) ! | px    py   pz   px    ( 110 )
@@ -1683,10 +2011,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1232) ! | px    py   pz   py    ( 111 )
@@ -1696,10 +2027,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1233) ! | px    py   pz   pz    ( 112 )
@@ -1709,10 +2043,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1300) ! | px    pz   s    s     ( 113 )
@@ -1722,10 +2059,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1301) ! | px    pz   s    px    ( 114 )
@@ -1735,10 +2075,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1302) ! | px    pz   s    py    ( 115 )
@@ -1748,10 +2091,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1303) ! | px    pz   s    pz    ( 116 )
@@ -1761,10 +2107,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1310) ! | px    pz   px   s     ( 117 )
@@ -1774,10 +2123,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1311) ! | px    pz   px   px    ( 118 )
@@ -1787,10 +2139,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1312) ! | px    pz   px   py    ( 119 )
@@ -1800,10 +2155,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1313) ! | px    pz   px   pz    ( 120 )
@@ -1813,10 +2171,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1320) ! | px    pz   py   s     ( 121 )
@@ -1826,10 +2187,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1321) ! | px    pz   py   px    ( 122 )
@@ -1839,10 +2203,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1322) ! | px    pz   py   py    ( 123 )
@@ -1852,10 +2219,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1323) ! | px    pz   py   pz    ( 124 )
@@ -1865,10 +2235,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1330) ! | px    pz   pz   s     ( 125 )
@@ -1878,10 +2251,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1331) ! | px    pz   pz   px    ( 126 )
@@ -1891,10 +2267,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1332) ! | px    pz   pz   py    ( 127 )
@@ -1904,10 +2283,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (1333) ! | px    pz   pz   pz    ( 128 )
@@ -1917,10 +2299,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpa*der_I_A(1, 0, n, I_A, A) + sxpa*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2000) ! | py    s    s    s     ( 129 )
@@ -1930,10 +2315,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2001) ! | py    s    s    px    ( 130 )
@@ -1943,10 +2331,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2002) ! | py    s    s    py    ( 131 )
@@ -1956,10 +2347,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2003) ! | py    s    s    pz    ( 132 )
@@ -1969,10 +2363,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2010) ! | py    s    px   s     ( 133 )
@@ -1982,10 +2379,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2011) ! | py    s    px   px    ( 134 )
@@ -1995,10 +2395,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2012) ! | py    s    px   py    ( 135 )
@@ -2008,10 +2411,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2013) ! | py    s    px   pz    ( 136 )
@@ -2021,10 +2427,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2020) ! | py    s    py   s     ( 137 )
@@ -2034,10 +2443,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2021) ! | py    s    py   px    ( 138 )
@@ -2047,10 +2459,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2022) ! | py    s    py   py    ( 139 )
@@ -2060,10 +2475,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2023) ! | py    s    py   pz    ( 140 )
@@ -2073,10 +2491,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2030) ! | py    s    pz   s     ( 141 )
@@ -2086,10 +2507,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2031) ! | py    s    pz   px    ( 142 )
@@ -2099,10 +2523,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2032) ! | py    s    pz   py    ( 143 )
@@ -2112,10 +2539,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2033) ! | py    s    pz   pz    ( 144 )
@@ -2125,10 +2555,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2100) ! | py    px   s    s     ( 145 )
@@ -2138,10 +2571,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2101) ! | py    px   s    px    ( 146 )
@@ -2151,10 +2587,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2102) ! | py    px   s    py    ( 147 )
@@ -2164,10 +2603,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2103) ! | py    px   s    pz    ( 148 )
@@ -2177,10 +2619,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2110) ! | py    px   px   s     ( 149 )
@@ -2190,10 +2635,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2111) ! | py    px   px   px    ( 150 )
@@ -2203,10 +2651,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2112) ! | py    px   px   py    ( 151 )
@@ -2216,10 +2667,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2113) ! | py    px   px   pz    ( 152 )
@@ -2229,10 +2683,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2120) ! | py    px   py   s     ( 153 )
@@ -2242,10 +2699,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2121) ! | py    px   py   px    ( 154 )
@@ -2255,10 +2715,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2122) ! | py    px   py   py    ( 155 )
@@ -2268,10 +2731,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2123) ! | py    px   py   pz    ( 156 )
@@ -2281,10 +2747,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2130) ! | py    px   pz   s     ( 157 )
@@ -2294,10 +2763,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2131) ! | py    px   pz   px    ( 158 )
@@ -2307,10 +2779,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2132) ! | py    px   pz   py    ( 159 )
@@ -2320,10 +2795,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2133) ! | py    px   pz   pz    ( 160 )
@@ -2333,10 +2811,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2200) ! | py    py   s    s     ( 161 )
@@ -2346,10 +2827,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2201) ! | py    py   s    px    ( 162 )
@@ -2359,10 +2843,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2202) ! | py    py   s    py    ( 163 )
@@ -2372,10 +2859,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2203) ! | py    py   s    pz    ( 164 )
@@ -2385,10 +2875,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2210) ! | py    py   px   s     ( 165 )
@@ -2398,10 +2891,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2211) ! | py    py   px   px    ( 166 )
@@ -2411,10 +2907,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2212) ! | py    py   px   py    ( 167 )
@@ -2424,10 +2923,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2213) ! | py    py   px   pz    ( 168 )
@@ -2437,10 +2939,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2220) ! | py    py   py   s     ( 169 )
@@ -2450,10 +2955,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2221) ! | py    py   py   px    ( 170 )
@@ -2463,10 +2971,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2222) ! | py    py   py   py    ( 171 )
@@ -2476,10 +2987,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2223) ! | py    py   py   pz    ( 172 )
@@ -2489,10 +3003,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2230) ! | py    py   pz   s     ( 173 )
@@ -2502,10 +3019,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2231) ! | py    py   pz   px    ( 174 )
@@ -2515,10 +3035,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2232) ! | py    py   pz   py    ( 175 )
@@ -2528,10 +3051,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2233) ! | py    py   pz   pz    ( 176 )
@@ -2541,10 +3067,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2300) ! | py    pz   s    s     ( 177 )
@@ -2554,10 +3083,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2301) ! | py    pz   s    px    ( 178 )
@@ -2567,10 +3099,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2302) ! | py    pz   s    py    ( 179 )
@@ -2580,10 +3115,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2303) ! | py    pz   s    pz    ( 180 )
@@ -2593,10 +3131,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2310) ! | py    pz   px   s     ( 181 )
@@ -2606,10 +3147,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2311) ! | py    pz   px   px    ( 182 )
@@ -2619,10 +3163,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2312) ! | py    pz   px   py    ( 183 )
@@ -2632,10 +3179,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2313) ! | py    pz   px   pz    ( 184 )
@@ -2645,10 +3195,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2320) ! | py    pz   py   s     ( 185 )
@@ -2658,10 +3211,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2321) ! | py    pz   py   px    ( 186 )
@@ -2671,10 +3227,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2322) ! | py    pz   py   py    ( 187 )
@@ -2684,10 +3243,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2323) ! | py    pz   py   pz    ( 188 )
@@ -2697,10 +3259,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2330) ! | py    pz   pz   s     ( 189 )
@@ -2710,10 +3275,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2331) ! | py    pz   pz   px    ( 190 )
@@ -2723,10 +3291,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2332) ! | py    pz   pz   py    ( 191 )
@@ -2736,10 +3307,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (2333) ! | py    pz   pz   pz    ( 192 )
@@ -2749,10 +3323,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3000) ! | pz    s    s    s     ( 193 )
@@ -2762,10 +3339,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3001) ! | pz    s    s    px    ( 194 )
@@ -2775,10 +3355,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3002) ! | pz    s    s    py    ( 195 )
@@ -2788,10 +3371,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3003) ! | pz    s    s    pz    ( 196 )
@@ -2801,10 +3387,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3010) ! | pz    s    px   s     ( 197 )
@@ -2814,10 +3403,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3011) ! | pz    s    px   px    ( 198 )
@@ -2827,10 +3419,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3012) ! | pz    s    px   py    ( 199 )
@@ -2840,10 +3435,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3013) ! | pz    s    px   pz    ( 200 )
@@ -2853,10 +3451,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3020) ! | pz    s    py   s     ( 201 )
@@ -2866,10 +3467,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3021) ! | pz    s    py   px    ( 202 )
@@ -2879,10 +3483,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3022) ! | pz    s    py   py    ( 203 )
@@ -2892,10 +3499,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3023) ! | pz    s    py   pz    ( 204 )
@@ -2905,10 +3515,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3030) ! | pz    s    pz   s     ( 205 )
@@ -2918,10 +3531,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3031) ! | pz    s    pz   px    ( 206 )
@@ -2931,10 +3547,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3032) ! | pz    s    pz   py    ( 207 )
@@ -2944,10 +3563,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3033) ! | pz    s    pz   pz    ( 208 )
@@ -2957,10 +3579,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3100) ! | pz    px   s    s     ( 209 )
@@ -2970,10 +3595,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3101) ! | pz    px   s    px    ( 210 )
@@ -2983,10 +3611,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3102) ! | pz    px   s    py    ( 211 )
@@ -2996,10 +3627,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3103) ! | pz    px   s    pz    ( 212 )
@@ -3009,10 +3643,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3110) ! | pz    px   px   s     ( 213 )
@@ -3022,10 +3659,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3111) ! | pz    px   px   px    ( 214 )
@@ -3035,10 +3675,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3112) ! | pz    px   px   py    ( 215 )
@@ -3048,10 +3691,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3113) ! | pz    px   px   pz    ( 216 )
@@ -3061,10 +3707,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3120) ! | pz    px   py   s     ( 217 )
@@ -3074,10 +3723,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3121) ! | pz    px   py   px    ( 218 )
@@ -3087,10 +3739,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3122) ! | pz    px   py   py    ( 219 )
@@ -3100,10 +3755,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3123) ! | pz    px   py   pz    ( 220 )
@@ -3113,10 +3771,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3130) ! | pz    px   pz   s     ( 221 )
@@ -3126,10 +3787,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3131) ! | pz    px   pz   px    ( 222 )
@@ -3139,10 +3803,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3132) ! | pz    px   pz   py    ( 223 )
@@ -3152,10 +3819,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3133) ! | pz    px   pz   pz    ( 224 )
@@ -3165,10 +3835,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = inv_ax*(cxpb*der_I_A(1, 0, n, I_A, A) + sxpb*der_I_A(0, 1, n, I_A, A))
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3200) ! | pz    py   s    s     ( 225 )
@@ -3178,10 +3851,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3201) ! | pz    py   s    px    ( 226 )
@@ -3191,10 +3867,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3202) ! | pz    py   s    py    ( 227 )
@@ -3204,10 +3883,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3203) ! | pz    py   s    pz    ( 228 )
@@ -3217,10 +3899,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3210) ! | pz    py   px   s     ( 229 )
@@ -3230,10 +3915,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3211) ! | pz    py   px   px    ( 230 )
@@ -3243,10 +3931,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3212) ! | pz    py   px   py    ( 231 )
@@ -3256,10 +3947,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3213) ! | pz    py   px   pz    ( 232 )
@@ -3269,10 +3963,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3220) ! | pz    py   py   s     ( 233 )
@@ -3282,10 +3979,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3221) ! | pz    py   py   px    ( 234 )
@@ -3295,10 +3995,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3222) ! | pz    py   py   py    ( 235 )
@@ -3308,10 +4011,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3223) ! | pz    py   py   pz    ( 236 )
@@ -3321,10 +4027,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3230) ! | pz    py   pz   s     ( 237 )
@@ -3334,10 +4043,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3231) ! | pz    py   pz   px    ( 238 )
@@ -3347,10 +4059,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3232) ! | pz    py   pz   py    ( 239 )
@@ -3360,10 +4075,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3233) ! | pz    py   pz   pz    ( 240 )
@@ -3373,10 +4091,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3300) ! | pz    pz   s    s     ( 241 )
@@ -3386,10 +4107,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3301) ! | pz    pz   s    px    ( 242 )
@@ -3399,10 +4123,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3302) ! | pz    pz   s    py    ( 243 )
@@ -3412,10 +4139,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3303) ! | pz    pz   s    pz    ( 244 )
@@ -3425,10 +4155,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3310) ! | pz    pz   px   s     ( 245 )
@@ -3438,10 +4171,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3311) ! | pz    pz   px   px    ( 246 )
@@ -3451,10 +4187,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax2*(cxqc*cxqd*der_I_B(2, 0, n, I_B, B) + cxqc*sxqd*der_I_B(1, 1, n, I_B, B) + cxqd*sxqc*der_I_B(1, 1, n, I_B, B) + sxqc*sxqd*der_I_B(0, 2, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3312) ! | pz    pz   px   py    ( 247 )
@@ -3464,10 +4203,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3313) ! | pz    pz   px   pz    ( 248 )
@@ -3477,10 +4219,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqc*der_I_B(1, 0, n, I_B, B) + sxqc*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3320) ! | pz    pz   py   s     ( 249 )
@@ -3490,10 +4235,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3321) ! | pz    pz   py   px    ( 250 )
@@ -3503,10 +4251,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3322) ! | pz    pz   py   py    ( 251 )
@@ -3516,10 +4267,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3323) ! | pz    pz   py   pz    ( 252 )
@@ -3529,10 +4283,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3330) ! | pz    pz   pz   s     ( 253 )
@@ -3542,10 +4299,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3331) ! | pz    pz   pz   px    ( 254 )
@@ -3555,10 +4315,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = inv_ax*(cxqd*der_I_B(1, 0, n, I_B, B) + sxqd*der_I_B(0, 1, n, I_B, B))
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3332) ! | pz    pz   pz   py    ( 255 )
@@ -3568,10 +4331,13 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
 
       case (3333) ! | pz    pz   pz   pz    ( 256 )
@@ -3581,12 +4347,14 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       do n   = 1 , Nmax
       termAn = I_A(n)
       termBn = I_B(n)
-      term   = termAn * termBn * I_C_table_x(n, i_quad) * exp_term(n)
+      term   = termAn * termBn * I_C_table_x(n, i_quad) * current_term
       sum = sum + 2.d0 * real(term)
-      !current_term = current_term * expo_term
-      
+      current_term = current_term * expo_term
+      if (abs(term) < eps * dabs(sum) ) then
+        no_converged_x = .false. 
+        exit
+      end if
       end do
-
 
       case default
         sum = 0.0d0
@@ -3647,5 +4415,3 @@ subroutine bessel_I_scaled_backward(Nmax, x, I_scaled)
 
       
 end subroutine bessel_I_scaled_backward
-
-      !call DGEMV('T', m, n_cols, 1.0d0, I_C_table_x, m, w_x, 1, 0.0d0, dot_vec, 1)

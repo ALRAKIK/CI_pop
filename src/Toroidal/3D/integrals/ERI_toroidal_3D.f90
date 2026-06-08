@@ -45,7 +45,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       !                      Schwarz screening                          !
       double precision, allocatable :: Q_schwarz(:,:)
       double precision              :: val_iijj
-      double precision, parameter   :: schwarz_thresh = 1.0d-10   ! tune this
+      double precision, parameter   :: schwarz_thresh = 1.0d-12   ! tune this
       integer                       :: n_screened, n_computed
       !-----------------------------------------------------------------!
 

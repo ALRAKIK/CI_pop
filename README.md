@@ -1,16 +1,16 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/ALRAKIK/CI_pop">
+  <a href="https://github.com/ALRAKIK/William_CI">
     <img src="src/project/logo.png" alt="Logo" width="140" height="140">
   </a>
 
-  <h3 align="center">CI_pop Project</h3>
+  <h3 align="center">William_CI Project</h3>
 
   <p align="center">
     Calculate the quantum chemistry integral required for the Hartree-Fock mechanism.
     <br />
-    <a href="https://github.com/ALRAKIK/CI_pop"><strong>Explore the Project »</strong></a>
+    <a href="https://github.com/ALRAKIK/William_CI"><strong>Explore the Project »</strong></a>
     <br />
     <br />
   </p>

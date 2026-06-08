@@ -50,9 +50,10 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       
       double precision, allocatable :: Q_schwarz(:,:)
       double precision              :: val_iijj
-      double precision, parameter   :: schwarz_thresh = 1.d-12
-      !double precision, parameter   :: schwarz_thresh = 0.d0 
-      integer                       :: n_screened, n_computed , n_check 
+      !double precision, parameter   :: schwarz_thresh = 1.d-12
+      double precision, parameter   :: schwarz_thresh = 0.d0 
+      integer                       :: n_screened, n_computed
+
       !-----------------------------------------------------------------!
       
       !-----------------------------------------------------------------!
@@ -61,6 +62,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
 
       call initialize_bessel_table_64_Lx()
       call precompute_gauss_legendre_64()
+      call gauss_legendre_64_points()
 
       do i = 1 , 64
         write(*,'(I3,2X,F12.4,F12.4)') i, gl_t_nodes(i), gl_t_weights(i)
@@ -208,6 +210,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       write(outfile,'(A,I0)')   'Screened out by Schwarz:   ', n_screened
       write(outfile,'(A,F8.2,A)') 'Reduction:                 ', &
         100.d0 * dble(n_screened) / dble(n_computed), ' %'
+      write(outfile,'(A)') ''
       flush(outfile)
       !-----------------------------------------------------------------!
       
@@ -235,7 +238,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
                cycle
              end if
 
-              call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))    ! chemist notation
+              call ERI_integral_4_function_toroidal(ERI(i),ERI(j),ERI(k),ERI(l), two_electron(i,j,k,l))         ! chemist notation
 
               !$omp critical
               integrals_done = integrals_done + 1.d0
@@ -254,6 +257,8 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       end do
       
       !$omp end parallel do
+
+
 
       write(*,'(a)') ""
       write(*,'(a)') "*************************************************"

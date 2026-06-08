@@ -9,7 +9,6 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
       ! local ! 
 
-      integer                        :: number_of_unitcell
       integer                        :: num_atoms
       integer                        :: io_stat, i, j, k, l, atom_index
 
@@ -40,44 +39,43 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
       open(1,file="unitcell.mol")
 
-      read(1,*) type_of_calculation
+        read(1,*) type_of_calculation
 
-      call read_2nd_line(type_of_calculation, number_of_unitcell,  &
-                        & distance_between_unitcells, Lx , Ly , Lz)
+        call read_2nd_line(type_of_calculation, distance_between_unitcells, Lx , Ly , Lz)
 
-      call read_keywords(keyword)
+        call read_keywords(keyword)
 
-      allocate(atom_names(max_atom))
-      allocate(geometry_unitcell(max_atom,3))
+        allocate(atom_names(max_atom))
+        allocate(geometry_unitcell(max_atom,3))
 
-      num_atoms              = 0
-      geometry_unitcell(:,3) = 0.d0 
+        num_atoms              = 0
+        geometry_unitcell(:,3) = 0.d0 
 
       ! --------------------------------------------------------------- !
       !               Read unitcell geometry from file                  !
       ! --------------------------------------------------------------- !
 
-      do
+        do
 
-        read(1, '(A)', iostat=io_stat) line
-        if (trim(line) == '$$') then
-          reading_cell = .false.
-          exit
-        end if
+          read(1, '(A)', iostat=io_stat) line
+          if (trim(line) == '$$') then
+            reading_cell = .false.
+            exit
+          end if
 
-        num_atoms = num_atoms + 1
+          num_atoms = num_atoms + 1
 
-        read(line, *, iostat=io_stat) atom_names(num_atoms),            &
-        &                             geometry_unitcell(num_atoms,1),   &
-        &                             geometry_unitcell(num_atoms,2),   &
-        &                             geometry_unitcell(num_atoms,3)
+          read(line, *, iostat=io_stat) atom_names(num_atoms),            &
+          &                             geometry_unitcell(num_atoms,1),   &
+          &                             geometry_unitcell(num_atoms,2),   &
+          &                             geometry_unitcell(num_atoms,3)
 
-        if (io_stat /= 0) then
-          print *, 'Error parsing atom data:', trim(line)
-          num_atoms = num_atoms - 1
-        end if
+          if (io_stat /= 0) then
+            print *, 'Error parsing atom data:', trim(line)
+            num_atoms = num_atoms - 1
+          end if
 
-      end do
+        end do
 
       close(1)
 
@@ -98,32 +96,61 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 
       deallocate(atom_names)
       deallocate(geometry_unitcell)
-      ! --------------------------------------------------------------- !
 
-      if (type_of_calculation == 'Tori1D') then 
-
-      allocate(super_atoms(num_atoms * number_of_unitcell))
-      allocate(super_geometry(num_atoms * number_of_unitcell, 3))
+      allocate(super_atoms(num_atoms * nx * ny * nz))
+      allocate(super_geometry(num_atoms * nx * ny * nz, 3))
 
       atom_index = 0
 
-      do i = 0, number_of_unitcell-1
-        do j = 1, num_atoms
-            atom_index = atom_index + 1
-            super_atoms(atom_index) = a_names(j)
-            ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
-            super_geometry(atom_index, 1) = unitcell(j, 1)              &
-          &                           + real(i, kind(1.0d0)) * distance_between_unitcells
-            ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
-            super_geometry(atom_index, 2) = unitcell(j, 2)
-            super_geometry(atom_index, 3) = unitcell(j, 3) 
+      ! --------------------------------------------------------------- !
+
+      if (   type_of_calculation == 'OBC'    .or. &
+          &  type_of_calculation == 'Tori1D' .or. & 
+          &  type_of_calculation == 'Tori2D' .or. & 
+          &  type_of_calculation == 'Tori3D')        then 
+
+        do i = 0, nx - 1 
+          do j = 0, ny - 1 
+            do k = 0 , nz -1 
+              do l = 1 , num_atoms
+                atom_index = atom_index + 1
+                super_atoms(atom_index) = a_names(l)
+              ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
+                super_geometry(atom_index, 1) = unitcell(l, 1) + i * distance_between_unitcells
+                super_geometry(atom_index, 2) = unitcell(l, 2) + j * distance_between_unitcells
+                super_geometry(atom_index, 3) = unitcell(l, 3) + k * distance_between_unitcells
+              ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
+              end do 
+            end do 
+          end do
         end do
-      end do
+
+      end if 
+
+      if (type_of_calculation == "Ring") then 
+
+        rx         = Lx / (2.d0*pi) 
+
+        do i = 0, nx-1
+          do j = 1, num_atoms
+              atom_index = atom_index + 1
+              super_atoms(atom_index) = a_names(j)
+              theta = (i * distance_between_unitcells + unitcell(j, 1)) &
+            & * 2.d0*pi/(nx * distance_between_unitcells)
+              super_geometry(atom_index, 1) = rx * cos(theta)
+              super_geometry(atom_index, 2) = rx * sin(theta)
+              super_geometry(atom_index, 3) = 0.d0
+          end do
+        end do
+
+      end if
 
       open(2,file="supermolecule.mol")
-        do i = 1, num_atoms * number_of_unitcell
-          write(2,*)        super_atoms(i), super_geometry(i, 1),       &
-          &                 super_geometry(i, 2), super_geometry(i, 3)
+        do i = 1, num_atoms * nx * ny * nz
+          write(2,*)  super_atoms(i),             & 
+          &           super_geometry(i, 1),       &
+          &           super_geometry(i, 2),       &
+          &           super_geometry(i, 3)
         end do
       close(2)
 
@@ -133,133 +160,8 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
         else
           write(3,*) Lx , Ly , Lz
         end if
-        write(3,*) num_atoms
-      close(3)
-
-      end if 
-
-
-
-      if (type_of_calculation == "Ring") then 
-
-        allocate(super_atoms(num_atoms * number_of_unitcell))
-        allocate(super_geometry(num_atoms * number_of_unitcell, 3))
-
-        atom_index = 0
-        rx         = Lx / (2.d0*pi) 
-
-        do i = 0, number_of_unitcell-1
-          do j = 1, num_atoms
-              atom_index = atom_index + 1
-              super_atoms(atom_index) = a_names(j)
-              theta = (i * distance_between_unitcells + unitcell(j, 1)) &
-            & * 2.d0*pi/(number_of_unitcell * distance_between_unitcells)
-              super_geometry(atom_index, 1) = rx * cos(theta)
-              super_geometry(atom_index, 2) = rx * sin(theta)
-              super_geometry(atom_index, 3) = 0.d0
-          end do
-        end do
-
-        open(2,file="supermolecule.mol")
-          do i = 1, num_atoms * number_of_unitcell
-            write(2,*) super_atoms(i), super_geometry(i, 1), &
-                       super_geometry(i, 2), super_geometry(i, 3)
-          end do
-        close(2)
-
-        open(3,file="torus_parameters.inp")
-          if (keyword(4) == 'Angstrom') then 
-            write(3,*) Lx * Ang_par , Ly * Ang_par , Lz * Ang_par
-          else
-            write(3,*) Lx , Ly , Lz
-          end if
           write(3,*) num_atoms
-        close(3)
-
-      end if 
-
-
-
-      if (type_of_calculation == 'OBC') then 
-
-      allocate(super_atoms(num_atoms))
-      allocate(super_geometry(num_atoms, 3))
-
-      atom_index = 0
-
-      do j = 1, num_atoms
-          atom_index = atom_index + 1
-          super_atoms(atom_index) = a_names(j)
-          super_geometry(atom_index, 1) = unitcell(j, 1)
-          super_geometry(atom_index, 2) = unitcell(j, 2)
-          super_geometry(atom_index, 3) = unitcell(j, 3) 
-      end do
-
-      open(2,file="supermolecule.mol")
-        do i = 1, num_atoms * number_of_unitcell
-          write(2, *)       super_atoms(i), super_geometry(i, 1),       &
-          &           super_geometry(i, 2), super_geometry(i, 3)
-        end do
-      close(2)
-
-      open(3,file="torus_parameters.inp")
-        if (keyword(4) == 'Angstrom') then 
-          write(3,*) Lx * Ang_par , Ly * Ang_par , Lz * Ang_par
-        else
-          write(3,*) Lx , Ly , Lz
-        end if
-        write(3,*) num_atoms
       close(3)
-
-      end if 
-
-
-      if (type_of_calculation == 'Tori3D') then 
-
-      allocate(super_atoms(num_atoms * nx * ny * nz))
-      allocate(super_geometry(num_atoms * nx * ny * nz, 3))
-
-      atom_index = 0
-
-      do i = 0, nx - 1 
-        do j = 0, ny - 1 
-          do k = 0 , nz -1 
-            do l = 1 , num_atoms
-            atom_index = atom_index + 1
-            super_atoms(atom_index) = a_names(l)
-            ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
-            super_geometry(atom_index, 1) = unitcell(l, 1)              &
-          &                           + i * distance_between_unitcells
-            ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
-            super_geometry(atom_index, 2) = unitcell(l, 2)              &
-          &                           + j * distance_between_unitcells
-          ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - ! - !
-            super_geometry(atom_index, 3) = unitcell(l, 3)            & 
-          &                           + k * distance_between_unitcells
-            end do 
-          end do 
-        end do
-      end do
-
-      open(2,file="supermolecule.mol")
-        do i = 1, num_atoms * nx * ny * nz
-          write(2, *)       super_atoms(i), super_geometry(i, 1),       &
-          &           super_geometry(i, 2), super_geometry(i, 3)
-        end do
-      close(2)
-
-      open(3,file="torus_parameters.inp")
-        if (keyword(4) == 'Angstrom') then 
-          write(3,*) Lx * Ang_par , Ly * Ang_par , Lz * Ang_par
-        else
-          write(3,*) Lx , Ly , Lz
-        end if
-        write(3,*) num_atoms
-      close(3)
-
-      end if 
-
-
 
       ! --------------------------------------------------------------- !
 
@@ -275,64 +177,88 @@ subroutine build_super_molecule(keyword,num_atom_per_unitcell)
 end subroutine
 
 
-subroutine read_2nd_line(type_of_calculation, number_of_unitcell,     &
-                         & distance_between_unitcells, Lx , Ly , Lz)
+subroutine read_2nd_line(type_of_calculation, distance_between_unitcells, Lx , Ly , Lz)
       
       use unitcell_module
+
       implicit none
 
       character(len=10)              :: type_of_calculation
-      integer                        :: number_of_unitcell
       double precision               :: distance_between_unitcells
       double precision               :: Lx , Ly , Lz
 
-        if (type_of_calculation == "Ring") then
 
-        write(*,'(a)') "Type of calculation: Ring"
-        read(1,*) number_of_unitcell , distance_between_unitcells, Lx
+      if (type_of_calculation == "OBC") then 
 
-      else if (type_of_calculation == "Torus") then
+        write(*,'(a)') ""
+        write(*,'(a)') "************************************"
+        write(*,'(a)') "* Type of calculation: OBC         *"
+        write(*,'(a)') "************************************"
+        write(*,'(a)') ""
 
-        write(*,'(a)') "Type of calculation: Torus"
-        read(1,*) number_of_unitcell , distance_between_unitcells, Lx , Ly , Lz 
+        read(1,*) nx , distance_between_unitcells, Lx
 
-      else if (type_of_calculation == "OBC") then 
+        ny = 1 
+        nz = 1 
+ 
+      else if (type_of_calculation == "Ring") then
 
-        write(*,'(a)') "Type of calculation: OBC"
+        write(*,'(a)') ""
+        write(*,'(a)') "************************************"
+        write(*,'(a)') "* Type of calculation: Ring        *"
+        write(*,'(a)') "************************************"
+        write(*,'(a)') ""
 
-        read(1,*) number_of_unitcell , distance_between_unitcells, Lx
+        read(1,*) nx , distance_between_unitcells, Lx
+
+        ny    = 1 
+        nz    = 1
 
       else if (type_of_calculation == "Tori1D") then 
 
-        write(*,'(a)') "Type of calculation: Toroidal"
-        read(1,*) number_of_unitcell , distance_between_unitcells, Lx
-        nx   = number_of_unitcell
+        write(*,'(a)') ""
+        write(*,'(a)') "************************************"
+        write(*,'(a)') "* Type of calculation: Toroidal 1D *"
+        write(*,'(a)') "************************************"
+        write(*,'(a)') ""
+
+        read(1,*) nx , distance_between_unitcells, Lx
+
         ny   = 1
         nz   = 1
 
       else if (type_of_calculation == "Tori2D") then 
 
-        write(*,'(a)') "Type of calculation: Toroidal real 2D"
-        read(1,*) number_of_unitcell , distance_between_unitcells, Lx , Ly
+        write(*,'(a)') ""
+        write(*,'(a)') "************************************"
+        write(*,'(a)') "* Type of calculation: Toroidal 2D *"
+        write(*,'(a)') "************************************"
+        write(*,'(a)') ""
+
+        read(1,*) nx , ny , distance_between_unitcells, Lx , Ly
+
+        nz   = 1 
 
       else if (type_of_calculation == "Tori3D") then 
 
-        write(*,'(a)') "Type of calculation: Toroidal real 3D"
+        write(*,'(a)') ""
+        write(*,'(a)') "************************************"
+        write(*,'(a)') "* Type of calculation: Toroidal 3D *"
+        write(*,'(a)') "************************************"
+        write(*,'(a)') ""
+
         read(1,*) nx , ny , nz , distance_between_unitcells, Lx , Ly , Lz
 
-      else if (type_of_calculation == "OBC2D") then 
-
-        write(*,'(a)') "Type of calculation: OBC with FCI"
-        read(1,*) number_of_unitcell , distance_between_unitcells
-
       else 
+
         write(*,'(a)') ""
         write(*,'(a)') "Error: Unknown type of calculation"
         write(*,'(a)') ""
-        write(*,'(a)') "Please use either    'OBC',   'Ring',  'Torus'"
-        write(*,'(a)') "                  'Tori1D', 'Tori2D', 'Tori3D'."
+        write(*,'(a)') "Please use either    'OBC',   'Ring',          "
+        write(*,'(a)') "                  'Tori1D', 'Tori2D', 'Tori3D' "
         write(*,'(a)') ""
         stop
+
       end if
 
 
@@ -404,10 +330,6 @@ subroutine read_keywords(keyword)
         if (trim(line) == 'SAO'      )   keyword(17) = 'SAO'
 
         if (trim(line) == 'Save'     )   keyword(18) = 'Save'
-
-
-
-
 
       end do
 

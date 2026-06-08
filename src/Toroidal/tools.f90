@@ -541,9 +541,6 @@ subroutine symmetry_of_integrals_ERI_mod(nf, fpuc, eri_tmp, eri)
       
       ! Timing
 
-      double precision             :: wstart, wend
-
-
       !-----------------------------------------------------------------!
 
       eri(:,:,:,:) = 0.d0

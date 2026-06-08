@@ -340,12 +340,6 @@ contains
           gl_t_nodes(64+1-i) = t_right
         end do
 
-        open(10, file='gl64_nodes_weights.txt', status='unknown')
-            do i = 1, 64
-              write(10, '(i3,2x,2f30.20)') i, gl_t_nodes(i), gl_t_weights(i)
-            end do
-        close(10)
-
       end subroutine precompute_gauss_legendre_64
 
 

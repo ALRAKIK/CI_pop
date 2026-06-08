@@ -9,15 +9,10 @@ contains
         implicit none 
         
         double precision, dimension(:), intent(in)               :: array_coef , array_expo
-
         double precision, dimension(:), allocatable, intent(out) :: f_array_coef, f_array_expo
-
         integer, allocatable                                     :: zero_indices(:)
-                             
         logical                                                  :: mask(size(array_coef))
-                             
         integer                                                  :: i, n , count_nonzeros , num_zeros
-                             
         double precision, parameter                              :: THRESHOLD = 1.0e-15
 
         
