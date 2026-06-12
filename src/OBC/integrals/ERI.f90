@@ -22,6 +22,14 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
 
       double precision               :: start_time, end_time
       integer                        :: days, hours, minutes, seconds , t 
+
+      !-----------------------------------------------------------------!
+      !                      Schwarz screening                          !
+      
+      double precision, allocatable :: Q_schwarz(:,:)
+      double precision              :: val_iijj
+      double precision, parameter   :: schwarz_thresh = 1.d-12
+      integer                       :: n_screened, n_computed
       
       !-----------------------------------------------------------------!
 
@@ -57,6 +65,35 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
         end do
       end do
 
+      !-----------------------------------------------------------------!
+      !              Schwarz screening precomputation                   !
+      !   Q_schwarz(i,j) = sqrt(|(ij|ij)|)  for all unique pairs        !
+      !   Done ONCE here, reused for every screening check below        !
+      !-----------------------------------------------------------------!
+
+      allocate(Q_schwarz(number_of_functions, number_of_functions))
+      Q_schwarz = 0.d0
+      write(*,'(A)') 'Precomputing Schwarz screening matrix...'
+      write(outfile,'(A)') 'Precomputing Schwarz screening matrix...'
+
+
+      do i = 1, number_of_functions
+        do j = i, number_of_functions
+          call ERI_integral_4_function(ERI(i), ERI(j), ERI(i), ERI(j), val_iijj)
+          Q_schwarz(i,j) = dsqrt(dabs(val_iijj))
+          Q_schwarz(j,i) = Q_schwarz(i,j)
+        end do
+      end do
+
+      write(*,'(A)') 'Schwarz matrix done.'
+      write(outfile,'(A)') 'Schwarz matrix done.'
+      flush(outfile)
+
+      write(*,'(A)') 'Sample Q_schwarz values:'
+      write(*,'(A,ES12.4)') 'Max Q value = ', maxval(Q_schwarz)
+      write(*,'(A,ES12.4)') 'Min Q value = ', minval(Q_schwarz)
+      write(*,'(A,ES12.4)') 'Threshold   = ', schwarz_thresh
+
       write(*,*) 'Will compute ', actual_total_int, ' unique integrals'
 
 !$omp parallel do private(j,k,l,value,p,q) shared(two_electron,ERI)
@@ -69,8 +106,13 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
                     p = i*(i-1)/2 + j
                     q = k*(k-1)/2 + l
 
-
                     if (p >= q) then
+
+                        ! ---- Schwarz screen: ONE multiply + ONE compare ----
+                        if (Q_schwarz(i,j) * Q_schwarz(k,l) < schwarz_thresh) then
+                          two_electron(i,j,k,l) = 0.d0   ! screened integrals are zero
+                          cycle
+                        end if
 
                         call ERI_integral_4_function(ERI(i),ERI(j),ERI(k),ERI(l),value)
                         two_electron(i,j,k,l) = value

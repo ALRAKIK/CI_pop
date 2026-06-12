@@ -35,16 +35,16 @@ program CI
       type(atom)        ,allocatable  ::                  atoms(:)
       type(ERI_function),allocatable  ::                    AO (:)
 
-      double precision,allocatable    ::                    S(:,:)
-      double precision,allocatable    ::                    T(:,:)
-      double precision,allocatable    ::                    V(:,:)
-      double precision,allocatable    ::                   Hc(:,:)
-      double precision,allocatable    ::                Hc_MO(:,:)
-      double precision,allocatable    ::                    X(:,:)
-      double precision,allocatable    ::              ERI(:,:,:,:)
-      double precision,allocatable    ::           ERI_MO(:,:,:,:)
-      double precision,allocatable    ::                      e(:)
-      double precision,allocatable    ::                    c(:,:)
+      double precision  ,allocatable  ::                    S(:,:)
+      double precision  ,allocatable  ::                    T(:,:)
+      double precision  ,allocatable  ::                    V(:,:)
+      double precision  ,allocatable  ::                   Hc(:,:)
+      double precision  ,allocatable  ::                Hc_MO(:,:)
+      double precision  ,allocatable  ::                    X(:,:)
+      double precision  ,allocatable  ::              ERI(:,:,:,:)
+      double precision  ,allocatable  ::           ERI_MO(:,:,:,:)
+      double precision  ,allocatable  ::                      e(:)
+      double precision  ,allocatable  ::                    c(:,:)
 
       double precision                ::               E_nuc , EHF
       double precision                ::            start,end,time
@@ -52,13 +52,16 @@ program CI
       character(len=10)               ::          calculation_type 
       character(len=2),allocatable    ::                  label(:)
 
-      integer                         :: io_stat
-      character(len=100)              :: line
-      integer                         :: n_alpha , n_beta
+      integer                         ::                   io_stat
+      character(len=100)              ::                      line
+      integer                         ::          n_alpha , n_beta
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
       !-----------------------------------------------------------------!
+
+      ! --------------------------------------------------------------- !
+      ! *************************************************************** !
 
       ! --------------------------------------------------------------- !
       !                   build the super molecule                      !
@@ -86,13 +89,19 @@ program CI
       c_ERI      = any(keyword == 'ERI'      )
       c_One      = any(keyword == 'One'      )
       c_Orbitals = any(keyword == 'Orbitals' )
-      c_SAO      = any(keyword == 'SAO' )
-      c_save     = any(keyword == 'Save' )
-      ! --------------------------------------------------------------- !
-      ! *************************************************************** !
+      c_SAO      = any(keyword == 'SAO'      )
+      c_save     = any(keyword == 'Save'     )
 
-      call load_table('table.bin')
+      ! --------------------------------------------------------------- !
+      !                     Read the table for Nmax                     !
+      ! --------------------------------------------------------------- !
+
+      call load_table   ('table.bin'   )
       call load_table_1d('table_1D.bin')
+
+      ! --------------------------------------------------------------- !
+      !            Read number of alpha and beta electrons              !
+      ! --------------------------------------------------------------- !
 
       if (c_UHF) then 
         n_alpha = 0 
@@ -116,6 +125,7 @@ program CI
 
         end do
         close(1)
+
       end if 
 
       ! --------------------------------------------------------------- !
@@ -138,11 +148,13 @@ program CI
       !       If the calculation is on a torus read the parameters      !  
       ! --------------------------------------------------------------- !
        
-      if (calculation_type ==  "Torus" .or.                             & 
-      &   calculation_type == "Tori1D" .or.                             &                            
-      &   calculation_type == "Tori2D" .or.                             & 
-      &   calculation_type == "Tori3D")                                 &
-      &   call Torus_def()
+      if (   calculation_type == "Tori1D" .or.             &                            
+          &  calculation_type == "Tori2D" .or.             & 
+          &  calculation_type == "Tori3D")  then 
+        
+          call Torus_def()
+
+      end if 
 
       ! --------------------------------------------------------------- !
 
@@ -156,8 +168,8 @@ program CI
       ! --------------------------------------------------------------- !
 
       do i = 1 , n_atoms
-        label(i)      =      label_tmp(i)
-        charge    (i) =     charge_tmp(i)
+        label (i)       =      label_tmp(i)
+        charge(i)       =     charge_tmp(i)
         if (c_Angstrom) then 
           geometry(i,1) = geometry_tmp(i,1) * Ang_par
           geometry(i,2) = geometry_tmp(i,2) * Ang_par
@@ -266,6 +278,10 @@ program CI
         call classification_orbital(n_atoms,number_of_functions,        &
         &                               geometry,atoms,AO)
       end if
+
+      ! --------------------------------------------------------------- !
+      !                    print  The orbital table                     !
+      ! --------------------------------------------------------------- !
 
       call print_orbital_table(AO,number_of_functions)
       
@@ -495,10 +511,6 @@ program CI
 
       ! --------------------------------------------------------------- !
       ! --------------------------------------------------------------- !
-
-
-
-
 
       close(outfile)
 

@@ -32,10 +32,9 @@ ifeq ($(BUILD),cluster)
     $(info Building for CLUSTER environment)
 else
     FC = gfortran
-    FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -g -fbacktrace -fcheck=all -fimplicit-none -fopenmp -funroll-loops -ftree-vectorize -ffast-math -frecursive
+    FFLAGS = -Wall -Wno-unused -Wno-unused-dummy-argument -O3 -g -fbacktrace -fcheck=all -fimplicit-none -fopenmp -funroll-loops -ftree-vectorize -ffast-math -frecursive -Wno-conversion
     MODDIR = -J$(ODIR) -I$(ODIR) -I/usr/local/include
     LIBS = src/lib/libquadpack.a -lblas -llapack \
-            \
            -L/usr/local/lib -ltrexio \
            -lm -fopenmp
     EXECUTABLE = $(BDIR)/CI_pop
@@ -61,7 +60,8 @@ MODULES_IN_ORDER = constants_module \
                    filter \
                    gauss_legendre_integrals \
                    heaviside \
-                   unitcell
+                   unitcell \
+                   functions 
 # =================================================== #
 
 # Find all module files

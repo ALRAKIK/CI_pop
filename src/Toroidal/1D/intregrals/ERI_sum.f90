@@ -190,10 +190,11 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
       end function transformed_integrand
 
 
-       double precision function S(t,i_quad) result(sum)
+      double precision function S(t,i_quad) result(sum)
 
-       use bessel_derivatives
-       use precomputed_bessel
+      use bessel_derivatives
+      use precomputed_bessel
+      use functions
 
       implicit none
 
@@ -215,7 +216,7 @@ subroutine integrate_ERI_sum(pattern_id,p,q,p_x,q_x,phi,xpA,xpB,xqC,xqD,xa,xb,xc
 
       ! /////////////////////////////////////////////////////////////// !
 
-      double precision                     :: Ireal , Ireal_0_ppt , Ireal_0_upq
+      double precision                     :: Ireal_0_ppt , Ireal_0_upq
       double precision                     :: u
 
       ! /////////////////////////////////////////////////////////////// !

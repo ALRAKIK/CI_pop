@@ -246,6 +246,7 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S)
       use torus_init
       use classification_ERI
       use bessel_functions
+      use functions
 
       implicit none 
 
@@ -281,8 +282,6 @@ subroutine overlap_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,S)
       double precision                 :: yp   , zp
       double precision                 :: ypa  , ypb 
       double precision                 :: zpa  , zpb 
-      double precision                 :: Ireal , Icliff
-
       
       integer                          :: pattern_id
 

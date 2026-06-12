@@ -243,7 +243,8 @@ subroutine kinetic_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,K_t)
       use torus_init
       use classification_ERI
       use bessel_functions
-
+      use functions
+      
       implicit none 
 
       !-----------------------------------------------------------------!
@@ -291,8 +292,6 @@ subroutine kinetic_integral_toroidal_1D(pattern_id,r1,r2,AO1,AO2,K_t)
       double precision                 :: S_01_x , S_01_y , S_01_z
       double precision                 :: S_10_x , S_10_y , S_10_z
       double precision                 :: S_11_x , S_11_y , S_11_z
-
-      double precision                 :: Ireal , Icliff
 
 
 

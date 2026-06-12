@@ -46,11 +46,6 @@ subroutine get_charge(number_of_atoms,type,charge)
         if (type(i) == "Se") charge(i) = 34
         if (type(i) == "Br") charge(i) = 35
         if (type(i) == "Kr") charge(i) = 36
-    end do
-
-
-
-
-
+      end do
 
 end subroutine
