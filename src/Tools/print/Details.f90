@@ -4,10 +4,10 @@ subroutine details_integrals(n_f,S,T,V,ERI)
       implicit none 
 
       integer , intent(in)         ::                 n_f 
-      double precision             ::           S(n_f,n_f)
-      double precision             ::           T(n_f,n_f)
-      double precision             ::           V(n_f,n_f)
-      double precision             :: ERI(n_f,n_f,n_f,n_f)
+      double precision, intent(in) ::           S(n_f,n_f)
+      double precision, intent(in) ::           T(n_f,n_f)
+      double precision, intent(in) ::           V(n_f,n_f)
+      double precision, intent(in) :: ERI(n_f,n_f,n_f,n_f)
 
 
       ! local ! 

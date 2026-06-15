@@ -12809,10 +12809,10 @@ subroutine integrate_ERI_3D(pattern_id    ,p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb,x
 
       sum = sum1 * sum2 * sum3
 
-      ! if ( (no_converged_x) .or. (no_converged_y) .or.  (no_converged_z) ) then
-      !   print *, "Warning: The sum did not converge in x " ,no_converged_x, " or/and y " , no_converged_y, " or/and z " , no_converged_z, ", sum is " , sum, " for the integral " , pattern_id
-      !   print *, "                                       " ,sum1, " or/and y " , sum2, " or/and z " , sum3
-      ! end if
+      if ( (no_converged_x) .or. (no_converged_y) .or.  (no_converged_z) ) then
+        print *, "Warning: The sum did not converge in x " ,no_converged_x, " or/and y " , no_converged_y, " or/and z " , no_converged_z, ", sum is " , sum, " for the integral " , pattern_id
+        print *, "                                       " ,sum1, " or/and y " , sum2, " or/and z " , sum3
+      end if
 
       end function S
 

@@ -46,7 +46,7 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
       double precision, allocatable :: Q_schwarz(:,:)
       double precision              :: val_iijj
       double precision, parameter   :: schwarz_thresh = 1.0d-14   ! tune this
-      integer                       :: n_screened, n_computed
+      integer(8)                    :: n_screened, n_computed
       !-----------------------------------------------------------------!
 
 
@@ -156,8 +156,8 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
 
       do i = 1, number_of_functions
         do j = i, number_of_functions
-          call ERI_integral_4_function_toroidal_3D(ERI(i), ERI(j), &
-                                                    ERI(i), ERI(j), val_iijj)
+          call ERI_integral_4_function_toroidal_3D_fast(ERI(i), ERI(j), &
+                                                        ERI(i), ERI(j), val_iijj)
           Q_schwarz(i,j) = dsqrt(dabs(val_iijj))
           Q_schwarz(j,i) = Q_schwarz(i,j)   ! symmetric
         end do
@@ -199,7 +199,6 @@ subroutine ERI_integral_toroidal_3D(number_of_atoms,geometry,number_of_functions
         100.d0 * dble(n_screened) / dble(n_computed), ' %'
       flush(outfile)
       !-----------------------------------------------------------------!
-
 
       !$omp parallel do private(ij_index,i,j,k,l) &
       !$omp shared(two_electron, ERI, i_index, j_index,Q_schwarz) &

@@ -34,4 +34,5 @@ subroutine hartree_potential(nBas,P,ERI,J)
       end do
 
 
+
 end subroutine hartree_potential

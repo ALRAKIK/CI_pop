@@ -278,7 +278,7 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
       double precision ,intent(in)     :: T(nBas,nBas)
       double precision ,intent(in)     :: V(nBas,nBas)
       double precision ,intent(in)     :: Hc(nBas,nBas)
-      double precision ,intent(inout)  :: ERI(nBas,nBas,nBas,nBas)
+      double precision ,intent(in)     :: ERI(nBas,nBas,nBas,nBas)
 
       ! local ! 
 
@@ -323,17 +323,19 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
         call exit(-1)
       end if
 
-      do i = 1, nBas
-        do j = 1, nBas
-          do k = j+1, nBas
-            do l = 1, nBas
-              tmp = ERI(i,j,k,l)
-              ERI(i,j,k,l) = ERI(i,k,j,l)
-              ERI(i,k,j,l) = tmp
-            end do
-          end do
-        end do
-      end do
+      ! change from the chemist notation to the physicist 
+
+      ! do i = 1, nBas
+      !   do j = 1, nBas
+      !     do k = j+1, nBas
+      !       do l = 1, nBas
+      !         tmp = ERI(i,j,k,l)
+      !         ERI(i,j,k,l) = ERI(i,k,j,l)
+      !         ERI(i,k,j,l) = tmp
+      !       end do
+      !     end do
+      !   end do
+      ! end do
 
       icount = 0_8
       offset = 0_8
@@ -343,7 +345,7 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
             do i = 1 , nBas
               if (i==j .and. k<l) cycle
               if (i<j) cycle
-              integral = ERI(i,j,k,l)
+              integral = ERI(i,k,j,l)
               if (integral == 0.d0) cycle
               icount = icount + 1_8
               buffer_index(1,icount) = i
