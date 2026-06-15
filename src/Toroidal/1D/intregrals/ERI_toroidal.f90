@@ -50,7 +50,7 @@ subroutine ERI_integral_toroidal(number_of_atoms,geometry,number_of_functions,at
       
       double precision, allocatable :: Q_schwarz(:,:)
       double precision              :: val_iijj
-      double precision, parameter   :: schwarz_thresh = 1.d-12
+      double precision, parameter   :: schwarz_thresh = 1.d-14
       !double precision, parameter   :: schwarz_thresh = 0.d0 
       integer(8)                    :: n_screened, n_computed
 

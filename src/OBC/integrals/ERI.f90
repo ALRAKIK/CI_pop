@@ -28,7 +28,7 @@ subroutine ERI_integral(number_of_atoms,number_of_functions,geometry,atoms,two_e
       
       double precision, allocatable :: Q_schwarz(:,:)
       double precision              :: val_iijj
-      double precision, parameter   :: schwarz_thresh = 1.d-12
+      double precision, parameter   :: schwarz_thresh = 1.d-14
       integer                       :: n_screened, n_computed
       
       !-----------------------------------------------------------------!
