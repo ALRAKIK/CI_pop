@@ -288,9 +288,9 @@ subroutine integrate_ERI_3D_fast(pattern_id, p_x,q_x,phi_x,xpA,xpB,xqC,xqD,xa,xb
         CCx = inv_ax2 * 2.d0 * t_val(n) * t_val(n) 
         CCy = inv_ay2 * 2.d0 * t_val(n) * t_val(n) 
         CCz = inv_az2 * 2.d0 * t_val(n) * t_val(n) 
-        Nmax_x(n) = get_Nmax(AAx, BBx, CCx, phi_x) + 10
-        Nmax_y(n) = get_Nmax(AAy, BBy, CCy, phi_y) + 10
-        Nmax_z(n) = get_Nmax(AAz, BBz, CCz, phi_z) + 10
+        Nmax_x(n) = get_Nmax(AAx, BBx, CCx, phi_x) + 50
+        Nmax_y(n) = get_Nmax(AAy, BBy, CCy, phi_y) + 50
+        Nmax_z(n) = get_Nmax(AAz, BBz, CCz, phi_z) + 50
       end do
 
       select case (pattern_id)
