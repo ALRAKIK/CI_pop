@@ -2,7 +2,7 @@ module precomputed_bessel
 
       implicit none
 
-      integer , parameter           :: Nmax_global = 5000
+      integer , parameter           :: Nmax_global = 100000
       double precision, allocatable :: I_C_table_x(:, :)  ! (0:Nmax, 1:32 or 1:64)
       double precision, allocatable :: I_C_table_y(:, :)  ! (0:Nmax, 1:32 or 1:64)
       double precision, allocatable :: I_C_table_z(:, :)  ! (0:Nmax, 1:32 or 1:64)
