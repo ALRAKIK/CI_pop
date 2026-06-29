@@ -9,6 +9,7 @@ module keywords
       public  :: c_MP2
       public  :: c_SAO
       public  :: c_save
+      public  :: c_DIIS
 
       logical :: c_One , c_OV , c_K , c_NA , c_ERI
       logical :: c_read, c_Integral, c_trexio
@@ -17,6 +18,7 @@ module keywords
       logical :: c_MP2     , c_Orbitals
       logical :: c_SAO
       logical :: c_save
+      logical :: c_DIIS
 
 
 end module keywords

@@ -331,6 +331,8 @@ subroutine read_keywords(keyword)
 
         if (trim(line) == 'Save'     )   keyword(18) = 'Save'
 
+        if (trim(line) == 'DIIS'     )   keyword(19) = 'DIIS'
+
       end do
 
 end subroutine

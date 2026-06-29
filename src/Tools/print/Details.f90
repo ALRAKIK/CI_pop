@@ -72,4 +72,16 @@ subroutine details_integrals(n_f,S,T,V,ERI)
         end do 
       close(1)
 
+      open(1,file=trim(tmp_file_name)//"/ERI_phy.dat")
+
+        do i = 1, n_f
+          do j = 1 , n_f
+            do k = 1 , n_f
+              do l = 1 , n_f
+                if (abs(ERI(i,j,k,l)) > 1.d-15) write(1,*) i , j , k , l , ERI(i,k,j,l)
+              end do 
+            end do 
+          end do 
+        end do 
+
 end subroutine

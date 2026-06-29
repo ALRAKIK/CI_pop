@@ -1,8 +1,10 @@
-subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
+subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       ! Perform a restricted Hartree-Fock calculation
 
       use files 
+      use keywords
+
       implicit none
 
       ! Input variables
@@ -18,8 +20,6 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,intent(in)   :: ERI(nBas,nBas,nBas,nBas)
 
       double precision,intent(in)   :: ENuc
-
-      logical         ,intent(in)   :: c_details , c_Huckel
   
       ! Local variables
   
@@ -80,7 +80,7 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
        
       if (c_Huckel) then 
          call header_under("Huckel guess",-1)
-         call guess_Huckel_RHF(nBas,c_details,nO,Hc,X,ENuc,S,T,V,P)
+         call guess_Huckel_RHF(nBas,c_details,nO,Hc,X,ENuc,S,T,V,P,ERI)
       else 
          call header_under("AO guess",-1)
       call    guess_AO_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
@@ -131,10 +131,12 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       nSCF = 0
       Conv = 1d0
 
-      n_diis        = 0
-      F_diis(:,:)   = 0d0
-      err_diis(:,:) = 0d0
-      rcond         = 0d0
+      if (c_DIIS) then 
+        n_diis        = 0
+        F_diis(:,:)   = 0d0
+        err_diis(:,:) = 0d0
+        rcond         = 0d0
+      end if 
 
       EHF_old       = 0d0 
       EHF           = 0d0 
@@ -161,7 +163,7 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       nSCF = nSCF + 1
   
       !   Compute the Hartree potential J
-        call hartree_potential(nBas,P,ERI,J)
+      call hartree_potential(nBas,P,ERI,J)
       ! ****************** !
   
       !   Compute the exchange potential K
@@ -255,10 +257,13 @@ subroutine RHF(nBas,c_details,c_Huckel,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       ! DIIS extrapolation ! 
 
-      if(max_diis > 1) then
-        n_diis = min(n_diis+1,max_diis)
-        call DIIS_extrapolation(rcond,nBas*nBas,nBas*nBas,n_diis,err_diis,F_diis,error,F)
-      end if
+      if (c_DIIS) then 
+        if(max_diis > 1) then
+          n_diis = min(n_diis+1,max_diis)
+          call DIIS_extrapolation(rcond,nBas*nBas,nBas*nBas,n_diis,err_diis,F_diis,error,F)
+        end if
+      end if 
+
 
       !   Transform for the Fock matrix F in the orthogonal basis 
       

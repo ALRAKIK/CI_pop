@@ -368,5 +368,7 @@ subroutine trexio_conv_integrals(nBas,S,T,V,Hc,ERI)
       rc = trexio_write_ao_2e_int_eri(trexio_file, offset, BUFSIZE, buffer_index, buffer_values)
       call trexio_assert(rc, TREXIO_SUCCESS)
       end if
+        
+      close(1)
 
 end subroutine trexio_conv_integrals
