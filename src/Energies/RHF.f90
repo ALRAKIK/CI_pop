@@ -83,7 +83,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
          call guess_Huckel_RHF(nBas,c_details,nO,Hc,X,ENuc,S,T,V,P,ERI)
       else 
          call header_under("AO guess",-1)
-      call    guess_AO_RHF(nBas,c_details,nO,HC,X,ENuc,T,V,P)
+      call    guess_AO_RHF(nBas,c_details,nO,HC,X,ENuc,S,T,V,P,ERI)
       end if 
          
       ! --------------------------------------------------------------- !
