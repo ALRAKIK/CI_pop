@@ -9,6 +9,8 @@ program CI
       use keywords
       use table_lookup_module
       use table_1d_lookup
+      use unitcell_module
+      use MCDE_module
 
       implicit none
 
@@ -25,10 +27,9 @@ program CI
       integer                         ::      charge_tmp(max_atom)
       character*(2)                   ::       label_tmp(max_atom)
       integer                         ::           n_atom_unitcell 
-      integer                         ::       number_of_functions
       integer                         ::      number_of_primitives
       integer                         ::          number_of_shells
-      character*(10)                  ::               keyword(20)
+      character*(10)                  ::               keyword(30)
 
       double precision  ,allocatable  ::             geometry(:,:)
       integer           ,allocatable  ::                 charge(:)
@@ -39,12 +40,13 @@ program CI
       double precision  ,allocatable  ::                    T(:,:)
       double precision  ,allocatable  ::                    V(:,:)
       double precision  ,allocatable  ::                   Hc(:,:)
-      double precision  ,allocatable  ::                Hc_MO(:,:)
       double precision  ,allocatable  ::                    X(:,:)
       double precision  ,allocatable  ::              ERI(:,:,:,:)
       double precision  ,allocatable  ::           ERI_MO(:,:,:,:)
       double precision  ,allocatable  ::                      e(:)
-      double precision  ,allocatable  ::                    c(:,:)
+      double precision  ,allocatable  ::                coeff(:,:)
+
+      complex(dpc)      ,allocatable  ::            coeff_SAO(:,:)
 
       double precision                ::               E_nuc , EHF
       double precision                ::            start,end,time
@@ -55,6 +57,7 @@ program CI
       integer                         ::                   io_stat
       character(len=100)              ::                      line
       integer                         ::          n_alpha , n_beta
+      integer                         ::                  ERI_size
 
       !-----------------------------------------------------------------!
       !                        END variables                            !
@@ -67,7 +70,7 @@ program CI
       !                   build the super molecule                      !
       ! --------------------------------------------------------------- !
       
-      call build_super_molecule(keyword,n_atom_unitcell) ! build the super molecule from the unitcell file 
+      call build_super_molecule(keyword,n_atom_unitcell)                ! build the super molecule from the unitcell file 
 
       ! --------------------------------------------------------------- !
       !                        Read key words                           !
@@ -91,7 +94,8 @@ program CI
       c_Orbitals = any(keyword == 'Orbitals' )
       c_SAO      = any(keyword == 'SAO'      )
       c_save     = any(keyword == 'Save'     )
-      c_save     = any(keyword == 'DIIS'     )     ! 19
+      c_DIIS     = any(keyword == 'DIIS'     )     
+      c_MCDE     = any(keyword == 'MCDE'     )     ! 20
 
       ! --------------------------------------------------------------- !
       !                     Read the table for Nmax                     !
@@ -236,12 +240,6 @@ program CI
 
       nO = n_electron/2
 
-      number_of_functions = 0 
-      do i = 1 , n_atoms
-        number_of_functions = number_of_functions                       &
-        &  + atoms(i)%num_s_function + 3 * atoms(i)%num_p_function
-      end do
-
       nBAS = 0 
       do i = 1 , n_atoms
         nBAS = nBAS                                                     & 
@@ -260,11 +258,20 @@ program CI
         &  + atoms(i)%num_s_function + atoms(i)%num_p_function
       end do
 
+      nfuc = 0 
+
+      do i = 1 , number_of_atom_in_unitcell
+        nfuc = nfuc  + atoms(i)%num_s_function + 3*atoms(i)%num_p_function
+      end do
+
+      N_cell = nBas / nfuc 
+
+
       ! --------------------------------------------------------------- !
       !          Allocate the memory for the atomic orbitals            !
       ! --------------------------------------------------------------- !
 
-      allocate(AO(number_of_functions))
+      allocate(AO(nBas))
 
       ! --------------------------------------------------------------- !
       !          Classify the atomic orbitals and print them            !
@@ -273,10 +280,10 @@ program CI
       if (calculation_type == "Tori1D" .or.                             &
       &   calculation_type == "Tori2D" .or.                             & 
       &   calculation_type == "Tori3D") then 
-        call classification_orbital_tor(n_atoms,number_of_functions,    &
+        call classification_orbital_tor(n_atoms,nBas,    &
         &                               geometry,atoms,AO)
       else
-        call classification_orbital(n_atoms,number_of_functions,        &
+        call classification_orbital(n_atoms,nBas,        &
         &                               geometry,atoms,AO)
       end if
 
@@ -284,13 +291,13 @@ program CI
       !                    print  The orbital table                     !
       ! --------------------------------------------------------------- !
 
-      call print_orbital_table(AO,number_of_functions)
+      call print_orbital_table(AO,nBas)
       
       ! --------------------------------------------------------------- !
       !           print  Informations from the Basis set                !
       ! --------------------------------------------------------------- !
 
-      call basis_info(number_of_functions,number_of_primitives,number_of_shells,n_atom_unitcell)
+      call basis_info(nBas,number_of_primitives,number_of_shells,n_atom_unitcell)
 
       ! --------------------------------------------------------------- !
       !                    Nuclear repulsion energy                     !
@@ -306,7 +313,7 @@ program CI
       if (c_trexio) then
         call trexio_conv_init(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
         call trexio_conv_global(n_atoms,label,geometry,charge,          &
-        &                       E_nuc,n_electron,number_of_functions,   &
+        &                       E_nuc,n_electron,nBas,   &
         &                       number_of_primitives,number_of_shells)
       end if
 
@@ -321,9 +328,17 @@ program CI
 
       allocate(S(nBas,nBas),T(nBas,nBas),V(nBas,nBas),Hc(nBas,nBas))
       
-      allocate(ERI  (nBas,nBas,nBas,nBas))
-      
-      allocate(X(nBas,nBas),e(nBas),c(nBas,nBas))
+      allocate(X(nBas,nBas),e(nBas),coeff(nBas,nBas))
+
+      allocate(coeff_SAO(nBas,nBas))
+
+      if (c_SAO) then 
+        allocate(ERI (nfuc,nBas,nBas,nBas))
+        ERI_size = nfuc
+      else 
+        allocate(ERI  (nBas,nBas,nBas,nBas))
+        ERI_size = nBas 
+      end if
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !               ---------------------------------                 !
@@ -335,11 +350,17 @@ program CI
         call plot(n_atoms,geometry,atoms)
       end if
 
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      !               ---------------------------------                 !
-      !                   calculate the integrals                       !
-      !               ---------------------------------                 !
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !              ---------------------------------                 !
+      !                  calculate the integrals                       !
+      !              ---------------------------------                 !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+      if (c_SAO) then 
+        write(outfile,'(A)') 'The integrals will be calculated'
+        call Tori1D_SAO(n_atoms,nBas,atoms,AO,geometry,S,T,V,ERI)
+        go to 100
+      end if 
 
       if (c_read) then
 
@@ -351,15 +372,15 @@ program CI
 
         select case (trim(calculation_type))
           case ("OBC", "Ring", "OBC2D")
-            call molecule(n_atoms,number_of_functions,atoms,geometry,S,T,V,ERI)            ! Molecule 
+            call molecule(n_atoms,nBas,atoms,geometry,S,T,V,ERI)                     ! Molecule 
           case ("Torus")
-            call Torus_PBC(n_atoms,number_of_functions,atoms,AO,geometry)                  ! Torus with PBC 
+            call Torus_PBC(n_atoms,nBas,atoms,AO,geometry)                           ! Torus with PBC 
           case ("Tori1D")
-            call Tori1D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)           ! Toroidal 1D Gaussian TRR
+            call Tori1D(n_atoms,nBas,atoms,AO,geometry,S,T,V,ERI)                  ! Toroidal 1D Gaussian TRR
           case ("Tori2D")
-            call Tori2D(n_atoms,number_of_functions,atoms,AO,geometry)                     ! Real Toroidal 2D Gaussian
+            call Tori2D(n_atoms,nBas,atoms,AO,geometry)                              ! Real Toroidal 2D Gaussian
           case ("Tori3D")
-            call Tori3D(n_atoms,number_of_functions,atoms,AO,geometry,S,T,V,ERI)           ! Real Toroidal 3D Gaussian
+            call Tori3D(n_atoms,nBas,atoms,AO,geometry,S,T,V,ERI)                    ! Real Toroidal 3D Gaussian
           case default
             write(outfile,'(A)') 'Unknown calculation type: ',          &
             &                     trim(calculation_type)
@@ -367,6 +388,8 @@ program CI
         end select         
 
       end if
+
+100   continue
 
       ! --------------------------------------------------------------- !
       !            Read the one and the two electron integrals     
@@ -379,17 +402,20 @@ program CI
 
       if (c_read) then
         call read_integrals_from_file(nBas,S,T,V,Hc,ERI,calculation_type)
-      else 
-        HC (:,:) = T(:,:) + V(:,:)
+      else
+        Hc(:,:) = T(:,:) + V(:,:)
       end if
-
 
       ! --------------------------------------------------------------- !
       !                  write the integrals to outputfile              !
       ! --------------------------------------------------------------- !
 
       if (c_details) then 
-        call details_integrals(nBas,S,T,V,ERI)
+        if (c_SAO) then 
+          call details_integrals_SAO(nBas,S,T,V,ERI)
+        else 
+          call details_integrals(nBas,S,T,V,ERI)
+        end if 
       end if 
 
       ! --------------------------------------------------------------- !
@@ -417,33 +443,23 @@ program CI
       !        pure 2D toroidal case (not 2D in 3D normal case)         !
       ! --------------------------------------------------------------- !
 
-      if (calculation_type == "Tori2D" ) then 
-        call get_X_from_overlap_2D(nBAS,S,X)
-      else 
-        call get_X_from_overlap(nBAS,S,X)
-      end if 
+      !call get_X_from_overlap_2D(nBAS,S,X)
+    
+      call get_X_from_overlap(nBAS,S,X)      
        
       ! ---------------------------------------------------------------- !
       !                                                                  !
       !                           HF code start                          !
       !                                                                  !
       ! ---------------------------------------------------------------- ! 
- 
-      !if (calculation_type == "Tori2D" .or. calculation_type == "Tori3D" ) E_nuc = 0.d0 
+       
+      call cpu_time(start)
+        call Hartree_Fock(nBas,nO,ERI_size,S,T,V,Hc,ERI,X,E_nuc,EHF,e,coeff,coeff_SAO,n_alpha,n_beta)
+      call cpu_time(end)
       
-      if (.not. c_UHF) then 
-         call cpu_time(start)
-           call RHF(nBas,nO,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
-         call cpu_time(end)
-      else 
-        call cpu_time(start)
-          call UHF(nBas,c_details,n_alpha,n_beta,S,T,V,Hc,ERI,X,E_nuc,EHF,e,c)
-        call cpu_time(end)
-      end if 
+      time = end - start
 
-        time = end - start
-
-        write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',time,' seconds'
+      write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for HF = ',time,' seconds'
 
       write(outfile,*)
       
@@ -451,39 +467,81 @@ program CI
         call system("tar -czf " // trim(output_file_name) // ".tar.gz "  // trim(tmp_file_name) )
       end if 
 
+
+      !-----------------------------------------------------------------!
+      !      physicist notation of the two electron integrals           !
+      !-----------------------------------------------------------------!
+
+      if (c_MCDE) then
+        call  chemist_to_physics_notation(nBas,ERI)
+        allocate(ERI_MO(nBas,nBas,nBas,nBas))
+
+        call cpu_time(start)
+          call AO_to_MO_ERI(nBas,coeff,ERI,ERI_MO)
+        call cpu_time(end)
+
+        call print_MO_file(nBas,ERI_MO)
+        
+        time = end - start
+      end if 
+
+
       
-      !-----------------------------------------------------------------!
-      !-----------------------------------------------------------------!
-
-
-      !if (calculation_type == "Tori2D" .or. calculation_type == "OBC2D" .or. calculation_type == "Tori3D" ) then
-
-      !  Hc(:,:) = T(:,:)
-
       !-----------------------------------------------------------------!
       ! AO to MO transformation
       !-----------------------------------------------------------------!
 
       if (c_MO .or. c_MP2) then 
 
+      if (c_SAO) then 
+
+      !allocate(ERI_MO_SAO(nBas,nBas,nBas,nBas))
+
+      !call cpu_time(start)
+      !  call AO_to_MO_ERI_SAO(nBas,coeff_SAO,ERI,ERI_MO_SAO)
+      !call cpu_time(end)
+
+      !call print_MO_file_SAO(nBas,ERI_MO_SAO)
+    
+      !time = end - start
+
+      else 
+
       allocate(ERI_MO(nBas,nBas,nBas,nBas))
-      allocate(Hc_MO(nBas,nBas))
+
       call cpu_time(start)
-        call AO_to_MO_HC (nBas,c,T,HC_MO)
-        call AO_to_MO_ERI(nBas,c,ERI,ERI_MO)
+        call AO_to_MO_ERI(nBas,coeff,ERI,ERI_MO)
       call cpu_time(end)
 
-      call print_MO_file(nBas,HC_MO,ERI_MO)
+      call print_MO_file(nBas,ERI_MO)
     
       time = end - start
-      
 
+      end if 
+      
       end if 
 
       !-----------------------------------------------------------------!
       ! FCI Energy calculation
       !-----------------------------------------------------------------!
       if (c_MP2) then 
+
+        if (c_SAO) then 
+
+        !call cpu_time(start)
+        !  call MP2_SAO(nBas,nO,e,ERI_MO_SAO,E_nuc,EHF)
+        !call cpu_time(end)
+
+        !write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for AO to MO transformation = ',time,' seconds'
+        !write(outfile,*)
+
+        !time = end - start
+        !write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for MP2 calculation = ',time,' seconds'
+        !write(outfile,*)
+
+
+        else 
+
         call cpu_time(start)
           call MP2(nBas,nO,e,ERI_MO,E_nuc,EHF)
         call cpu_time(end)
@@ -495,10 +553,18 @@ program CI
         write(outfile,'(A65,1X,F9.3,A8)') 'Total CPU time for MP2 calculation = ',time,' seconds'
         write(outfile,*)
 
+        end if 
+
+        
+
       end if
 
       ! --------------------------------------------------------------- !
       ! --------------------------------------------------------------- !
+
+      if (c_MCDE) then
+        call  MCDE(nBas, nO, e, ERI_MO)
+      end if 
 
 
     
@@ -508,8 +574,6 @@ program CI
 
       !call FCI(Hc_MO,ERI_MO,nBAS,E_nuc)
         
-      !end if
-
       ! --------------------------------------------------------------- !
       ! --------------------------------------------------------------- !
 

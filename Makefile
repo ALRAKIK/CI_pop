@@ -61,7 +61,9 @@ MODULES_IN_ORDER = constants_module \
                    gauss_legendre_integrals \
                    heaviside \
                    unitcell \
-                   functions 
+                   functions \
+                   K_blocks \
+                   MCDE \
 # =================================================== #
 
 # Find all module files
@@ -116,5 +118,9 @@ local: clean
 cluster: clean
 	@$(MAKE) BUILD=cluster modules -j1
 	@$(MAKE) BUILD=cluster $(EXECUTABLE) -j
+
+fast:
+	@$(MAKE) BUILD=local modules -j1
+	@$(MAKE) BUILD=local $(EXECUTABLE) -j
 
 .PHONY: all modules clean local cluster

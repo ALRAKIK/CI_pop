@@ -24,13 +24,12 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       ! Local variables
   
       integer,parameter             :: maxSCF = 100
-      double precision,parameter    :: thresh = 1d-5
+      double precision,parameter    :: thresh = 1d-8
       integer                       :: nSCF
       double precision              :: Conv
       double precision              :: Gap
       double precision              :: ET,EV,EJ , EHF_old
       double precision              :: EK
-      double precision,allocatable  :: cp(:,:)
       double precision,allocatable  :: P(:,:)
       double precision,allocatable  :: J(:,:)
       double precision,allocatable  :: K(:,:)
@@ -38,7 +37,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
       double precision,allocatable  :: error(:,:)
       double precision,external     :: trace_matrix
 
-      integer                       :: max_diis = 0
+      integer                       :: max_diis = 5
       integer                       :: n_diis
       integer                       :: i  , o
       integer                       :: mu , nu 
@@ -71,7 +70,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       ! Memory allocation
   
-      allocate(cp(nBas,nBas), P(nBas,nBas) ,error(nBas,nBas))
+      allocate(P(nBas,nBas) ,error(nBas,nBas))
       allocate(J(nBas,nBas) , K(nBas,nBas))
       allocate(F(nBas,nBas) ,Fp(nBas,nBas))
 
@@ -239,7 +238,7 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
   
       EHF = ET + EV + EJ + EK
 
-      !if ((abs(EHF - EHF_old) < thresh ) .and. nSCF > 15 ) exit
+      if ((abs(EHF - EHF_old) < thresh ) .and. nSCF > 2 ) exit
 
       if (nSCF > 2) then 
         EHF_old = EHF 
@@ -271,13 +270,11 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
             
       !   Diagonalize F' to get MO coefficients (eigenvectors in the orthogonal basis) c' and MO energies (eigenvalues) e
 
-      cp(:,:) = Fp(:,:)
-
-      call diagonalize_matrix(nBas,cp,e)
-
+      call diagonalize_matrix(nBas,Fp,e)
+      
       !   Back-transform the MO coefficients c in the original non-orthogonal basis
 
-      c = matmul(X,cp)
+      c = matmul(X,Fp)
 
       !   Compute the density matrix P 
 
@@ -286,19 +283,6 @@ subroutine RHF(nBas,nO,S,T,V,Hc,ERI,X,ENuc,EHF,e,c)
 
       if (c_details) then 
 
-      call header_HF("Fock matrix in the orthogonal basis Fp =  X^t   F   X  ", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(Fp,1))
-      do i = 1 , size(Fp,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (Fp(i,o),o=1,size(Fp,1))
-      end do
-      write(HFfile,'(a)') ""
-
-      call header_HF("MO coefficients in the non-orthogonal basis c = X cp", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(c,1))
-      do i = 1 , size(c,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (c(i,o),o=1,size(c,1))
-      end do 
-      write(HFfile,'(a)') ""
       
       call header_HF("Density matrix P = 2 c c^t", -1)
       write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(P,1))

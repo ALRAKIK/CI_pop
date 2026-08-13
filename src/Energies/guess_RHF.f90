@@ -135,8 +135,8 @@ subroutine guess_AO_RHF(nBas,c_details,nO,HC,X,ENuc,S,T,V,P,ERI)
 
 
       ! --------------------------------------------------------------- !
-      deallocate(cp, e)
+      deallocate(cp,c,ct,e)
       ! --------------------------------------------------------------- !
 
 
-end subroutine guess_AO_RHF 
+end subroutine guess_AO_RHF

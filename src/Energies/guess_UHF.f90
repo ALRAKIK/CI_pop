@@ -76,7 +76,7 @@ subroutine guess_UHF(nBas,c_details,nO,HC,X,ENuc,T,V,P,type_calc,ET1,EV1,ET2,EV2
 
 
       ! --------------------------------------------------------------- !
-      deallocate(cp, e)
+      deallocate(cp,c,ct,e)
       ! --------------------------------------------------------------- !
 
 

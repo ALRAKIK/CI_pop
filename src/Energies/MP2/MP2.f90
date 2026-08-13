@@ -41,11 +41,11 @@ subroutine MP2(nBas,nO,e,ERI,ENuc,EHF)
             
               ! Second-order ring diagram
             
-              E2d   = E2d   - ERI(i,j,a,b)*ERI(i,j,a,b)/Dijab
+              E2d   = E2d   - ERI(i,a,j,b)*ERI(i,a,j,b)/Dijab
             
               ! Second-order exchange diagram
             
-              E2x   = E2x   - ERI(i,j,a,b)*ERI(i,j,b,a)/Dijab
+              E2x   = E2x   - ERI(i,a,j,b)*ERI(i,b,j,a)/Dijab
             
             enddo
           enddo
@@ -66,7 +66,8 @@ subroutine MP2(nBas,nO,e,ERI,ENuc,EHF)
       write(outfile,'(A32,1X,F24.16)') ' Direct part            = ',2d0*E2d
       write(outfile,'(A32,1X,F24.16)') ' Exchange part          = ',-E2x
       write(outfile,'(A32)')           '--------------------------'
-      write(outfile,'(A32,1X,F24.16)') ' MP2 electronic  energy = ',EHF + EcMP2
+      write(outfile,'(A32,1X,F24.16)') ' Hartree Fock    energy = ',EHF + ENuc
+      write(outfile,'(A32,1X,F24.16)') ' MP2 electronic  energy = ',EcMP2
       write(outfile,'(A32,1X,F24.16)') ' MP2 total       energy = ',ENuc + EHF + EcMP2
       write(outfile,'(A32)')           '--------------------------'
       write(outfile,*)

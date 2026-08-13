@@ -39,10 +39,10 @@ subroutine NRE(calculation_type,number_of_atoms,geometry,atoms,E)
               z  = (dsqrt(2.d0 * (1.d0 - dcos(az*z)) / (az * az)))
             end if 
 
-
             dist =  x*x+y*y+z*z
             dist = dsqrt(dist)
             E = E + atoms(i)%charge*atoms(j)%charge/dist
+            
           end do 
         end do 
 

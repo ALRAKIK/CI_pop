@@ -1,6 +1,7 @@
 subroutine exchange_potential(nBas,P,ERI,K)
 
       ! Compute exchange matrix in the AO basis
+      use keywords
 
       implicit none
 
@@ -19,7 +20,7 @@ subroutine exchange_potential(nBas,P,ERI,K)
       double precision,intent(out)  :: K(nBas,nBas)
       
       K(:,:) = 0d0
-
+      
       do nu=1,nBas
         do si=1,nBas
           do la=1,nBas
@@ -30,5 +31,11 @@ subroutine exchange_potential(nBas,P,ERI,K)
           end do
         end do
       end do
+
+
+
+
+
+
 
 end subroutine exchange_potential

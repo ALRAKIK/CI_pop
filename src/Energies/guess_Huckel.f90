@@ -54,8 +54,8 @@ subroutine guess_Huckel_RHF(nBas,c_details,nO,HC,X,ENuc,S,T,V,P,ERI)
       ET = trace_matrix(nBas,matmul(P,T))
       EV = trace_matrix(nBas,matmul(P,V))
 
-      call hartree_potential(nBas,P,ERI,har)
-      call exchange_potential(nBas,P,ERI,exch)
+      call hartree_potential_SAO(nBas,P,ERI,har)
+      call exchange_potential_SAO(nBas,P,ERI,exch)
 
       EJ = 0.5d0*trace_matrix(nBas,matmul(P,Har))
       EK = 0.5d0*trace_matrix(nBas,matmul(P,exch))
@@ -79,27 +79,6 @@ subroutine guess_Huckel_RHF(nBas,c_details,nO,HC,X,ENuc,S,T,V,P,ERI)
       write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(X,1))
       do i = 1 , size(X,1)
         write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (X(i,o),o=1,size(X,1))
-      end do 
-      write(HFfile,'(a)') ""
-
-      call header_HF("Guess CP Matrix, CP = X^t F X", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(cp,1))
-      do i = 1 , size(cp,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (cp(i,o),o=1,size(cp,1))
-      end do 
-      write(HFfile,'(a)') ""
-
-      call header_HF("Guess C Matrix, C = X CP", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(c,1))
-      do i = 1 , size(c,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  (c(i,o),o=1,size(c,1))
-      end do 
-      write(HFfile,'(a)') ""
-
-      call header_HF(" C^t Matrix, C^t = transpose(C)", -1)
-      write(HFfile,'(15x,1000(i3,15x))') (i,i=1,size(c,1))
-      do i = 1 , size(c,1)
-        write(HFfile,'(i3,6x,1000(f16.10,2x))') i ,  ((ct(i,o)),o=1,size(transpose(c),1))
       end do 
       write(HFfile,'(a)') ""
 
@@ -145,7 +124,7 @@ subroutine guess_Huckel_RHF(nBas,c_details,nO,HC,X,ENuc,S,T,V,P,ERI)
 
 
       ! --------------------------------------------------------------- !
-      deallocate(cp, e)
+      deallocate(cp,c,ct,e)
       ! --------------------------------------------------------------- !
 
 

@@ -333,6 +333,8 @@ subroutine read_keywords(keyword)
 
         if (trim(line) == 'DIIS'     )   keyword(19) = 'DIIS'
 
+        if (trim(line) == 'MCDE'     )   keyword(20) = 'MCDE'
+
       end do
 
 end subroutine

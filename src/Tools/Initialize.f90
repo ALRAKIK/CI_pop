@@ -30,7 +30,7 @@ subroutine initialize_ff(calculation_type,n_atom_unitcell,label_tmp,n_atoms)
       write(output_file_name,'(A,A,A,A,A,I0,A)') "results_",trim(calculation_type),"_",trim(label),"_",n_atoms,".out"
       open (outfile,file=trim(output_file_name))
       if (c_Orbitals) then 
-            write(orb_file_name,'(A)') "orb.CI"
+            write(orb_file_name,'(A)') "orb.dat"
             open (orbfile,file=trim(orb_file_name))
       end if 
 

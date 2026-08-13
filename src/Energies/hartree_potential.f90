@@ -2,6 +2,7 @@ subroutine hartree_potential(nBas,P,ERI,J)
 
       ! Compute Coulomb matrix
 
+      use keywords
       implicit none
 
       ! Input variables
@@ -22,12 +23,13 @@ subroutine hartree_potential(nBas,P,ERI,J)
 
       J(:,:) = 0d0
 
+
       do si=1,nBas
         do la=1,nBas
           do nu=1,nBas
             do mu=1,nBas
               J(mu,nu) = J(mu,nu) + P(la,si)*ERI(mu,nu,la,si)   !   chemist notation
-              !J(mu,nu) = J(mu,nu) + P(la,si)*ERI(mu,la,nu,si)    ! physicist notation  
+              !J(mu,nu) = J(mu,nu) + P(la,si)*ERI(mu,la,nu,si)  ! physicist notation  
             end do
           end do
         end do

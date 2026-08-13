@@ -1,3 +1,7 @@
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
 subroutine read_integrals(nBas,S,T,V,Hc,G)
 
       ! Read one- and two-electron integrals from files
@@ -71,6 +75,10 @@ subroutine read_integrals(nBas,S,T,V,Hc,G)
 
 end subroutine read_integrals
 
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
 subroutine read_integrals_from_file(nBas,S,T,V,Hc,G)
 
       ! Read one- and two-electron integrals from files
@@ -142,7 +150,10 @@ subroutine read_integrals_from_file(nBas,S,T,V,Hc,G)
 
 end subroutine read_integrals_from_file
 
-!------------------------------------------------------------------------!
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
 subroutine get_X_from_overlap(N,over,X)
 
       use files 
@@ -197,7 +208,6 @@ subroutine get_X_from_overlap(N,over,X)
     
       call ADAt(N,Evec,Eval,X)
 
-      !open(1,file="./tmp/X.dat")
       open(1,file=trim(tmp_file_name)//"/X.dat")
       write(1,'(15x,1000(i3,15x))') (i,i=1,size(X,1))
       do i = 1 , size(X,1)
@@ -205,25 +215,21 @@ subroutine get_X_from_overlap(N,over,X)
       end do 
       close(1)
 
-      !open(2,file="./tmp/eigen_values.dat")
-      !open(2,file=trim(tmp_file_name)//"/eigen_values.dat")
-      !do i = 1 , N
-      !write(2,*) Eval(i)
-      !end do 
-      !close(2)
-
       Xt = matmul(transpose(X),(matmul(over,X)))
 
       ! --------------------------------------------------------------- !
 
-!      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
-!      call matout(N,N,Xt)
+      !call header("check Unitary matrix X^(t) S X  = 1 ",-1)
+      !call matout(N,N,Xt)
 
       ! --------------------------------------------------------------- !
   
 end subroutine get_X_from_overlap
 
-!------------------------------------------------------------------------!
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
 subroutine get_X_from_overlap_2D(N,over,X)
 
       use files 
@@ -340,7 +346,10 @@ subroutine get_X_from_overlap_2D(N,over,X)
   
 end subroutine get_X_from_overlap_2D
 
-!------------------------------------------------------------------------
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
 subroutine AtDA(N,A,D,B)
 
       ! Perform B = At.D.A where A is a NxN matrix and D is a diagonal matrix given
@@ -373,7 +382,10 @@ subroutine AtDA(N,A,D,B)
   
 end subroutine AtDA
   
-!------------------------------------------------------------------------
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
 subroutine ADAt(N,A,D,B)
   
       ! Perform B = A.D.At where A is a NxN matrix and D is a diagonal matrix given 
@@ -405,44 +417,11 @@ subroutine ADAt(N,A,D,B)
       enddo
   
 end subroutine ADAt
-!------------------------------------------------------------------------
-subroutine diagonalize_matrix(N,A,e)
 
-      ! Diagonalize a square matrix
-      use files
-      implicit none
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
 
-      ! Input variables
-
-      integer,intent(in)            :: N
-      double precision,intent(inout):: A(N,N)
-      double precision,intent(out)  :: e(N)
-
-      ! Local variables
-
-      integer                       :: lwork,info
-      integer                       :: i
-      double precision,allocatable  :: work(:)
-
-
-      ! Memory allocation
-
-      allocate(work(3*N))
-      lwork = size(work)
-
-      call dsyev('V','U',N,A,N,e,work,lwork,info)
-
-      if(info /= 0) then
-        write(outfile,'(a,I0)') 'Problem in diagonalize_matrix (dsyev)!!  --> ' , info 
-        stop
-      endif
-
-      do i = 1 , N
-        if (abs(e(i)) < 1d-15) e(i) = 0.d0
-      end do
-
-end subroutine diagonalize_matrix
-!------------------------------------------------------------------------
 subroutine matout(m,n,A)
 
       ! Print the MxN array A
@@ -474,10 +453,13 @@ subroutine matout(m,n,A)
   
 end subroutine matout
 
-!------------------------------------------------------------------------
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
 function trace_matrix(n,A) result(Tr)
 
-      ! Calculate the trace of the square matrix A
+      ! Calculate the trace of a square matrix A
   
       implicit none
   
@@ -500,75 +482,176 @@ function trace_matrix(n,A) result(Tr)
       enddo
   
 end function trace_matrix
-!------------------------------------------------------------------------
 
-subroutine check_the_overlap(N,over)
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
+
+function trace_complex(N, A) result(Tr)
+
+      ! Calculate the trace of a complex square matrix A
+
+      use constants_module
+      implicit none
+      
+      ! Input variables
+
+      integer, intent(in)      :: n
+      complex(dpc), intent(in) :: A(n,n)
+
+      ! Local variables
+
+      integer                  :: i
+
+      ! Output variables
+
+      complex(dpc)             :: Tr
+      
+
+      Tr = (0.0_dp, 0.0_dp)
+
+      do i = 1, n
+        Tr = Tr + A(i,i)
+      end do
+
+end function trace_complex
+
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
+subroutine get_X_from_overlap_complex(N,over,X)
 
       use files 
+      use constants_module
       implicit none 
 
       ! input !
 
       integer,intent(in)            :: N
-      double precision, intent(in)  :: over(N,N)
+      complex(dpc), intent(in)      :: over(N,N)
 
       ! local !
 
-      integer                       :: i
-      double precision              :: Evec(N,N)
+      integer                       :: i , o
+      complex(dpc)                  :: Evec(N,N)
       double precision              :: Eval(N)
       double precision,parameter    :: thresh = 1d-6
-      double precision,parameter    :: machine_eps = 2.22E-16
-      double precision              :: cond
-      double precision              :: double_digits, digits_lost, reliable_digits
 
+      complex(dpc)                  :: Xt(N,N)
 
       ! output !
+
+      complex(dpc), intent(out)     :: X(N,N)
       
       Evec(:,:) = over(:,:)
 
-      call diagonalize_matrix(N,Evec,Eval)
+      call diagonalize_matrix_complex(N,Evec,Eval)
 
-      ! /////////////////////////////////////////////////////////////// !
+      do i = 1 , N
+          if (Eval(i) > thresh) then
+            Eval(i) = dsqrt(1.d0 / Eval(i))
+          else
+            write(outfile,"(a,I3,a,4x,E16.10)") 'Eigenvalue ',i,' is too small for Lowdin orthogonalization',Eval(i)
+          end if
+      end do
+    
+      call ADAt_complex(N,Evec,Eval,X)
 
-      call header_under("The Overlap Eigenvalues",-1)
+      open(1,file=trim(tmp_file_name)//"/X.dat")
+      write(1,'(15x,1000(i3,15x))') (i,i=1,size(X,1))
+      do i = 1 , size(X,1)
+        write(1,'(i3,6x,1000(f16.10,2x))') i ,  (X(i,o),o=1,size(X,1))
+      end do 
+      close(1)
 
-      write(outfile, "(5f16.8)") (Eval(i), i=1,n)
+      Xt = matmul(conjg(transpose(X)),(matmul(over,X)))
 
-      ! \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ !
+      ! --------------------------------------------------------------- !
 
-      cond            = MAXVAL(Eval)/MINVAL(Eval)
-      double_digits   = log10(1.0 / machine_eps)
-      digits_lost     = log10(cond)
-      reliable_digits = double_digits - digits_lost
-
-
-      write(outfile,*) ""
-      write(outfile,*) ""
-      write(outfile,'(5X,a,f16.8)') " The smallest eigenvalue   : " , MINVAL(Eval)
-      write(outfile,'(5X,a,f16.8)') " The Largest  eigenvalue   : " , MAXVAL(Eval)
-      write(outfile,'(5X,a,f16.8)') " The conditional number    : " , cond
-      write(outfile,'(5X,a,f16.4)') " Estimated digits lost     : " , digits_lost
-      write(outfile,'(5X,a,f16.4)') " Estimated reliable digits : " , reliable_digits
-      write(outfile,*) ""
-      if (cond > 1.0E12) then
-        write(outfile,'(a)') " *** WARNING: Matrix is ill-conditioned! Results may be inaccurate. ***"
-      end if
-      if (cond > 1.0E15) then
-        write(outfile,'(a)') " *** CRITICAL: Matrix is numerically singular! Results are likely garbage. ***"
-      end if
-      FLUSH(outfile)
-
-      if (Minval(Eval) < 0.d0) then 
-        call header("Error",-1)
-          write(outfile,'(a80)')'*******************************************************************************************'
-          write(outfile,'(a80)')           "* The smallest eigenvalue of the overlap is negative, exiting the program      *"
-          write(outfile,'(a80)')'*******************************************************************************************'
-          FLUSH(outfile)
-          stop            
-      end if
-      ! /////////////////////////////////////////////////////////////// !
+!      call header("check Unitary matrix X^(t) S X  = 1 ",-1)
+!      call matout(N,N,Xt)
 
       ! --------------------------------------------------------------- !
   
-end subroutine check_the_overlap
+end subroutine get_X_from_overlap_complex
+
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
+subroutine ADAt_complex(N,A,D,B)
+  
+      ! Perform B = A.D.At where A is a NxN matrix and D is a diagonal matrix given 
+      ! as a vector of length N
+
+      use constants_module
+      implicit none
+
+      ! Input variables
+  
+      integer,intent(in)            :: N
+      complex(dpc),intent(in)       :: A(N,N)
+      double precision,intent(in)   :: D(N)
+    
+      ! Local viaruabkes
+  
+      integer                       :: i,j,k
+  
+      ! Output variables
+  
+      complex(dpc),intent(out)      :: B(N,N)
+  
+      B = 0d0
+
+      do i=1,N
+        do j=1,N
+          do k=1,N
+            B(i,k) = B(i,k) + A(i,j)*D(j)*conjg(A(k,j))
+          enddo
+        enddo
+      enddo
+  
+end subroutine ADAt_complex
+
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+! --------------------------------------------------------------------- !
+
+subroutine check_lowdin(N, S, X)
+  use constants_module
+  use files 
+  implicit none
+  integer, intent(in) :: N
+  complex(dpc), intent(in) :: S(N,N), X(N,N)
+  complex(dpc), allocatable :: Xt(:,:), diff(:,:)
+  real(dp) :: max_diff
+  integer :: i
+
+  allocate(Xt(N,N), diff(N,N))
+
+  ! Compute X† S X
+  Xt = matmul(conjg(transpose(X)), matmul(S, X))
+
+  diff = Xt
+  do i = 1, N
+    diff(i,i) = diff(i,i) - (1.0_dp, 0.0_dp)
+  end do
+
+  max_diff = maxval(abs(diff))
+  write(outfile, '(a, ES15.7)') 'Max deviation from identity (X† S X):', max_diff
+
+  if (max_diff < 1.0d-10) then
+    write(outfile, '(a)') '✓ Lowdin orthogonalisation is CORRECT'
+  else
+    write(outfile, '(a)') '✗ Lowdin orthogonalisation is WRONG – check your conjugation'
+  end if
+
+  deallocate(Xt, diff)
+  
+end subroutine check_lowdin
